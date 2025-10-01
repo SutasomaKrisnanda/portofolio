@@ -8,7 +8,7 @@ import Projects from '@/components/projects';
 import Languages from '@/components/languages';
 import Hobbies from '@/components/hobbies';
 import Contact from '@/components/contact';
-import { ResumeSummary } from '@/components/resume-summary';
+// import { ResumeSummary } from '@/components/resume-summary';
 import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
@@ -35,7 +35,7 @@ export default function Home() {
             <Hobbies />
           </div>
           <Separator />
-          <ResumeSummary />
+          {/* <ResumeSummary /> */}
           <Separator />
           <Contact />
         </div>
