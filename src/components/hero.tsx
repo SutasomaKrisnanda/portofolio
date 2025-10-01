@@ -35,7 +35,7 @@ export default function Hero() {
           </div>
           <div className="flex flex-col justify-center gap-3 sm:flex-row md:justify-start">
             <Button asChild size="lg">
-              <a href="/cv-placeholder.pdf" download="CV-Arya-Krisnanda.pdf">
+              <a href="/CV I Gede Arya Krisnanda Sutasoma.pdf" download="CV I Gede Arya Krisnanda Sutasoma.pdf">
                 Download CV
               </a>
             </Button>
