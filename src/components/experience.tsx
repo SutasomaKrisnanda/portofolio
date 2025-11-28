@@ -9,6 +9,13 @@ const organizations = [
     description:
       'Menginisiasi dan membentuk komunitas pemrograman pertama di sekolah sebagai wadah belajar coding, berbagi pengetahuan, dan mengembangkan keterampilan teknologi.',
   },
+  {
+    role: 'Anggota Aktif UKM Catur',
+    organization: 'Universitas Pendidikan Ganesha',
+    period: '2025 - Sekarang',
+    description:
+      'terlibat langsung dalam dinamika organisasi dengan berkontribusi pada kepanitiaan acara besar seperti Ganesha Grand Chess Tournament (GGCT) dan kejuaraan internal.',
+  },
 ];
 
 export default function Experience() {
@@ -23,11 +30,11 @@ export default function Experience() {
           komunitas.
         </p>
       </div>
-      <div className="mx-auto mt-8 max-w-3xl">
+      <div className="mx-auto mt-8 grid max-w-3xl gap-6">
         {organizations.map((org) => (
           <Card key={org.organization} className="overflow-hidden">
             <CardHeader className="bg-muted/30">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col items-start gap-4 sm:flex-row">
                 <div className="grid flex-1 gap-1">
                   <CardTitle>{org.role}</CardTitle>
                   <p className="font-medium">{org.organization}</p>
