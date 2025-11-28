@@ -1,4 +1,4 @@
-import { Users } from 'lucide-react';
+import { Users, } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const organizations = [
@@ -6,6 +6,7 @@ const organizations = [
     role: 'Ketua & Pendiri Komunitas Pemrograman',
     organization: 'SMA Negeri 2 Amlapura',
     period: '2024 - 2025',
+    icon: <Users className="h-8 w-8 text-accent" />,
     description:
       'Menginisiasi dan membentuk komunitas pemrograman pertama di sekolah sebagai wadah belajar coding, berbagi pengetahuan, dan mengembangkan keterampilan teknologi.',
   },
@@ -13,6 +14,7 @@ const organizations = [
     role: 'Anggota Aktif UKM Catur',
     organization: 'Universitas Pendidikan Ganesha',
     period: '2025 - Sekarang',
+    icon: <Users className="h-8 w-8 text-accent" />,
     description:
       'terlibat langsung dalam dinamika organisasi dengan berkontribusi pada kepanitiaan acara besar seperti Ganesha Grand Chess Tournament (GGCT) dan kejuaraan internal.',
   },
@@ -30,7 +32,7 @@ export default function Experience() {
           komunitas.
         </p>
       </div>
-      <div className="mx-auto mt-8 grid max-w-3xl gap-6">
+      <div className="mx-auto mt-8 grid lg:grid-cols-2 max-w-3xl gap-6">
         {organizations.map((org) => (
           <Card key={org.organization} className="overflow-hidden">
             <CardHeader className="bg-muted/30">
@@ -40,7 +42,7 @@ export default function Experience() {
                   <p className="font-medium">{org.organization}</p>
                   <p className="text-sm text-muted-foreground">{org.period}</p>
                 </div>
-                <Users className="h-8 w-8 text-accent" />
+                {org.icon}
               </div>
             </CardHeader>
             <CardContent className="p-6">
