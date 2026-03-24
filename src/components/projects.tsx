@@ -10,24 +10,24 @@ import {
 
 const projects = [
   {
+    title: 'Text Case Converter App',
+    description: 'Aplikasi utilitas teks berkinerja tinggi yang mendukung standardisasi format kapitalisasi. Dilengkapi algoritma khusus untuk format PUEBI/KBBI (Bahasa Indonesia) dan APA/Chicago style (Bahasa Inggris).',
+    tags: ['React', 'TypeScript', 'TailwindCSS', 'Vite'],
+  },
+  {
+    title: 'Website HMJ Kedokteran Undiksha',
+    description: 'Sistem informasi dan portal resmi untuk Himpunan Mahasiswa Jurusan Kedokteran Universitas Pendidikan Ganesha. Dirancang dan diinisiasi untuk mempusatkan publikasi, dokumentasi, dan layanan organisasi kedokteran.',
+    tags: ['Laravel', 'Filament', 'TailwindCSS'],
+  },
+  {
     title: 'ChessProject',
     description: 'Sebuah proyek catur yang dikembangkan menggunakan C++ dengan integrasi engine Stockfish untuk analisis dan permainan.',
     tags: ['C++', 'Stockfish'],
   },
   {
-    title: 'Website Pribadi (itsmandapura.com)',
-    description: 'Website pribadi yang dibangun dengan tumpukan teknologi modern untuk menampilkan portofolio dan informasi.',
-    tags: ['Laravel', 'React', 'TailwindCSS'],
-  },
-  {
     title: 'Aplikasi Try Out SKD Kedinasan',
     description: 'Aplikasi mobile untuk simulasi ujian SKD sekolah kedinasan, dibangun dengan arsitektur yang skalabel.',
     tags: ['Flutter', 'Go', 'PostgreSQL'],
-  },
-  {
-    title: 'Web Game Dungeon Exploration',
-    description: 'Game eksplorasi dungeon berbasis web dengan mekanisme turn-based. Direncanakan untuk menggunakan Phaser.js.',
-    tags: ['Laravel', 'React', 'Phaser.js (Plan)'],
   },
 ];
 

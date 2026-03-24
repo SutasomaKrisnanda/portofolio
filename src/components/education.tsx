@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const educationHistory = [
   {
-    institution: 'Universitas Pendidikan Kedokteran',
+    institution: 'Universitas Pendidikan Ganesha',
     period: '2025 - sekarang',
   },
   {

@@ -18,6 +18,20 @@ const organizations = [
     description:
       'terlibat langsung dalam dinamika organisasi dengan berkontribusi pada kepanitiaan acara besar seperti Ganesha Grand Chess Tournament (GGCT) dan kejuaraan internal.',
   },
+  {
+    role: 'Sekretaris Bidang Komnasinfo',
+    organization: 'HMJ Kedokteran Universitas Pendidikan Ganesha',
+    period: '2026 - Sekarang',
+    icon: <Users className="h-8 w-8 text-accent" />,
+    description: 'Menginisiasi dan menyusun Website HMJ Undiksha serta mengkoordinasi bidang Komunikasi, Humas, dan Informasi selaku Sekretaris Bidang.'
+  },
+  {
+    role: 'Sekretaris Divisi Intechprochanter',
+    organization: 'BSO Hermestha FK Undiksha',
+    period: 'Feb 2026 - Sekarang',
+    icon: <Users className="h-8 w-8 text-accent" />,
+    description: 'Bertanggung jawab atas fungsi Technocrates (pelatihan teknologi) dan HM-SSO (manajemen & pemeliharaan website) di Divisi Intechprochanter.'
+  }
 ];
 
 export default function Experience() {
@@ -32,21 +46,25 @@ export default function Experience() {
           komunitas.
         </p>
       </div>
-      <div className="mx-auto mt-8 grid lg:grid-cols-2 max-w-3xl gap-6">
+      <div className="mx-auto mt-8 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 max-w-6xl">
         {organizations.map((org) => (
-          <Card key={org.organization} className="overflow-hidden">
-            <CardHeader className="bg-muted/30">
-              <div className="flex flex-col items-start gap-4 sm:flex-row">
-                <div className="grid flex-1 gap-1">
-                  <CardTitle>{org.role}</CardTitle>
-                  <p className="font-medium">{org.organization}</p>
-                  <p className="text-sm text-muted-foreground">{org.period}</p>
+          <Card key={org.organization} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-l-4 border-l-accent/20 hover:border-l-accent">
+            <CardHeader className="bg-gradient-to-r from-muted/30 to-muted/10 pb-4">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-1">
+                    <CardTitle className="text-lg leading-tight">{org.role}</CardTitle>
+                    <p className="font-medium text-accent">{org.organization}</p>
+                    <p className="text-sm text-muted-foreground font-medium">{org.period}</p>
+                  </div>
+                  <div className="ml-4 flex-shrink-0">
+                    {org.icon}
+                  </div>
                 </div>
-                {org.icon}
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <p className="text-muted-foreground">{org.description}</p>
+            <CardContent className="p-6 pt-4">
+              <p className="text-muted-foreground leading-relaxed">{org.description}</p>
             </CardContent>
           </Card>
         ))}

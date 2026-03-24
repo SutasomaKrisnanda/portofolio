@@ -13,7 +13,7 @@ TENTANG SAYA
 Saya adalah individu yang cepat belajar, adaptif, dan mampu beradaptasi dengan lingkungan baru. Terbiasa bekerja secara kolaboratif dalam tim, saya juga memiliki keterampilan pemecahan masalah yang baik. Selain itu, saya menguasai penggunaan teknologi dasar serta memiliki pemahaman awal dalam pemrograman. Dengan semangat tinggi untuk terus berkembang, saya berkomitmen memperluas kemampuan melalui pendidikan dan pengalaman praktis.
 
 PENDIDIKAN
-- Universitas Pendidikan Kedokteran (2025 - sekarang)
+- S1 Kedokteran, Universitas Pendidikan Ganesha (2025 - sekarang)
 - SMA Negeri 2 Amlapura (2022 - 2025)
 - SMP Negeri 5 Amlapura (2019 - 2022)
 
