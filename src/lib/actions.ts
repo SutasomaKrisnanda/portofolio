@@ -1,2 +1,1 @@
-// This file is empty because the user is expected to implement this functionality.
-// This is a placeholder file.
+// Ga jadin buat actions, karena ternyata di Next.js 13 bisa langsung buat API route di dalam folder app/api, jadi aku buat file sendEmail.ts di dalam folder app/api/email/route.ts, terus aku panggil API itu dari contact component. Jadi lebih simple dan gak perlu install nodemailer lagi.

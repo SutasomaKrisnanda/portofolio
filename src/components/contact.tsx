@@ -42,20 +42,42 @@ export default function Contact() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Here you would typically call a server action to send the data
-    // For now, we'll simulate an API call and show a toast
-    console.log('Form submitted:', values);
     
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: 'Pesan Terkirim!',
-      description: 'Terima kasih telah menghubungi saya. Saya akan segera membalasnya.',
-    });
-    
-    form.reset();
-    setIsSubmitting(false);
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "56649e71-bb1f-4f58-965d-b069203df15d",
+          name: values.name,
+          email: values.email,
+          message: values.message,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: 'Pesan Terkirim!',
+          description: 'Terima kasih telah menghubungi saya. Saya akan segera membalasnya.',
+        });
+        form.reset();
+      } else {
+        throw new Error("Gagal mengirim");
+      }
+    } catch (error) {
+      toast({
+        title: 'Gagal Mengirim Pesan',
+        description: 'Terjadi kesalahan jaringan. Silakan coba lagi.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
