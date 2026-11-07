@@ -1,0 +1,240 @@
+{
+  "tech": {
+    "groups": [
+      {
+        "id": "tech-languages",
+        "category": "Bahasa Pemrograman",
+        "subtitle": "Digunakan pada rekayasa web, algoritma, sistem, dan pengolahan data",
+        "items": [
+          { "name": "TypeScript & JavaScript", "context": "Next.js, React, React Native, Vite, komponen UI modular" },
+          { "name": "PHP", "context": "Ekosistem Laravel, Livewire reaktif, panel administratif Filament" },
+          { "name": "C++ & C", "context": "Algoritma kompetitif, ChessProject dengan integrasi Stockfish, OSN Informatika" },
+          { "name": "Python & Go", "context": "Coding Camp DBS 2026 (AI Engineer path), backend API Try Out SKD" },
+          { "name": "Dart / Flutter", "context": "Prototipe aplikasi mobile multi-platform" },
+          { "name": "SQL (MySQL / PostgreSQL)", "context": "Skema relasional ternormalisasi, query indexing, manajemen relasi data" }
+        ]
+      },
+      {
+        "id": "tech-frontend",
+        "category": "Frontend & Arsitektur UI",
+        "subtitle": "Antarmuka responsif, aksesibel, dan berbasis komponen terstruktur",
+        "items": [
+          { "name": "React & Next.js", "context": "Aplikasi web interaktif, static site export, platform edukasi VIVA-EDAN" },
+          { "name": "Tailwind CSS", "context": "Desain token terpusat, tata letak mobile-first, dark mode" },
+          { "name": "shadcn/ui & Radix UI", "context": "Komponen primitif aksesibel dengan interaksi terukur" },
+          { "name": "React Native & Flutter", "context": "Arsitektur mHealth Smart-KIA & simulasi ujian CAT" },
+          { "name": "Laravel Livewire", "context": "Antarmuka reaktif tanpa overhead SPA pada dashboard admin" }
+        ]
+      },
+      {
+        "id": "tech-backend",
+        "category": "Backend, Database & Layanan",
+        "subtitle": "Pemodelan data relasional, role-based access control, dan arsitektur portal",
+        "items": [
+          { "name": "Laravel & Filament Framework", "context": "HMSSO BSO Hermestha, RBAC pengurus, portal resmi HMJ" },
+          { "name": "RESTful API & Integrasi", "context": "Handler form, integrasi Web3Forms, JSON payloads endpoint" },
+          { "name": "Git & Deployment", "context": "Version control GitHub, alur CI/CD GitHub Pages" }
+        ]
+      },
+      {
+        "id": "tech-design",
+        "category": "UI/UX & Desain Grafis",
+        "subtitle": "Sistem identitas visual, perancangan prototipe antarmuka, dan media seminar",
+        "items": [
+          { "name": "Figma", "context": "Wireframing, high-fidelity UI/UX prototype, token desain, aset vektor" },
+          { "name": "Branding & Publikasi", "context": "Identitas visual Temu Ilmiah Kolaborasi FK Undiksha 2026, poster digital" },
+          { "name": "OBS Studio & Video Editing", "context": "Produksi siaran seminar hybrid, audio routing, video motion" }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "id": "srv-web-dev",
+        "title": "Pengembangan Web Application & Sistem Informasi",
+        "category": "Software Development",
+        "description": "Pengembangan aplikasi web kustom, sistem informasi manajemen anggota, arsip digital, dan dashboard administratif yang disesuaikan dengan alur kerja institusi.",
+        "deliverables": [
+          "Repositori source code terstruktur dan siap deploy",
+          "Dokumentasi ERD database & arsitektur sistem",
+          "Antarmuka administratif dan tampilan publik yang responsif"
+        ],
+        "workflow": ["Discovery Kebutuhan", "Perancangan Skema & UI", "Implementasi Sprint", "Pengujian & Serah Terima"],
+        "pricingNote": "Berbasis kolaborasi institusional atau ruang lingkup projek terverifikasi."
+      },
+      {
+        "id": "srv-uiux-design",
+        "title": "UI/UX Design & Interactive Prototyping",
+        "category": "UI/UX Design",
+        "description": "Perancangan pengalaman antarmuka yang berpusat pada pengguna untuk platform edukasi, inovasi kesehatan (mHealth), dan produk digital.",
+        "deliverables": [
+          "File desain Figma terorganisir dengan sistem token komponen",
+          "Prototipe interaktif clickable untuk presentasi atau uji coba pengguna",
+          "Kode antarmuka frontend mobile-first dan aksesibel"
+        ],
+        "workflow": ["Framing Pengguna", "Wireframe & Visual", "Prototipe Interaktif", "Frontend Handoff"],
+        "pricingNote": "Disesuaikan dengan kompleksitas alur antarmuka dan modul."
+      },
+      {
+        "id": "srv-branding-media",
+        "title": "Identitas Visual Acara Akademik & Multimedia",
+        "category": "Graphic Design",
+        "description": "Paket identitas visual menyeluruh untuk seminar ilmiah, publikasi organisasi, desain poster cetak/digital, serta penyiapan siaran hybrid OBS Studio.",
+        "deliverables": [
+          "Aset grafis siap cetak dan optimasi web (SVG/PNG/PDF)",
+          "Template desain yang dapat diedit tim panitia",
+          "Konfigurasi teknis siaran seminar hybrid"
+        ],
+        "workflow": ["Brief & Moodboard", "Draf Key Visual", "Rollout Aset", "Ekspor Siap Pakai"],
+        "pricingNote": "Terbuka untuk organisasi mahasiswa, panitia seminar, dan kolaborasi kreatif."
+      }
+    ]
+  },
+  "medical": {
+    "groups": [
+      {
+        "id": "med-biomedical",
+        "category": "Dasar Biomedis & Pra-Klinis",
+        "subtitle": "Ditempuh melalui kurikulum terstruktur S1 Kedokteran di Fakultas Kedokteran Undiksha",
+        "items": [
+          { "name": "Ilmu Biomedis Pra-Klinis", "context": "Anatomi, histologi, fisiologi, biokimia, dan patologi dasar" },
+          { "name": "Visualisasi 3D Anatomi", "context": "Studi mendalam memanfaatkan BioDigital Human dan sintesis modul klinis" },
+          { "name": "Literasi Medis Berkelanjutan", "context": "Penelusuran pedoman klinis berbasis bukti dan telaah literatur ilmiah" }
+        ]
+      },
+      {
+        "id": "med-community",
+        "category": "Promosi Kesehatan & Aksi Komunitas",
+        "subtitle": "Menerjemahkan konsep promosi kesehatan bagi ibu hamil, keluarga, dan masyarakat",
+        "items": [
+          { "name": "Literasi Kesehatan Ibu & Anak (KIA)", "context": "Kerangka digital Smart-KIA & edukasi tanda bahaya kehamilan (Buku KIA)" },
+          { "name": "Intervensi Berbasis Budaya", "context": "Protokol MBSR dipadukan dengan relaksasi akustik Rindik Bali di Pustu Panji Anom" },
+          { "name": "Aksi Kesehatan Lingkungan", "context": "Bakti sosial pesisir Pantai Kubujati & inovasi pengelolaan sampah terpilah SIPADU-RI" }
+        ]
+      },
+      {
+        "id": "med-leadership",
+        "category": "Kepemimpinan & Organisasi Kedokteran",
+        "subtitle": "Menggerakkan iklim ilmiah dan komunikasi kelembagaan mahasiswa kedokteran",
+        "items": [
+          { "name": "Kepengurusan BSO Hermestha FK", "context": "Sekretaris Divisi 4 (Intechprochanter) mengelola HMSSO dan pelatihan teknologi" },
+          { "name": "Kepengurusan HMJ Kedokteran", "context": "Sekretaris Bidang Komnasinfo mengkoordinasi komunikasi, humas, dan website" },
+          { "name": "Kepanitiaan Medis & Publik", "context": "Sekretaris 1 Medventure 2026 & Master of Ceremonies (MC) Grand Final GAMALA 2026" }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "id": "srv-health-edu",
+        "title": "Perancangan Media Edukasi Kesehatan Komunitas",
+        "category": "Health Education",
+        "description": "Kolaborasi penyusunan infografis kesehatan berdasar bukti, buku saku edukatif ramah pasien, dan materi promosi kesehatan terstruktur untuk kegiatan pengabdian masyarakat.",
+        "deliverables": [
+          "Aset visual edukasi kesehatan siap cetak dan optimasi digital",
+          "Daftar rujukan literatur ilmiah yang mendasari informasi edukasi",
+          "Panduan fasilitasi penyuluhan bagi kader kesehatan komunitas"
+        ],
+        "workflow": ["Review Sasaran", "Verifikasi Literatur", "Perancangan Visual", "Uji Lapangan"],
+        "pricingNote": "Terbuka untuk kolaborasi pengabdian masyarakat, tim PKM, dan kegiatan puskesmas."
+      },
+      {
+        "id": "srv-med-poster-srv",
+        "title": "Desain Poster Ilmiah Simposium & Slide Medis",
+        "category": "Academic Collaboration",
+        "description": "Penataan tata letak visual resolusi tinggi untuk poster simposium biomedis, presentasi sidang ilmiah, dan materi seminar fakultas kedokteran.",
+        "deliverables": [
+          "File poster ilmiah resolusi tinggi (PDF/TIFF) dan file sumber vektor (Figma)",
+          "Slide presentasi dengan hierarki tipografi profesional",
+          "Diagram alir konsep dan sintesis data penelitian"
+        ],
+        "workflow": ["Review Abstrak", "Penataan Grid", "Ilustrasi Diagram", "Pengecekan Akhir"],
+        "pricingNote": "Berbasis kolaborasi akademik atau projek riset."
+      },
+      {
+        "id": "srv-med-portal",
+        "title": "Sistem Informasi & Publikasi Organisasi Kedokteran",
+        "category": "Organizational Projects",
+        "description": "Bantuan teknis pengembangan portal informasi, manajemen arsip ilmiah, serta koordinasi tim publikasi, dekorasi, dan dokumentasi (PDD) acara kedokteran.",
+        "deliverables": [
+          "Modul sistem web organisasi yang siap digunakan",
+          "Paket template publikasi dan arsip kesekretariatan standar"
+        ],
+        "workflow": ["Penyelarasan Kebutuhan", "Penyiapan Sistem", "Pelaksanaan", "Serah Terima"],
+        "pricingNote": "Kerja sama kelembagaan mahasiswa kedokteran dan institusi."
+      }
+    ],
+    "integrityNotice": "I Gede Arya Krisnanda Sutasoma adalah mahasiswa sarjana (S1 Kedokteran, Angkatan 2025) di FK Undiksha. Seluruh konten mencerminkan kegiatan pembelajaran pra-klinis, pengabdian masyarakat terbimbing (PKM-PM), inisiatif edukasi kesehatan, dan kontribusi organisasi mahasiswa. Tidak ada klaim izin praktik dokter mandiri atau layanan diagnosis klinis individual."
+  },
+  "academic": {
+    "groups": [
+      {
+        "id": "acad-writing",
+        "category": "Kepenulisan Ilmiah & Proposal PKM",
+        "subtitle": "Merumuskan proposal PKM terstruktur, esai ilmiah, dan artikel sains populer",
+        "items": [
+          { "name": "Arsitektur Proposal PKM (PKM-PM / PKM-KC)", "context": "Perumusan urgensi masalah, tahapan luaran, rencana anggaran, dan keberlanjutan" },
+          { "name": "Sintesis Esai Ilmiah & LKTI", "context": "Struktur thesis statement, integrasi bukti multi-perspektif, dan perancangan solusi" },
+          { "name": "Publikasi Ilmiah Populer", "context": "Penulisan artikel opini kesehatan masyarakat di Kompasiana yang komunikatif dan edukatif" }
+        ]
+      },
+      {
+        "id": "acad-csl",
+        "category": "Otomasi Sitasi (CSL) & Pustaka",
+        "subtitle": "Manajemen referensi otomatis dan audit kepatuhan pedoman nasional",
+        "items": [
+          { "name": "Rekayasa XML CSL Mendeley", "context": "Konfigurasi otomatis: 'dkk.' tegak dan tanda petik tunggal pada judul artikel" },
+          { "name": "Penelusuran Literatur & Matriks", "context": "Penyusunan matriks literatur biomedis, kesehatan masyarakat, dan komputasi" },
+          { "name": "Audit Kepatuhan Format Pedoman PKM", "context": "Verifikasi batas halaman, format tabel, lampiran, dan keaslian naskah" }
+        ]
+      },
+      {
+        "id": "acad-diagrams",
+        "category": "Diagram Riset & Presentasi Sidang",
+        "subtitle": "Mengubah teks metodologi yang padat menjadi bagan visual yang mudah dipahami",
+        "items": [
+          { "name": "Diagram Kerangka Konsep", "context": "Perancangan alur input-proses-output dan skema sistem inovasi di Figma" },
+          { "name": "Poster Ilmiah & Slide Sidang", "context": "Desain poster kompetisi dan slide presentasi dengan tipografi editorial yang tegas" }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "id": "srv-pkm-review",
+        "title": "Review Struktur & Brainstorming Naskah PKM / LKTI",
+        "category": "PKM Mentoring",
+        "description": "Konsultasi sejawat dalam membedah alur logika, ketajaman urgensi masalah, dan kesesuaian draf proposal dengan kriteria Pedoman PKM resmi.",
+        "deliverables": [
+          "Catatan evaluasi terstruktur mencakup poin logika dan format penulisan",
+          "Rekomendasi penyempurnaan bagan kerangka konsep"
+        ],
+        "workflow": ["Pemberian Draf", "Audit Logika", "Sesi Diskusi", "Review Perbaikan"],
+        "pricingNote": "Terbuka untuk kolaborasi tim mahasiswa dan kelompok ilmiah."
+      },
+      {
+        "id": "srv-csl-setup",
+        "title": "Setup Custom File CSL Mendeley & Sitasi",
+        "category": "Academic Editing",
+        "description": "Konfigurasi teknis file gaya sitasi Mendeley Desktop (.csl) agar daftar pustaka otomatis mematuhi aturan Pedoman PKM ('dkk.' tegak, tanda petik tunggal pada judul).",
+        "deliverables": [
+          "File .csl siap pakai untuk Mendeley Desktop",
+          "Pustaka referensi yang rapi dan terverifikasi metadata",
+          "Draf naskah dengan perbaikan redaksional"
+        ],
+        "workflow": ["Ekstraksi Aturan", "Kustomisasi XML", "Pembersihan Metadata", "Pemeriksaan Akhir"],
+        "pricingNote": "Disesuaikan dengan panjang naskah dan kebutuhan aturan CSL."
+      },
+      {
+        "id": "srv-poster-defense",
+        "title": "Desain Poster Ilmiah LKTI & Bagan Kerangka Pikir",
+        "category": "Scientific Poster or Presentation",
+        "description": "Tata letak visual berstandar publikasi untuk poster kompetisi ilmiah, skema alur riset, dan slide presentasi sidang penilaian PKM/PIMNAS.",
+        "deliverables": [
+          "File poster ilmiah siap cetak dan draf presentasi digital",
+          "Diagram kerangka pikir vektor resolusi tinggi"
+        ],
+        "workflow": ["Sintesis Naskah", "Wireframe Diagram", "Penyempurnaan Visual", "Ekspor Siap Tampil"],
+        "pricingNote": "Tersedia untuk tim riset mahasiswa dan delegasi lomba."
+      }
+    ],
+    "integrityNotice": "Seluruh karya ilmiah, konsultasi telaah PKM, dan dukungan editorial mematuhi etika akademik dan aturan resmi secara ketat. Saya tidak menyediakan jasa joki, fabrikasi data, plagiarisme, atau manipulasi kepengarangan. Setiap kolaborasi bertujuan memberdayakan mahasiswa agar mampu mengomunikasikan gagasan orisinalnya dengan jelas dan akurat."
+  }
+}

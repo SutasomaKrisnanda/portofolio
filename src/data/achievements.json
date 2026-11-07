@@ -1,0 +1,99 @@
+[
+  {
+    "id": "ach-osn-informatika-2024",
+    "title": "Peringkat 1 OSN Informatika / Komputer",
+    "organization": "BPTI Kemendikbudristek",
+    "year": "2024",
+    "level": "Tingkat Kabupaten/Kota",
+    "category": "Kompetisi & Penghargaan",
+    "modes": [
+      "tech"
+    ],
+    "description": "Meraih peringkat pertama dalam kompetisi OSN bidang Informatika/Komputer dengan menyelesaikan tantangan pemrograman kompetitif, logika komputasi, dan struktur data.",
+    "evidenceLabel": "Sertifikat Juara 1 OSN Informatika 2024"
+  },
+  {
+    "id": "ach-storytelling-jepang-2023",
+    "title": "Juara 1 Story Telling Bahasa Jepang",
+    "organization": "World Training Center",
+    "year": "2023",
+    "level": "Tingkat Wilayah",
+    "category": "Kompetisi & Penghargaan",
+    "modes": [
+      "medical",
+      "academic"
+    ],
+    "description": "Meraih Juara 1 melalui pembawaan cerita berbahasa Jepang yang ekspresif, tata bahasa tepat, dan intonasi artikulatif.",
+    "evidenceLabel": "Piagam Penghargaan Juara 1"
+  },
+  {
+    "id": "ach-osn-matematika-2023",
+    "title": "Peringkat 3 OSN Matematika",
+    "organization": "Pusat Prestasi Nasional / Kemendikbudristek",
+    "year": "2023",
+    "level": "Tingkat Kabupaten/Kota",
+    "category": "Kompetisi & Penghargaan",
+    "modes": [
+      "tech",
+      "academic"
+    ],
+    "description": "Meraih peringkat 3 dalam kompetisi matematika analitis tingkat kabupaten meliputi aljabar, kombinatorika, teori bilangan, dan geometri.",
+    "evidenceLabel": "Sertifikat Juara 3 OSN Matematika 2023"
+  },
+  {
+    "id": "ach-coding-camp-2026",
+    "title": "Peserta Cohort Coding Camp 2026 (AI Engineer Path)",
+    "organization": "DBS Foundation & Dicoding Indonesia",
+    "year": "2026",
+    "level": "Nasional",
+    "category": "Program Teknis & Akademik",
+    "modes": [
+      "tech"
+    ],
+    "description": "Terpilih dalam jalur intensif AI Engineer untuk pendalaman machine learning, algoritma kecerdasan buatan, dan implementasi model terapan di Python.",
+    "evidenceLabel": "Catatan Cohort Coding Camp 2026"
+  },
+  {
+    "id": "ach-pkm-pm-2026",
+    "title": "PIMNAS PKM-PM 2026 — Bunda Bahagia",
+    "organization": "Universitas Pendidikan Ganesha & Pustu Panji Anom",
+    "year": "2026",
+    "level": "Program Nasional",
+    "category": "Kontribusi Komunitas & Riset",
+    "modes": [
+      "medical",
+      "academic"
+    ],
+    "description": "Menginisiasi program kemitraan reduksi stres maternal memadukan latihan relaksasi MBSR dan musik Rindik Bali bagi ibu hamil di Desa Panji Anom, Buleleng.",
+    "evidenceLabel": "Proposal PKM-PM 2026 & Dokumentasi Lapangan"
+  },
+  {
+    "id": "ach-hmsso-lead",
+    "title": "Lead Programmer & System Analyst — HMSSO BSO Hermestha",
+    "organization": "BSO Hermestha FK Undiksha",
+    "year": "2026",
+    "level": "Tingkat Fakultas",
+    "category": "Milestone Projek Perangkat Lunak",
+    "modes": [
+      "tech",
+      "medical",
+      "academic"
+    ],
+    "description": "Memimpin perancangan dan implementasi platform digital manajemen organisasi dan arsip karya ilmiah berbasis Laravel, Filament, dan MySQL.",
+    "evidenceLabel": "Repositori & Arsitektur Sistem HMSSO"
+  },
+  {
+    "id": "ach-ncc-3",
+    "title": "Silver Medalist, Best Paper, dan Best Poster NCC 2026",
+    "organization": "National Creative Competition",
+    "year": "2026",
+    "level": "Nasional",
+    "category": "Kompetisi & Penghargaan",
+    "modes": [
+      "academic",
+      "tech"
+    ],
+    "description": "Meraih Silver Medalist, Best Paper, dan Best Poster dalam kompetisi NCC 2026 dengan penelitian berjudul 'SIPADU-RI'.",
+    "evidenceLabel": "Medali NCC 2026"
+  }
+]

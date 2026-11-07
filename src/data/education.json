@@ -1,0 +1,42 @@
+[
+  {
+    "id": "edu-undiksha",
+    "institution": "Universitas Pendidikan Ganesha (Undiksha)",
+    "degree": "S1 Kedokteran (Bachelor of Medicine)",
+    "period": "2025 – Sekarang",
+    "location": "Singaraja, Buleleng, Bali",
+    "status": "Aktif",
+    "description": "Menempuh pendidikan sarjana kedokteran sembari aktif mengintegrasikan pembelajaran biomedis pra-klinis dengan rekayasa perangkat lunak dan riset komunitas.",
+    "highlights": [
+      "Angkatan 2025 (NIM 2518011053), Kelas K",
+      "Fungsionaris BSO Hermestha & HMJ Kedokteran",
+      "PIMNAS PKM-PM 2026"
+    ]
+  },
+  {
+    "id": "edu-sman2-amlapura",
+    "institution": "SMA Negeri 2 Amlapura",
+    "degree": "MIPA (Matematika & Ilmu Pengetahuan Alam)",
+    "period": "2022 – 2025",
+    "location": "Amlapura, Karangasem, Bali",
+    "status": "Lulus",
+    "description": "Membangun fondasi logika matematika, sains, dan pemrograman serta mendirikan Komunitas Pemrograman siswa.",
+    "highlights": [
+      "Peringkat 1 OSN Informatika/Komputer Kabupaten/Kota (2024)",
+      "Peringkat 3 OSN Matematika Kabupaten/Kota (2023)",
+      "Juara 1 Story Telling Bahasa Jepang (2023)"
+    ]
+  },
+  {
+    "id": "edu-smpn5-amlapura",
+    "institution": "SMP Negeri 5 Amlapura",
+    "degree": "Pendidikan Menengah Pertama",
+    "period": "2019 – 2022",
+    "location": "Amlapura, Karangasem, Bali",
+    "status": "Lulus",
+    "description": "Pendidikan dasar analitis dengan fokus prestasi akademik sains dan bahasa asing.",
+    "highlights": [
+      "Lulusan berprestasi akademik di SMP Negeri 5 Amlapura"
+    ]
+  }
+]

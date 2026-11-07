@@ -1,0 +1,428 @@
+[
+  {
+    "id": "proj-hmsso",
+    "slug": "hmsso-hermestha-system",
+    "title": "HMSSO — Hermestha Management & Scientific System Online",
+    "mode": "tech",
+    "secondaryModes": [
+      "medical",
+      "academic"
+    ],
+    "category": "Software Engineering",
+    "secondaryCategory": "Web Development",
+    "summary": "Sistem informasi manajemen keorganisasian dan pengarsipan naskah ilmiah berbasis web untuk BSO Hermestha Fakultas Kedokteran Undiksha menggunakan Laravel, Livewire, Filament, dan MySQL.",
+    "year": "2026",
+    "status": "Verified Work",
+    "role": "Lead Programmer & System Analyst",
+    "organization": "BSO Hermestha FK Undiksha",
+    "visualType": "System Architecture",
+    "technologies": [
+      "Laravel",
+      "Livewire",
+      "Filament",
+      "PHP",
+      "MySQL",
+      "Tailwind CSS",
+      "RBAC"
+    ],
+    "featured": true,
+    "caseStudy": {
+      "overview": "HMSSO adalah sistem web terpusat yang dirancang untuk mendukung operasional BSO Hermestha di Fakultas Kedokteran Universitas Pendidikan Ganesha.",
+      "backgroundAndProblem": "Organisasi ilmiah mahasiswa mengelola basis data anggota, pendelegasian lomba, dan arsip naskah karya tulis yang sebelumnya tersebar di berbagai lembar kerja terpisah, menyulitkan tata kelola dan kesinambungan kepengurusan.",
+      "objectives": [
+        "Menyatukan administrasi keanggotaan, evaluasi proker divisi, dan repositori naskah ilmiah dalam satu sistem terintegrasi.",
+        "Menerapkan Role-Based Access Control (RBAC) berbutir halus untuk Badan Pengurus Harian, koordinator divisi, dan anggota umum.",
+        "Menghadirkan antarmuka administratif yang cepat dan reaktif memanfaatkan Laravel Filament dan Livewire."
+      ],
+      "roleAndContributions": [
+        "Bertindak sebagai Lead Programmer & System Analyst yang bertanggung jawab atas arsitektur sistem dari hulu ke hilir.",
+        "Merancang skema database relasional MySQL ternormalisasi untuk anggota, prestasi ilmiah, dan kegiatan organisasi.",
+        "Membangun resource Filament kustom, dashboard widget, dan alur reaktif Livewire."
+      ],
+      "processAndMethodology": [
+        "1. Analisis Kebutuhan Divisi: Memetakan alur administrasi lintas divisi di BSO Hermestha.",
+        "2. Pemodelan Skema & Hak Akses: Merancang tabel relasional dan hak akses berbasis peran pengurus.",
+        "3. Implementasi Full-Stack: Membangun backend Laravel, panel Filament, dan komponen Livewire.",
+        "4. Pengujian & Penyiapan Deploy: Menguji alur otorisasi dan keamanan data."
+      ],
+      "finalOutput": "Aplikasi web full-stack dengan panel eksekutif Filament, direktori anggota, dan arsip karya ilmiah yang responsif.",
+      "resultsAndImpact": "Menjadi fondasi digital resmi bagi tata kelola ilmiah dan administrasi BSO Hermestha FK Undiksha periode 2026.",
+      "lessonsLearned": "Kombinasi Laravel Filament dan Livewire mempercepat pembuatan antarmuka CRUD administratif tanpa mengorbankan fleksibilitas logika backend.",
+      "linksAndReferences": [
+        {
+          "label": "Repositori GitHub",
+          "url": "https://github.com/sutasomakrisnanda",
+          "isExternal": true
+        },
+        {
+          "label": "BSO Hermestha FK Undiksha",
+          "url": "https://fk.undiksha.ac.id",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-bunda-bahagia",
+    "slug": "bunda-bahagia-maternal-health",
+    "title": "Bunda Bahagia — Intervensi Reduksi Stress Kecemasan Prenatal Berbantuan Musik Rindik",
+    "mode": "medical",
+    "secondaryModes": [
+      "academic"
+    ],
+    "category": "Kesehatan Komunitas",
+    "secondaryCategory": "Proposal PKM",
+    "summary": "Program pengabdian masyarakat PKM-PM 2026 di Pustu Panji Anom, Buleleng, yang mengintegrasikan latihan relaksasi MBSR (Mindfulness-Based Stress Reduction) dengan alunan gamelan tradisional Rindik Bali bagi ibu hamil.",
+    "year": "2026",
+    "status": "Verified Work",
+    "role": "Ko-Inisiator Program & Edukator Kesehatan",
+    "organization": "FK Undiksha & Pustu Panji Anom",
+    "visualType": "Community Health",
+    "technologies": [
+      "Protokol MBSR",
+      "Musik Akustik Rindik Bali",
+      "Literasi KIA",
+      "Kesehatan Komunitas"
+    ],
+    "featured": true,
+    "caseStudy": {
+      "overview": "\"Bunda Bahagia\" adalah program kemitraan masyarakat (PKM-PM 2026) yang dilaksanakan di Puskesmas Pembantu (Pustu) Panji Anom, Buleleng, Bali, guna mendukung kesehatan mental dan emosional ibu hamil.",
+      "backgroundAndProblem": "Kecemasan prenatal dan stres maternal berpengaruh langsung pada kesejahteraan ibu serta perkembangan janin, namun pemeriksaan antenatal di tingkat desa umumnya lebih berfokus pada parameter fisik.",
+      "objectives": [
+        "Memperkenalkan teknik pernapasan dan kesadaran penuh Mindfulness-Based Stress Reduction (MBSR) yang disesuaikan bagi ibu hamil.",
+        "Memadukan relaksasi mindfulness dengan frekuensi akustik menenangkan dari gamelan Rindik Bali untuk memperkuat penerimaan budaya.",
+        "Memberdayakan bidan desa, kader posyandu, dan keluarga dengan panduan relaksasi berkelanjutan."
+      ],
+      "roleAndContributions": [
+        "Menyusun modul edukasi kesehatan, panduan visual tahapan relaksasi, dan alur integrasi musik.",
+        "Terjun langsung dalam koordinasi lapangan, fasilitasi sesi relaksasi, dan edukasi bagi ibu hamil di Pustu Panji Anom.",
+        "Menuliskan artikel dokumentasi dan opini ilmiah populer di Kompasiana."
+      ],
+      "processAndMethodology": [
+        "1. Penilaian Kebutuhan Mitra: Berkoordinasi dengan tenaga kesehatan di Pustu Panji Anom.",
+        "2. Kurasi Modul & Musik: Memadukan panduan napas MBSR dengan komposisi gamelan Rindik Bali.",
+        "3. Sesi Relaksasi Komunitas: Melaksanakan sesi kelompok terpandu dan dialog kesehatan maternal."
+      ],
+      "finalOutput": "Program pengabdian komunitas yang terlaksana nyata, buku saku modul relaksasi, dan dokumentasi publikasi ilmiah.",
+      "resultsAndImpact": "Memberikan sarana relaksasi yang menenangkan dan diterima antusias oleh ibu hamil di Desa Panji Anom, serta dipublikasikan di media ilmiah populer.",
+      "lessonsLearned": "Mengintegrasikan intervensi kesehatan modern dengan medium budaya lokal yang akrab secara signifikan meningkatkan kenyamanan dan kepatuhan masyarakat.",
+      "linksAndReferences": [
+        {
+          "label": "Artikel Publikasi Kompasiana",
+          "url": "https://www.kompasiana.com",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-hmj-kedokteran",
+    "slug": "website-hmj-kedokteran-undiksha",
+    "title": "Website Portal Resmi HMJ Kedokteran Undiksha",
+    "mode": "tech",
+    "secondaryModes": [
+      "medical"
+    ],
+    "category": "Web Development",
+    "secondaryCategory": "Software Engineering",
+    "summary": "Sistem informasi dan portal resmi Himpunan Mahasiswa Jurusan Kedokteran Universitas Pendidikan Ganesha untuk memusatkan publikasi, dokumentasi, dan layanan organisasi kedokteran.",
+    "year": "2026",
+    "status": "Verified Work",
+    "role": "Inisiator & Web Architect (Sekretaris Bidang Komnasinfo)",
+    "organization": "HMJ Kedokteran Undiksha",
+    "visualType": "System Architecture",
+    "technologies": [
+      "Laravel",
+      "Filament",
+      "Tailwind CSS",
+      "PHP",
+      "MySQL"
+    ],
+    "featured": true,
+    "caseStudy": {
+      "overview": "Portal resmi HMJ Kedokteran Undiksha dibangun untuk menjadi pusat informasi terpadu bagi seluruh mahasiswa kedokteran, calon mahasiswa baru, alumni, dan sivitas akademika.",
+      "backgroundAndProblem": "Pengumuman akademik, pendaftaran delegasi lomba kedokteran, dan pengarsipan agenda HMJ sebelumnya terfragmentasi di media sosial tanpa repositori web yang permanen dan terstruktur.",
+      "objectives": [
+        "Membangun portal informasi terpusat yang mencerminkan profesionalisme mahasiswa kedokteran Undiksha.",
+        "Menyediakan sistem pengumuman, kalender kegiatan, dan formulir layanan mahasiswa berbasis web.",
+        "Memudahkan pengelolaan konten berkala oleh pengurus bidang Komnasinfo."
+      ],
+      "roleAndContributions": [
+        "Menginisiasi gagasan portal, merancang struktur arsitektur sistem, dan menyusun antarmuka utama.",
+        "Mengintegrasikan panel admin Filament untuk pembaruan berita dan arsip dokumen HMJ."
+      ],
+      "processAndMethodology": [
+        "1. Audiensi Kebutuhan Pengurus: Memetakan kebutuhan bidang Komnasinfo dan aspirasi mahasiswa.",
+        "2. Desain Layout Berstandar Medis: Memilih palet warna dan tipografi yang berwibawa.",
+        "3. Pembangunan Modul & Database: Menyusun manajemen konten pengumuman dan direktori kepengurusan."
+      ],
+      "finalOutput": "Portal web resmi HMJ Kedokteran Undiksha yang memuat berita kegiatan, profil kepengurusan, dan pusat informasi terpadu.",
+      "resultsAndImpact": "Meningkatkan transparansi informasi dan efisiensi komunikasi internal maupun eksternal HMJ Kedokteran.",
+      "lessonsLearned": "Peran sekretaris bidang humas dan teknologi saling melengkapi dalam menghadirkan sistem komunikasi yang modern.",
+      "linksAndReferences": [
+        {
+          "label": "HMJ Kedokteran Undiksha",
+          "url": "https://fk.undiksha.ac.id",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-text-case-converter",
+    "slug": "text-case-converter-app",
+    "title": "Text Case Converter App (Standar PUEBI & APA/Chicago)",
+    "mode": "tech",
+    "secondaryModes": [
+      "academic"
+    ],
+    "category": "Web Development",
+    "secondaryCategory": "Software Engineering",
+    "summary": "Aplikasi utilitas teks berkinerja tinggi yang mendukung standardisasi format kapitalisasi. Dilengkapi algoritma khusus untuk format PUEBI/KBBI (Bahasa Indonesia) dan APA/Chicago style (Bahasa Inggris).",
+    "year": "2025",
+    "status": "Completed",
+    "role": "Creator & Frontend Developer",
+    "organization": "Personal Open Source Project",
+    "visualType": "Text Utility",
+    "technologies": [
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vite",
+      "Regex Algoritma"
+    ],
+    "featured": false,
+    "caseStudy": {
+      "overview": "Aplikasi utilitas teks berkecepatan tinggi yang dirancang khusus untuk memformat judul karya tulis ilmiah, esai, dan artikel sesuai kaidah resmi bahasa Indonesia dan internasional.",
+      "backgroundAndProblem": "Banyak penulis karya tulis mahasiswa melakukan kesalahan kapitalisasi pada kata tugas (konjungsi, preposisi) seperti 'dan', 'di', 'ke', 'yang' pada judul artikel ilmiah.",
+      "objectives": [
+        "Mengembangkan algoritma pengenalan kata tugas bahasa Indonesia sesuai kaidah PUEBI/EYD.",
+        "Mendukung konversi instan ke berbagai format: Title Case, Sentence Case, UPPERCASE, lowercase, dan camelCase.",
+        "Menyediakan antarmuka web ultra-ringan tanpa reload halaman."
+      ],
+      "roleAndContributions": [
+        "Menulis seluruh logika konversi teks dan pengujian regex untuk ratusan variasi kata tugas.",
+        "Membangun antarmuka bersih di React, TypeScript, dan Tailwind CSS menggunakan Vite."
+      ],
+      "processAndMethodology": [
+        "1. Inventarisasi Kata Tugas: Mengumpulkan daftar konjungsi dan preposisi berdasar KBBI dan PUEBI.",
+        "2. Pemrograman Fungsi Parser: Membangun unit test untuk validasi kapitalisasi judul.",
+        "3. Desain Antarmuka Reaktif: Menyediakan one-click copy to clipboard dan statistik karakter."
+      ],
+      "finalOutput": "Aplikasi web utilitas teks interaktif yang dapat diakses langsung oleh penulis dan peneliti.",
+      "resultsAndImpact": "Mempercepat proses penyuntingan judul karya ilmiah dan mengurangi kesalahan tata bahasa secara otomatis.",
+      "lessonsLearned": "Menangani keunikan tata bahasa dalam kode membutuhkan algoritma regex yang teliti dan penanganan edge case yang cermat.",
+      "linksAndReferences": [
+        {
+          "label": "Repositori GitHub",
+          "url": "https://github.com/sutasomakrisnanda",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-sipadu-ri",
+    "slug": "sipadu-ri-smart-waste-system",
+    "title": "SIPADU-RI — Sistem Pengelolaan Sampah Terpadu Rumah Tangga",
+    "mode": "academic",
+    "secondaryModes": [
+      "tech"
+    ],
+    "category": "Artikel & Esai Ilmiah",
+    "secondaryCategory": "Proposal PKM",
+    "summary": "Naskah inovasi karya tulis ilmiah interdisipliner yang mengusulkan tempat sampah pintar 3-inlet bertenaga surya dengan validasi pemilahan berbasis AI dan insentif ekonomi sirkular.",
+    "year": "2025–2026",
+    "status": "Verified Work",
+    "role": "Lead Author & Konseptor Sistem",
+    "organization": "Kompetisi Karya Tulis Ilmiah Mahasiswa",
+    "visualType": "Smart IoT & AI",
+    "technologies": [
+      "Karya Tulis Ilmiah (LKTI)",
+      "Kesehatan Lingkungan",
+      "IoT & AI Vision",
+      "Energi Surya"
+    ],
+    "featured": true,
+    "caseStudy": {
+      "overview": "Naskah ilmiah dan cetak biru sistem inovasi yang memadukan rekayasa teknologi dan kesehatan lingkungan untuk mengatasi masalah sampah rumah tangga di Indonesia sejak dari sumbernya.",
+      "backgroundAndProblem": "Pengelolaan sampah nasional kerap terkendala pada tingkat rumah tangga akibat rendahnya kepatuhan pemilahan dan minimnya mekanisme umpan balik langsung.",
+      "objectives": [
+        "Menyintesis data kesehatan lingkungan dengan rekayasa sistem terbenam ke dalam naskah ilmiah yang teruji.",
+        "Menyajikan bagan arsitektur mekanisme 3-inlet (Organik, Anorganik, Residu) mandiri energi bertenaga panel surya.",
+        "Merumuskan model insentif ekonomi sirkular yang terhubung ke Bank Sampah lokal."
+      ],
+      "roleAndContributions": [
+        "Menyusun tesis utama, telaah pustaka data lingkungan, dan arsitektur teknis SIPADU-RI.",
+        "Membuat seluruh diagram visual sistem, bagan alir operasional, dan matriks kelayakan ekonomi."
+      ],
+      "processAndMethodology": [
+        "1. Telaah Literatur & Regulasi: Menganalisis statistik sampah nasional dan riset IoT smart-city.",
+        "2. Pemodelan Sistem Konseptual: Merancang subsistem mekanik, elektrik surya, dan logika AI.",
+        "3. Penyusunan Naskah: Menyusun argumentasi berdasar format standar IMRAD naskah ilmiah."
+      ],
+      "finalOutput": "Naskah karya tulis ilmiah lengkap, bagan konsep sistem resolusi tinggi, dan bahan presentasi inovasi.",
+      "resultsAndImpact": "Menjadi model representasi kepenulisan lintas disiplin yang menghubungkan kesehatan masyarakat, kelestarian lingkungan, dan teknologi cerdas.",
+      "lessonsLearned": "Diagram blok yang komunikatif sangat menentukan pemahaman reviewer juri saat membedah sistem teknologi pada kompetisi esai ilmiah.",
+      "linksAndReferences": [
+        {
+          "label": "Repositori GitHub",
+          "url": "https://github.com/sutasomakrisnanda",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-temu-ilmiah",
+    "slug": "temu-ilmiah-fk-undiksha-branding",
+    "title": "Temu Ilmiah Kolaborasi FK Undiksha 2026 — Visual Branding & Siaran",
+    "mode": "tech",
+    "secondaryModes": [
+      "medical"
+    ],
+    "category": "Branding & Media",
+    "secondaryCategory": "UI/UX Design",
+    "summary": "Perancangan identitas visual komprehensif, materi publikasi seminar ilmiah fakultas, video promosi, dan penataan sistem siaran langsung OBS Studio untuk simposium ilmiah kedokteran.",
+    "year": "2026",
+    "status": "Verified Work",
+    "role": "Visual Designer & Koordinator Siaran PDD",
+    "organization": "Fakultas Kedokteran Undiksha",
+    "visualType": "Brand & Media",
+    "technologies": [
+      "Figma",
+      "OBS Studio",
+      "CapCut",
+      "Voicemeeter Banana",
+      "Desain Vektor"
+    ],
+    "featured": false,
+    "caseStudy": {
+      "overview": "Paket komunikasi visual terpadu dan konfigurasi siaran hybrid untuk Temu Ilmiah Kolaborasi Fakultas Kedokteran Universitas Pendidikan Ganesha 2026.",
+      "backgroundAndProblem": "Simposium medis membutuhkan identitas visual yang serasi di seluruh media: poster digital, slide pembicara, grid media sosial, sertifikat, hingga tayangan siaran langsung.",
+      "objectives": [
+        "Membangun identitas visual bernuansa ilmiah medis yang elegan dan konsisten.",
+        "Memproduksi poster, virtual background, template sertifikat, dan video promosi.",
+        "Mengonfigurasi multi-scene OBS Studio dan routing audio Voicemeeter untuk kelancaran sesi hybrid."
+      ],
+      "roleAndContributions": [
+        "Merancang seluruh aset identitas visual di Figma.",
+        "Menyunting video motion promosi dan mengoperasikan sistem live switching di OBS Studio."
+      ],
+      "processAndMethodology": [
+        "1. Penentuan Sistem Identitas: Menetapkan palet warna, tipografi, dan elemen grafis kedokteran.",
+        "2. Rollout Format Publikasi: Mengekspor aset untuk pemateri, peserta, dan media sosial.",
+        "3. Penyiapan Siaran Teknis: Menguji transisi layar dan kejernihan audio pemateri daring."
+      ],
+      "finalOutput": "Paket visual branding lengkap, grid publikasi Instagram, video promosi, dan setup siaran hybrid.",
+      "resultsAndImpact": "Meningkatkan standar visual dan keandalan siaran pada acara ilmiah tingkat fakultas di FK Undiksha.",
+      "lessonsLearned": "Template modular di Figma memungkinkan tim panitia memproduksi kartu pembicara dengan cepat tanpa merusak keselarasan visual.",
+      "linksAndReferences": [
+        {
+          "label": "FK Undiksha",
+          "url": "https://fk.undiksha.ac.id",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-chess-project",
+    "slug": "chess-project-stockfish-engine",
+    "title": "ChessProject — C++ Engine & Analisis Algoritma Catur",
+    "mode": "tech",
+    "category": "Software Engineering",
+    "summary": "Proyek perangkat lunak catur yang dikembangkan menggunakan bahasa C++ dengan integrasi engine analisis Stockfish untuk studi evaluasi posisi, simulasi taktik, dan eksplorasi logika permainan.",
+    "year": "2024–2025",
+    "status": "Completed",
+    "role": "Programmer & Pecatur Aktif",
+    "organization": "UKM Catur Undiksha / Proyek Pribadi",
+    "visualType": "Game Engine",
+    "technologies": [
+      "C++",
+      "Stockfish Engine",
+      "Algoritma Minimax",
+      "Logika Catur",
+      "Struktur Data"
+    ],
+    "featured": false,
+    "caseStudy": {
+      "overview": "Proyek eksplorasi komputasional yang memadukan hobi bermain catur dengan rekayasa algoritma dan analisis pohon keputusan di bahasa C++.",
+      "backgroundAndProblem": "Memahami evaluasi posisi catur secara mendalam membutuhkan pengamatan bagaimana engine seperti Stockfish memproses evaluasi papan, kedalaman kalkulasi, dan pemangkasan cabang langkah.",
+      "objectives": [
+        "Mempelajari integrasi komunikasi protokol UCI (Universal Chess Interface) antara aplikasi C++ dan engine Stockfish.",
+        "Menerapkan struktur data representasi papan catur dan pemrosesan notasi FEN.",
+        "Mengembangkan modul analisis untuk membantu sesi latihan catur."
+      ],
+      "roleAndContributions": [
+        "Menulis kode C++ untuk integrasi engine Stockfish dan parsing notasi posisi catur.",
+        "Menganalisis hasil kalkulasi engine untuk kebutuhan peningkatan kemampuan catur personal dan tim UKM."
+      ],
+      "processAndMethodology": [
+        "1. Studi Protokol UCI: Mempelajari cara interaksi standar antara antarmuka dan mesin catur.",
+        "2. Implementasi C++: Menulis modul pemanggilan proses Stockfish via pipe stdin/stdout.",
+        "3. Evaluasi Posisi: Menguji akurasi pembacaan FEN dan output evaluasi sentipawn."
+      ],
+      "finalOutput": "Modul program C++ fungsional yang mampu berkomunikasi dengan Stockfish dan mengevaluasi posisi catur.",
+      "resultsAndImpact": "Memperdalam pemahaman struktur data pohon (tree search) dan algoritma optimasi yang relevan untuk kompetisi catur maupun informatika.",
+      "lessonsLearned": "Catur dan pemrograman sama-sama menuntut disiplin berpikir ke depan, pengenalan pola, dan evaluasi konsekuensi yang ketat.",
+      "linksAndReferences": [
+        {
+          "label": "Repositori GitHub",
+          "url": "https://github.com/sutasomakrisnanda",
+          "isExternal": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "proj-tryout-skd",
+    "slug": "aplikasi-tryout-skd-kedinasan",
+    "title": "Aplikasi Try Out SKD Kedinasan (Simulasi Ujian CAT)",
+    "mode": "tech",
+    "category": "Mobile Applications",
+    "secondaryCategory": "Software Engineering",
+    "summary": "Aplikasi mobile untuk simulasi ujian Seleksi Kompetensi Dasar (SKD) sekolah kedinasan, dibangun dengan arsitektur skalabel untuk mendukung latihan TWK, TIU, dan TKP berwaktu nyata.",
+    "year": "2025",
+    "status": "Completed",
+    "role": "Mobile & Backend Developer",
+    "organization": "Student Tech Project",
+    "visualType": "UI/UX Platform",
+    "technologies": [
+      "Flutter",
+      "Go (Golang)",
+      "PostgreSQL",
+      "RESTful API",
+      "State Management"
+    ],
+    "featured": false,
+    "caseStudy": {
+      "overview": "Aplikasi latihan dan simulasi ujian berbasis komputer (CAT) yang dirancang untuk calon peserta seleksi sekolah kedinasan dengan simulasi skor dan passing grade resmi.",
+      "backgroundAndProblem": "Peserta seleksi kedinasan membutuhkan media simulasi ujian dengan batas waktu ketat dan perankingan transparan yang mencerminkan kondisi Computer Assisted Test (CAT) BKN.",
+      "objectives": [
+        "Membangun antarmuka mobile yang responsif untuk pengerjaan 110 butir soal SKD dalam 100 menit.",
+        "Menerapkan kalkulasi penilaian passing grade otomatis untuk sub-tes TWK, TIU, dan TKP.",
+        "Menyediakan backend cepat di bahasa Go dengan basis data PostgreSQL."
+      ],
+      "roleAndContributions": [
+        "Merancang antarmuka mobile di Flutter dengan timer penghitung mundur dan navigasi butir soal cepat.",
+        "Membangun API penilaian dan penyimpanan bank soal menggunakan Go dan PostgreSQL."
+      ],
+      "processAndMethodology": [
+        "1. Analisis Ketentuan BKN: Memetakan aturan passing grade dan pembobotan nilai SKD.",
+        "2. Pemodelan Endpoint API: Menulis handler Go untuk otentikasi dan pengiriman lembar jawaban.",
+        "3. Uji Kecepatan Navigasi: Memastikan pergantian soal tidak mengalami jeda (latency rendah)."
+      ],
+      "finalOutput": "Prototipe aplikasi mobile simulasi SKD terpadu beserta backend layanan API berbasis Go.",
+      "resultsAndImpact": "Menyediakan sarana latihan mandiri yang realistis bagi siswa yang mempersiapkan diri menuju sekolah kedinasan.",
+      "lessonsLearned": "Keandalan penyimpanan state lokal pada aplikasi mobile sangat krusial agar jawaban peserta tidak hilang saat koneksi internet terputus di tengah simulasi.",
+      "linksAndReferences": [
+        {
+          "label": "Repositori GitHub",
+          "url": "https://github.com/sutasomakrisnanda",
+          "isExternal": true
+        }
+      ]
+    }
+  }
+]

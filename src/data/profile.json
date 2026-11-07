@@ -1,0 +1,49 @@
+{
+  "fullName": "I Gede Arya Krisnanda Sutasoma",
+  "shortName": "Arya Krisnanda",
+  "title": "Medical Student • Software Engineer • Scientific Writer",
+  "birthDate": "26 Februari 2007",
+  "origin": "Tampaksiring, Gianyar, Bali",
+  "location": "Singaraja, Buleleng, Bali, Indonesia",
+  "hometown": "Amlapura, Karangasem, Bali",
+  "nim": "2518011053",
+  "currentProgram": "S1 Kedokteran (Bachelor of Medicine)",
+  "faculty": "Fakultas Kedokteran (FK)",
+  "university": "Universitas Pendidikan Ganesha (Undiksha)",
+  "cohort": "Angkatan 2025",
+  "email": "SutasomaKrisnanda@Gmail.com",
+  "phone": "089634699449",
+  "whatsappUrl": "https://wa.me/6289634699449",
+  "githubUsername": "sutasomakrisnanda",
+  "githubUrl": "https://github.com/sutasomakrisnanda",
+  "linkedinUsername": "krisnandasutasoma",
+  "linkedinUrl": "https://linkedin.com/in/krisnandasutasoma",
+  "cvPath": "/CV I Gede Arya Krisnanda Sutasoma.pdf",
+  "cvFileName": "CV I Gede Arya Krisnanda Sutasoma.pdf",
+  "avatarUrl": "https://i.imgur.com/FAUnDx9.png",
+  "bio": "Mahasiswa S1 Kedokteran Universitas Pendidikan Ganesha sekaligus full-stack software engineer dan peneliti karya ilmiah. Berpengalaman membangun sistem web organisasi, aplikasi mobile kesehatan, dan riset berbasis kearifan lokal.",
+  "languages": [
+    "Bahasa Bali (Native)",
+    "Bahasa Indonesia (Formal & Akademik)",
+    "Bahasa Inggris (Professional & Academic)",
+    "Bahasa Jepang (Percakapan & Storytelling)"
+  ],
+  "hobbies": [
+    {
+      "name": "Bermain Catur",
+      "icon": "brain"
+    },
+    {
+      "name": "Pemrograman & Rekayasa Perangkat Lunak",
+      "icon": "code"
+    },
+    {
+      "name": "Membaca Buku Sains & Filsafat",
+      "icon": "book"
+    },
+    {
+      "name": "Melukis & Desain Vektor Digital",
+      "icon": "palette"
+    }
+  ]
+}

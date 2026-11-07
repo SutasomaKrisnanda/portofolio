@@ -3,26 +3,43 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import Header from '@/components/header';
-import Footer from '@/components/footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'I Gede Arya Krisnanda Sutasoma | Personal Portfolio',
   description:
-    'Personal portfolio of I Gede Arya Krisnanda Sutasoma, a future doctor, young programmer, and problem solver.',
+    'Portfolio resmi I Gede Arya Krisnanda Sutasoma — Mahasiswa S1 Kedokteran FK Undiksha, full-stack & mobile software engineer, perancang sistem UI/UX, dan peneliti PKM/karya ilmiah.',
+  authors: [{ name: 'I Gede Arya Krisnanda Sutasoma', url: 'https://github.com/sutasomakrisnanda' }],
   keywords: [
-    'Portfolio',
+    'I Gede Arya Krisnanda Sutasoma',
     'Arya Krisnanda',
-    'Programmer',
-    'Web Developer',
-    'Calon Dokter',
-    'Bali',
-    'React',
+    'Portfolio',
+    'S1 Kedokteran Undiksha',
+    'Full-Stack Developer',
+    'Laravel',
     'Next.js',
-    'TailwindCSS',
+    'React',
+    'TypeScript',
+    'UI/UX Design',
+    'PKM-PM',
+    'BSO Hermestha',
+    'HMJ Kedokteran',
+    'Bali',
+    'Software Engineer'
   ],
+  openGraph: {
+    type: 'website',
+    locale: 'id_ID',
+    url: 'https://sutasomakrisnanda.github.io',
+    siteName: 'Arya Krisnanda Portfolio',
+    title: 'I Gede Arya Krisnanda Sutasoma | Multi-Mode Portfolio',
+    description:
+      'Mahasiswa S1 Kedokteran FK Undiksha, full-stack engineer, UI/UX designer, dan peneliti PKM/karya ilmiah.'
+  },
+  icons: {
+    icon: '/favicon.ico'
+  }
 };
 
 export default function RootLayout({
@@ -31,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -40,15 +57,13 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className={`${inter.variable} font-body antialiased`}>
+      <body className={`${inter.variable} font-body antialiased selection:bg-white selection:text-slate-950`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Header />
-          <main className="flex min-h-screen flex-col">{children}</main>
-          <Footer />
+          {children}
           <Toaster />
         </ThemeProvider>
       </body>

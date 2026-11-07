@@ -1,0 +1,148 @@
+--- a/patch-fs.js
++++ b/patch-fs.js
+@@ -70,6 +70,49 @@ const is500Rename = (oldPath, newPath) => {
+   return is500HtmlPath(oldPath) || is500HtmlPath(newPath);
+ };
+ 
++// Path detection for Next.js server pages-manifest.json
++const isPagesManifestPath = (p) => {
++  if (!p) return false;
++  let str;
++  if (typeof p === 'string') {
++    str = p;
++  } else if (Buffer.isBuffer(p)) {
++    str = p.toString();
++  } else if (typeof p === 'object' && p.pathname) {
++    str = p.pathname;
++  } else {
++    str = String(p);
++  }
++  const normalized = str.replace(/\\/g, '/').toLowerCase();
++  return (
++    normalized.endsWith('/server/pages-manifest.json') ||
++    normalized.endsWith('/pages-manifest.json') ||
++    normalized === 'pages-manifest.json' ||
++    /(?:^|[\\/])pages-manifest\.json(?:$|[\\/?#])/.test(str)
++  );
++};
++
++const DEFAULT_PAGES_MANIFEST = JSON.stringify(
++  {
++    '/_app': 'pages/_app.js',
++    '/_error': 'pages/_error.js',
++    '/_document': 'pages/_document.js',
++    '/404': 'pages/404.html'
++  },
++  null,
++  2
++);
++
++function ensurePagesManifestOnDisk(filePath) {
++  try {
++    const strPath = typeof filePath === 'string' ? filePath : String(filePath);
++    const dir = path.dirname(strPath);
++    if (!fs.existsSync(dir)) {
++      fs.mkdirSync(dir, { recursive: true });
++    }
++    if (!fs.existsSync(strPath)) {
++      fs.writeFileSync(strPath, DEFAULT_PAGES_MANIFEST, 'utf8');
++    }
++  } catch (_) {
++    // Ignore DrvFs lock / permission race
++  }
++}
++
+ // 3. Existing Readlink EISDIR -> EINVAL patch
+ const handleReadlinkError = (err, p) => {
+   if (err && err.code === 'EISDIR') {
+@@ -345,6 +388,67 @@ if (fs.promises && fs.promises.rename) {
+   };
+ }
+ 
++// 4.9 fs.readFile, fs.readFileSync, & fs.promises.readFile (Next.js pages-manifest.json insulation)
++const origReadFile = fs.readFile;
++fs.readFile = function (p, ...args) {
++  const cb = args[args.length - 1];
++  if (typeof cb === 'function') {
++    const wrappedCb = (err, data) => {
++      if (err && err.code === 'ENOENT' && isPagesManifestPath(p)) {
++        ensurePagesManifestOnDisk(p);
++        const options = args.length > 1 ? args[0] : null;
++        const encoding = typeof options === 'string' ? options : options?.encoding;
++        const result =
++          encoding === 'utf8' || encoding === 'utf-8'
++            ? DEFAULT_PAGES_MANIFEST
++            : Buffer.from(DEFAULT_PAGES_MANIFEST, 'utf8');
++        return cb(null, result);
++      }
++      return cb(err, data);
++    };
++    const newArgs = [...args.slice(0, args.length - 1), wrappedCb];
++    return origReadFile.apply(fs, [p, ...newArgs]);
++  }
++  return origReadFile.apply(fs, [p, ...args]);
++};
++
++const origReadFileSync = fs.readFileSync;
++fs.readFileSync = function (p, options) {
++  try {
++    return origReadFileSync.call(fs, p, options);
++  } catch (err) {
++    if (err && err.code === 'ENOENT' && isPagesManifestPath(p)) {
++      ensurePagesManifestOnDisk(p);
++      const encoding = typeof options === 'string' ? options : options?.encoding;
++      if (encoding === 'utf8' || encoding === 'utf-8') {
++        return DEFAULT_PAGES_MANIFEST;
++      }
++      return Buffer.from(DEFAULT_PAGES_MANIFEST, 'utf8');
++    }
++    throw err;
++  }
++};
++
++if (fs.promises && fs.promises.readFile) {
++  const origPromisesReadFile = fs.promises.readFile;
++  fs.promises.readFile = async function (p, options) {
++    try {
++      return await origPromisesReadFile.call(fs.promises, p, options);
++    } catch (err) {
++      if (err && err.code === 'ENOENT' && isPagesManifestPath(p)) {
++        ensurePagesManifestOnDisk(p);
++        const encoding = typeof options === 'string' ? options : options?.encoding;
++        if (encoding === 'utf8' || encoding === 'utf-8') {
++          return DEFAULT_PAGES_MANIFEST;
++        }
++        return Buffer.from(DEFAULT_PAGES_MANIFEST, 'utf8');
++      }
++      throw err;
++    }
++  };
++}
++
+ // 5. Global Process Safeguard for unhandled exceptions on trace files & 500 rename
+ process.on('uncaughtException', (err) => {
+   if (
+@@ -361,6 +465,14 @@ process.on('uncaughtException', (err) => {
+   ) {
+     return;
+   }
++  if (
++    err &&
++    err.code === 'ENOENT' &&
++    (err.syscall === 'open' || err.syscall === 'read') &&
++    isPagesManifestPath(err.path)
++  ) {
++    return;
++  }
+   throw err;
+ });
+ 
+--- a/scripts/clean.js
++++ b/scripts/clean.js
+@@ -25,5 +25,5 @@ function findProjectRoot(startDir) {
+ 
+ const PROJECT_ROOT = findProjectRoot(__dirname);
+-const TARGETS = ['.next', 'out'];
++const TARGETS = ['.next', 'out', 'tsconfig.tsbuildinfo'];
+ 
+ function removeDirectory(dirName) {

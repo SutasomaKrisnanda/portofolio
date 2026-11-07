@@ -1,0 +1,204 @@
+[
+  {
+    "id": "com-ggct-catur",
+    "role": "Panitia Pelaksana",
+    "event": "Ganesha Grand Chess Tournament (GGCT)",
+    "organization": "UKM Catur Universitas Pendidikan Ganesha",
+    "year": "2025",
+    "description": "Berkontribusi pada kepanitiaan turnamen catur bergengsi tingkat universitas dalam manajemen teknis pertandingan.",
+    "modes": [
+      "tech"
+    ]
+  },
+  {
+    "id": "com-pengmas-peduli-2025",
+    "role": "Sie PDD",
+    "event": "Pengmas Peduli 2025",
+    "organization": "HMJ Kedokteran Undiksha",
+    "year": "2025",
+    "description": "Bertanggung jawab atas publikasi, desain grafis visual, serta dokumentasi kegiatan pengabdian masyarakat.",
+    "modes": [
+      "tech",
+      "medical"
+    ]
+  },
+  {
+    "id": "com-chess-celebration-2025",
+    "role": "Sie PDK",
+    "event": "Chess Celebration",
+    "organization": "UKM Catur Undiksha",
+    "year": "2025",
+    "description": "Menangani publikasi, dekorasi, dan dokumentasi visual pada perayaan kejuaraan catur.",
+    "modes": [
+      "tech"
+    ]
+  },
+  {
+    "id": "com-kamus-pena-2025",
+    "role": "Sie PDD",
+    "event": "Kamus Pena 2025",
+    "organization": "Hermestha FK Undiksha",
+    "year": "2025",
+    "description": "Mengelola publikasi media, dokumentasi, dan pembuatan aset visual kegiatan kepenulisan ilmiah.",
+    "modes": [
+      "tech",
+      "academic"
+    ]
+  },
+  {
+    "id": "com-dies-natalis-2026",
+    "role": "Sie Dokumentasi",
+    "event": "Dies Natalis 2026",
+    "organization": "Kontingen FK Undiksha",
+    "year": "2026",
+    "description": "Mendokumentasikan seluruh rangkaian partisipasi kontingen Fakultas Kedokteran pada perayaan Dies Natalis.",
+    "modes": [
+      "tech",
+      "medical"
+    ]
+  },
+  {
+    "id": "com-musker-2026",
+    "role": "Sie Perlengkapan",
+    "event": "Musker 2026",
+    "organization": "Hermestha FK Undiksha",
+    "year": "2026",
+    "description": "Menyiapkan dan mengelola logistik serta kebutuhan teknis fasilitas Musyawarah Kerja organisasi.",
+    "modes": [
+      "academic"
+    ]
+  },
+  {
+    "id": "com-temu-ilmiah-kolaborasi-2026",
+    "role": "Koordinator Sie PDD",
+    "event": "Temu Ilmiah Kolaborasi 2026",
+    "organization": "FK Undiksha",
+    "year": "2026",
+    "description": "Memimpin divisi publikasi, dekorasi, dan dokumentasi serta merancang identitas visual acara temu ilmiah kolaborasi.",
+    "modes": [
+      "tech",
+      "medical",
+      "academic"
+    ]
+  },
+  {
+    "id": "com-ask-fk-2026",
+    "role": "Wakil Koordinator Sie Produksi",
+    "event": "ASK-FK 2026",
+    "organization": "FK Undiksha",
+    "year": "2026",
+    "description": "Mengkoordinasikan kebutuhan teknis produksi panggung, multimedia, dan alur operasional acara.",
+    "modes": [
+      "tech",
+      "medical"
+    ]
+  },
+  {
+    "id": "com-umesco-2026",
+    "role": "Sie Perlengkapan",
+    "event": "UMESCO 2026",
+    "organization": "Hermestha FK Undiksha",
+    "year": "2026",
+    "description": "Menyediakan, menata, dan mengelola sarana prasarana penunjang operasional perlombaan ilmiah kedokteran.",
+    "modes": [
+      "academic",
+      "medical"
+    ]
+  },
+  {
+    "id": "com-tik-2026",
+    "role": "Wakil Koordinator Sie PDD",
+    "event": "Temu Ilmiah Kedokteran 2026",
+    "organization": "HMJ Kedokteran Undiksha",
+    "year": "2026",
+    "description": "Membantu koordinasi perancangan desain publikasi, media sosial, dan peliputan visual acara ilmiah kedokteran.",
+    "modes": [
+      "tech",
+      "medical",
+      "academic"
+    ]
+  },
+  {
+    "id": "com-skyfall-2026",
+    "role": "Sie Perlengkapan",
+    "event": "Skyfall 2026",
+    "organization": "Hermestha FK Undiksha",
+    "year": "2026",
+    "description": "Mengatur kesiapan logistik dan inventaris perlengkapan kompetisi ilmiah mahasiswa.",
+    "modes": [
+      "academic"
+    ]
+  },
+  {
+    "id": "com-adrenal-2026",
+    "role": "Sie PDD",
+    "event": "Adrenal 2026",
+    "organization": "HMJ Kedokteran Undiksha",
+    "year": "2026",
+    "description": "Melakukan liputan foto/video dan merancang media publikasi visual untuk kegiatan kemahasiswaan Adrenal.",
+    "modes": [
+      "tech",
+      "medical"
+    ]
+  },
+  {
+    "id": "com-medventure-2026",
+    "role": "Sekretaris 1",
+    "event": "Medventure 2026",
+    "organization": "HMJ Kedokteran Undiksha",
+    "year": "2026",
+    "description": "Memimpin tata kelola administrasi surat-menyurat resmi, dokumentasi notulensi, dan arsip kesekretariatan panitia.",
+    "modes": [
+      "medical",
+      "academic"
+    ]
+  },
+  {
+    "id": "com-amerta-2026",
+    "role": "Sie PDD",
+    "event": "AMERTA 2026",
+    "organization": "BEM FK Undiksha",
+    "year": "2026",
+    "description": "Mendukung publikasi informasi serta mendokumentasikan setiap sesi kegiatan tingkat fakultas.",
+    "modes": [
+      "tech",
+      "medical"
+    ]
+  },
+  {
+    "id": "com-scale-up-2026",
+    "role": "Wakil Koordinator Sie Dokumentasi",
+    "event": "Scale Up 2026",
+    "organization": "Hermestha FK Undiksha",
+    "year": "2026",
+    "description": "Mengkoordinasikan perekaman dokumentasi visual, pengarsipan foto/video, dan konten liputan kegiatan pelatihan.",
+    "modes": [
+      "tech",
+      "academic"
+    ]
+  },
+  {
+    "id": "com-mau-hmjk-2026",
+    "role": "Sie Fasilitator",
+    "event": "MAU HMJK 2026",
+    "organization": "HMJ Kedokteran Undiksha",
+    "year": "2026",
+    "description": "Memfasilitasi dan mendampingi jalannya sesi musyawarah serta koordinasi alur interaksi peserta acara.",
+    "modes": [
+      "medical",
+      "academic"
+    ]
+  },
+  {
+    "id": "com-kamus-pena-2026",
+    "role": "Koordinator Sie PDD",
+    "event": "Kamus Pena 2026",
+    "organization": "Hermestha FK Undiksha",
+    "year": "2026",
+    "description": "Memimpin tim kerja publikasi, pembuatan aset grafis digital, dan peliputan dokumentasi pelatihan karya ilmiah.",
+    "modes": [
+      "tech",
+      "academic"
+    ]
+  }
+]

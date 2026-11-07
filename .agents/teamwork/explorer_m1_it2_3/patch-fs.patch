@@ -1,0 +1,255 @@
+--- a/patch-fs.js
++++ b/patch-fs.js
+@@ -1,5 +1,48 @@
+ const fs = require('fs');
++const path = require('path');
+ 
++// 1. Environment insulation: disable telemetry and span reporting in Next.js
++process.env.NEXT_TELEMETRY_DISABLED = '1';
++process.env.NEXT_TRACE_SPAN_THRESHOLD_MS = '99999999';
++
++// Ensure child processes / workers spawned by Next.js inherit patch-fs.js
++const patchFsPath = path.resolve(__dirname, 'patch-fs.js');
++if (!process.env.NODE_OPTIONS || !process.env.NODE_OPTIONS.includes('patch-fs')) {
++  process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} -r "${patchFsPath}"`.trim();
++}
++
++// 2. Platform null device for safe redirection
++const NULL_DEVICE = process.platform === 'win32' ? '\\\\.\\nul' : '/dev/null';
++
++// Path detection for Next.js internal trace files
++const isTracePath = (p) => {
++  if (!p) return false;
++  let str;
++  if (typeof p === 'string') {
++    str = p;
++  } else if (Buffer.isBuffer(p)) {
++    str = p.toString();
++  } else if (typeof p === 'object' && p.pathname) {
++    str = p.pathname;
++  } else {
++    str = String(p);
++  }
++  const normalized = str.replace(/\\/g, '/');
++  return (
++    normalized.endsWith('/trace') ||
++    normalized.includes('/.next/trace') ||
++    normalized === 'trace' ||
++    /(?:^|[\\/])\.next[\\/]trace(?:$|[\\/?#])/.test(str)
++  );
++};
++
++const isLockingError = (err) => {
++  if (!err) return false;
++  return err.code === 'EPERM' || err.code === 'EBUSY' || err.code === 'EACCES';
++};
++
++// 3. Existing Readlink EISDIR -> EINVAL patch
+ const handleReadlinkError = (err, p) => {
+   if (err && err.code === 'EISDIR') {
+     const newErr = new Error(`EINVAL: invalid argument, readlink '${p}'`);
+@@ -44,3 +87,192 @@ if (fs.promises && fs.promises.readlink) {
+     }
+   };
+ }
++
++// 4. Trace file EPERM / EBUSY / EACCES insulation
++
++// 4.1 fs.open
++const origOpen = fs.open;
++fs.open = function (p, ...args) {
++  const cb = args[args.length - 1];
++  if (isTracePath(p) && typeof cb === 'function') {
++    const wrappedCb = (err, fd) => {
++      if (err && isLockingError(err)) {
++        const modeOrFlags = args.slice(0, args.length - 1);
++        return origOpen.apply(fs, [NULL_DEVICE, ...modeOrFlags, cb]);
++      }
++      return cb(err, fd);
++    };
++    const newArgs = [...args.slice(0, args.length - 1), wrappedCb];
++    return origOpen.apply(fs, [p, ...newArgs]);
++  }
++  return origOpen.apply(fs, [p, ...args]);
++};
++
++// 4.2 fs.openSync
++const origOpenSync = fs.openSync;
++fs.openSync = function (p, ...args) {
++  try {
++    return origOpenSync.apply(fs, [p, ...args]);
++  } catch (err) {
++    if (err && isLockingError(err) && isTracePath(p)) {
++      return origOpenSync.apply(fs, [NULL_DEVICE, ...args]);
++    }
++    throw err;
++  }
++};
++
++// 4.3 fs.promises.open
++if (fs.promises && fs.promises.open) {
++  const origPromisesOpen = fs.promises.open;
++  fs.promises.open = async function (p, ...args) {
++    try {
++      return await origPromisesOpen.apply(fs.promises, [p, ...args]);
++    } catch (err) {
++      if (err && isLockingError(err) && isTracePath(p)) {
++        return await origPromisesOpen.apply(fs.promises, [NULL_DEVICE, ...args]);
++      }
++      throw err;
++    }
++  };
++}
++
++// 4.4 fs.createWriteStream
++const origCreateWriteStream = fs.createWriteStream;
++fs.createWriteStream = function (p, options) {
++  const ws = origCreateWriteStream.apply(fs, [p, options]);
++  if (isTracePath(p)) {
++    ws.on('error', (err) => {
++      if (err && isLockingError(err)) {
++        // Silently swallow DrvFs trace stream error
++      }
++    });
++  }
++  return ws;
++};
++
++// 4.5 fs.writeFile & fs.writeFileSync
++const origWriteFile = fs.writeFile;
++fs.writeFile = function (p, ...args) {
++  const cb = args[args.length - 1];
++  if (isTracePath(p) && typeof cb === 'function') {
++    const wrappedCb = (err) => {
++      if (err && isLockingError(err)) {
++        return cb(null);
++      }
++      return cb(err);
++    };
++    const newArgs = [...args.slice(0, args.length - 1), wrappedCb];
++    return origWriteFile.apply(fs, [p, ...newArgs]);
++  }
++  return origWriteFile.apply(fs, [p, ...args]);
++};
++
++const origWriteFileSync = fs.writeFileSync;
++fs.writeFileSync = function (p, ...args) {
++  try {
++    return origWriteFileSync.apply(fs, [p, ...args]);
++  } catch (err) {
++    if (err && isLockingError(err) && isTracePath(p)) {
++      return undefined;
++    }
++    throw err;
++  }
++};
++
++if (fs.promises && fs.promises.writeFile) {
++  const origPromisesWriteFile = fs.promises.writeFile;
++  fs.promises.writeFile = async function (p, ...args) {
++    try {
++      return await origPromisesWriteFile.apply(fs.promises, [p, ...args]);
++    } catch (err) {
++      if (err && isLockingError(err) && isTracePath(p)) {
++        return undefined;
++      }
++      throw err;
++    }
++  };
++}
++
++// 4.6 fs.appendFile & fs.appendFileSync
++const origAppendFile = fs.appendFile;
++fs.appendFile = function (p, ...args) {
++  const cb = args[args.length - 1];
++  if (isTracePath(p) && typeof cb === 'function') {
++    const wrappedCb = (err) => {
++      if (err && isLockingError(err)) {
++        return cb(null);
++      }
++      return cb(err);
++    };
++    const newArgs = [...args.slice(0, args.length - 1), wrappedCb];
++    return origAppendFile.apply(fs, [p, ...newArgs]);
++  }
++  return origAppendFile.apply(fs, [p, ...args]);
++};
++
++const origAppendFileSync = fs.appendFileSync;
++fs.appendFileSync = function (p, ...args) {
++  try {
++    return origAppendFileSync.apply(fs, [p, ...args]);
++  } catch (err) {
++    if (err && isLockingError(err) && isTracePath(p)) {
++      return undefined;
++    }
++    throw err;
++  }
++};
++
++if (fs.promises && fs.promises.appendFile) {
++  const origPromisesAppendFile = fs.promises.appendFile;
++  fs.promises.appendFile = async function (p, ...args) {
++    try {
++      return await origPromisesAppendFile.apply(fs.promises, [p, ...args]);
++    } catch (err) {
++      if (err && isLockingError(err) && isTracePath(p)) {
++        return undefined;
++      }
++      throw err;
++    }
++  };
++}
++
++// 4.7 fs.unlink & fs.unlinkSync (called by Next.js RotatingWriteStream.rotate())
++const origUnlink = fs.unlink;
++fs.unlink = function (p, cb) {
++  if (isTracePath(p) && typeof cb === 'function') {
++    const wrappedCb = (err) => {
++      if (err && isLockingError(err)) {
++        return cb(null);
++      }
++      return cb(err);
++    };
++    return origUnlink.call(fs, p, wrappedCb);
++  }
++  return origUnlink.call(fs, p, cb);
++};
++
++const origUnlinkSync = fs.unlinkSync;
++fs.unlinkSync = function (p) {
++  try {
++    return origUnlinkSync.call(fs, p);
++  } catch (err) {
++    if (err && isLockingError(err) && isTracePath(p)) {
++      return undefined;
++    }
++    throw err;
++  }
++};
++
++if (fs.promises && fs.promises.unlink) {
++  const origPromisesUnlink = fs.promises.unlink;
++  fs.promises.unlink = async function (p) {
++    try {
++      return await origPromisesUnlink.call(fs.promises, p);
++    } catch (err) {
++      if (err && isLockingError(err) && isTracePath(p)) {
++        return undefined;
++      }
++      throw err;
++    }
++  };
++}
++
++// 5. Global Process Safeguard for unhandled exceptions on trace files
++process.on('uncaughtException', (err) => {
++  if (
++    err &&
++    isLockingError(err) &&
++    isTracePath(err.path)
++  ) {
++    return;
++  }
++  throw err;
++});

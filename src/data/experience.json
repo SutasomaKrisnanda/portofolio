@@ -1,0 +1,65 @@
+[
+  {
+    "id": "exp-hermestha",
+    "role": "Wakil Kepala Divisi Intechprochanter",
+    "organization": "BSO Hermestha FK Undiksha",
+    "period": "Feb 2026 – Sekarang",
+    "type": "Organisasi Ilmiah Mahasiswa",
+    "description": "Bertanggung jawab atas fungsi Technocrates (pelatihan teknologi mahasiswa) dan arsitektur pembuatan dan pemeliharaan sistem web organisasi HMSSO.",
+    "modes": [
+      "tech",
+      "medical",
+      "academic"
+    ],
+    "highlights": [
+      "Mengembangkan arsitektur basis data relasional HMSSO",
+      "Memfasilitasi pelatihan teknologi dan media ilmiah"
+    ]
+  },
+  {
+    "id": "exp-hmj-kedokteran",
+    "role": "Sekretaris Bidang Komnasinfo",
+    "organization": "HMJ Kedokteran Universitas Pendidikan Ganesha",
+    "period": "2026 – Sekarang",
+    "type": "Organisasi Jurusan Mahasiswa",
+    "description": "Menginisiasi portal website resmi HMJ Kedokteran Undiksha serta mengkoordinasikan standar publikasi, dokumentasi, dan hubungan komunikasi eksternal.",
+    "modes": [
+      "tech",
+      "medical"
+    ],
+    "highlights": [
+      "Inisiator & perancang sistem portal resmi HMJ",
+      "Manajemen publikasi informasi kedokteran"
+    ]
+  },
+  {
+    "id": "exp-ukm-catur",
+    "role": "Anggota Aktif UKM Catur",
+    "organization": "Universitas Pendidikan Ganesha",
+    "period": "2025 – Sekarang",
+    "type": "Unit Kegiatan Mahasiswa",
+    "description": "Terlibat aktif dalam pembinaan catur mahasiswa, analisis taktik berbasis engine Stockfish, dan kepanitiaan kejuaraan catur universitas.",
+    "modes": [
+      "tech"
+    ],
+    "highlights": [
+      "Analisis posisi dan pemrograman C++ catur",
+      "Kontribusi kepanitiaan Ganesha Grand Chess Tournament"
+    ]
+  },
+  {
+    "id": "exp-komunitas-coding",
+    "role": "Ketua & Pendiri Komunitas Pemrograman",
+    "organization": "SMA Negeri 2 Amlapura",
+    "period": "2024 – 2025",
+    "type": "Komunitas Teknologi Siswa",
+    "description": "Menginisiasi dan memimpin komunitas coding pertama di sekolah untuk memfasilitasi rekan sebaya belajar logika algoritma, web dasar, dan problem solving.",
+    "modes": [
+      "tech"
+    ],
+    "highlights": [
+      "Mendirikan wadah belajar teknologi pertama di sekolah",
+      "Mentoring algoritma dan persiapan olimpiade komputer"
+    ]
+  }
+]
