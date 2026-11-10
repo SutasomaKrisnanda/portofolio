@@ -7,6 +7,7 @@ import {
 } from '@/data/portfolio-data';
 import { PinwheelGlyph } from './geometric-glyphs';
 import { Github, Linkedin, Download, ArrowUp } from 'lucide-react';
+import { getAssetPath } from '@/lib/utils';
 
 interface FooterProps {
   activeMode: ModeId;
@@ -55,7 +56,7 @@ export default function Footer({
 
         <div className="flex items-center gap-3">
           <a
-            href={GLOBAL_PROFILE.cvPath}
+            href={getAssetPath(GLOBAL_PROFILE.cvPath)}
             download={GLOBAL_PROFILE.cvFileName}
             className="text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white transition-colors flex items-center gap-1 text-[11px] font-semibold"
           >

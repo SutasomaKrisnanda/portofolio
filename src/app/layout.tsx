@@ -60,6 +60,26 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <link rel="icon" href="favicon.ico" sizes="any" />
+        <link rel="shortcut icon" href="favicon.ico" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+              try {
+                var p = window.location.pathname.split('/').filter(Boolean);
+                if (window.location.hostname.endsWith('.github.io') && p.length > 0) {
+                  var base = '/' + p[0] + '/';
+                  var links = document.querySelectorAll("link[rel*='icon']");
+                  links.forEach(function(l){
+                    if (l.getAttribute('href') === '/favicon.ico') {
+                      l.href = base + 'favicon.ico';
+                    }
+                  });
+                }
+              } catch(e) {}
+            })();`,
+          }}
+        />
       </head>
       <body className={`${inter.variable} font-body antialiased selection:bg-white selection:text-slate-950`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

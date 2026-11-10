@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { ModeId } from '@/data/portfolio-data';
 import { IridescentCrystalCanvas } from './crystal-canvas';
+import { getAssetPath } from '@/lib/utils';
 
 export interface Hero3DSceneProps {
   mode: ModeId;
@@ -521,46 +522,35 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
 
       // 3. Medical & Academic modes: load authentic GLB models via GLTFLoader with MeshoptDecoder
       const requestId = ++activeRequestIdRef.current;
-      const assetPath =
+      const rawAssetPath =
         targetMode === 'medical'
           ? '/models/model-jantung.glb'
           : '/models/model-pena.glb';
+
+      // Build fallback-tolerant candidate URLs (base-path aware, relative, and root)
+      const candidates: string[] = [];
+      const primaryUrl = getAssetPath(rawAssetPath);
+      candidates.push(primaryUrl);
+      const relativeUrl = rawAssetPath.replace(/^\//, '');
+      if (!candidates.includes(relativeUrl)) {
+        candidates.push(relativeUrl);
+      }
+      if (!candidates.includes(`./${relativeUrl}`)) {
+        candidates.push(`./${relativeUrl}`);
+      }
+      if (!candidates.includes(rawAssetPath)) {
+        candidates.push(rawAssetPath);
+      }
 
       setLoadingProgress(0);
 
       getGLTFLoader()
         .then((loader) => {
           if (activeRequestIdRef.current !== requestId) return;
-          loader.load(
-            assetPath,
-            (gltf) => {
-              if (activeRequestIdRef.current !== requestId) return;
-              const modelData = normalizeLoadedModel(gltf.scene, 2.40);
-              if (targetMode === 'academic') {
-                modelData.pivotGroup.rotation.y = Math.PI + Math.PI / 2;
-              } else if (targetMode === 'medical') {
-                modelData.pivotGroup.rotation.y = 0.15 + Math.PI / 2;
-              }
-              modelSceneCache.set(targetMode, modelData);
-              if (currentModeRef.current === targetMode && sceneRef.current) {
-                if (activePivotRef.current) {
-                  sceneRef.current.remove(activePivotRef.current);
-                }
-                activePivotRef.current = modelData.pivotGroup;
-                activeBaseScaleRef.current = modelData.baseScale;
-                sceneRef.current.add(modelData.pivotGroup);
-              }
-              setLoadingProgress(null);
-            },
-            (progressEvent) => {
-              if (activeRequestIdRef.current !== requestId) return;
-              if (progressEvent.total && progressEvent.total > 0) {
-                const pct = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                setLoadingProgress(pct);
-              }
-            },
-            (error) => {
-              console.warn(`Failed to load ${assetPath}, falling back to procedural model:`, error);
+
+          const loadCandidate = (index: number) => {
+            if (index >= candidates.length) {
+              console.warn(`All candidate URLs failed for ${modelFileName}, falling back to procedural model`);
               if (activeRequestIdRef.current !== requestId) return;
               const fallbackData =
                 targetMode === 'medical' ? createMedicalDNA() : createAcademicQuill();
@@ -571,8 +561,46 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
                 sceneRef.current.add(fallbackData.pivotGroup);
               }
               setLoadingProgress(null);
+              return;
             }
-          );
+
+            const currentUrl = candidates[index];
+            loader.load(
+              currentUrl,
+              (gltf) => {
+                if (activeRequestIdRef.current !== requestId) return;
+                const modelData = normalizeLoadedModel(gltf.scene, 2.40);
+                if (targetMode === 'academic') {
+                  modelData.pivotGroup.rotation.y = Math.PI + Math.PI / 2;
+                } else if (targetMode === 'medical') {
+                  modelData.pivotGroup.rotation.y = 0.15 + Math.PI / 2;
+                }
+                modelSceneCache.set(targetMode, modelData);
+                if (currentModeRef.current === targetMode && sceneRef.current) {
+                  if (activePivotRef.current) {
+                    sceneRef.current.remove(activePivotRef.current);
+                  }
+                  activePivotRef.current = modelData.pivotGroup;
+                  activeBaseScaleRef.current = modelData.baseScale;
+                  sceneRef.current.add(modelData.pivotGroup);
+                }
+                setLoadingProgress(null);
+              },
+              (progressEvent) => {
+                if (activeRequestIdRef.current !== requestId) return;
+                if (progressEvent.total && progressEvent.total > 0) {
+                  const pct = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                  setLoadingProgress(pct);
+                }
+              },
+              (error) => {
+                console.warn(`Candidate path ${currentUrl} failed, trying next candidate...`, error);
+                loadCandidate(index + 1);
+              }
+            );
+          };
+
+          loadCandidate(0);
         })
         .catch((err) => {
           console.warn('Failed to get GLTFLoader:', err);

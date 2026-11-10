@@ -19,6 +19,7 @@ import {
   TooltipContent,
   TooltipProvider
 } from '@/components/ui/tooltip';
+import { getAssetPath } from '@/lib/utils';
 
 const Hero3DScene = dynamic(
   () => import('./hero-3d-scene').then((mod) => mod.Hero3DScene),
@@ -280,7 +281,7 @@ export default function Hero({
                   <a
                     id="btn-cta-cv"
                     data-testid="btn-cta-cv"
-                    href={GLOBAL_PROFILE.cvPath}
+                    href={getAssetPath(GLOBAL_PROFILE.cvPath)}
                     download={GLOBAL_PROFILE.cvFileName}
                     className="px-5 py-3 rounded-full bg-slate-900/5 hover:bg-slate-900/10 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-md border border-slate-900/15 dark:border-white/35 text-slate-900 dark:text-white font-medium text-xs tracking-wider transition-all cursor-pointer inline-flex items-center gap-2 shadow-sm"
                   >

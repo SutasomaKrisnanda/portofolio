@@ -27,6 +27,7 @@ import {
   Sparkles,
   Layers
 } from 'lucide-react';
+import { getAssetPath } from '@/lib/utils';
 
 interface AboutProps {
   modeConfig: PortfolioModeConfig;
@@ -98,7 +99,7 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
           {/* Quick CV Download Action */}
           <div className="flex items-center gap-2.5">
             <a
-              href={GLOBAL_PROFILE.cvPath}
+              href={getAssetPath(GLOBAL_PROFILE.cvPath)}
               download={GLOBAL_PROFILE.cvFileName}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-slate-950 text-white dark:bg-white dark:text-slate-950 hover:opacity-90 transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
             >
@@ -106,7 +107,7 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
               <span>Download CV</span>
             </a>
             <a
-              href={GLOBAL_PROFILE.cvPath}
+              href={getAssetPath(GLOBAL_PROFILE.cvPath)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white transition-all cursor-pointer"
