@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Image, { StaticImageData } from 'next/image';
-import { ModeId, Project } from '@/data/portfolio-data';
+import { ModeId, Project, PORTFOLIO_PROJECTS } from '@/data/portfolio-data';
+import { DiamondArtifactGlyph } from './geometric-glyphs';
 
 // Static Image Imports processed by Next.js bundler
 import techIcon from '@/assets/icons/project-tech.svg';
@@ -36,6 +37,12 @@ export interface ProjectModeIconProps {
    * If provided and project does not support `mode`, falls back to `project.mode`.
    */
   project?: Project | null;
+  /**
+   * Optional zero-based index of the item (e.g. in grid or carousel).
+   * Used by tech mode geometric glyphs to deterministically pick 1 of 3 procedural shapes.
+   * If omitted, attempts to resolve from PORTFOLIO_PROJECTS or defaults to 0.
+   */
+  index?: number;
   /** Custom CSS classes for sizing, drop-shadow, filter, transitions, etc. */
   className?: string;
   /** Inline CSS style overrides */
@@ -53,6 +60,7 @@ export interface ProjectModeIconProps {
 export const ProjectModeIcon: React.FC<ProjectModeIconProps> = ({
   mode,
   project,
+  index,
   className = 'w-8 h-8 object-contain drop-shadow',
   style,
   alt,
@@ -60,19 +68,43 @@ export const ProjectModeIcon: React.FC<ProjectModeIconProps> = ({
   height = 48,
   priority = false,
 }) => {
-  // 1. Dynamic multi-mode resolution
-  const resolvedMode: ModeId =
-    project && project.mode !== mode && !project.secondaryModes?.includes(mode)
-      ? project.mode
-      : mode;
+  // 1. Dynamic multi-mode resolution with defensive fallback
+  const resolvedMode: ModeId = !project
+    ? (mode || 'tech')
+    : project.mode !== mode && !project.secondaryModes?.includes(mode)
+    ? (project.mode || 'tech')
+    : (mode || 'tech');
 
-  // 2. Select asset
-  const iconAsset = MODE_ICON_MAP[resolvedMode] || MODE_ICON_MAP.tech;
   const accessibleAlt =
     alt ||
-    (project
-      ? `${project.title} — Logo Mode ${MODE_LABELS[resolvedMode]}`
-      : `Logo Mode ${MODE_LABELS[resolvedMode]}`);
+    (project && project.title
+      ? `${project.title} — Logo Mode ${MODE_LABELS[resolvedMode] || MODE_LABELS.tech}`
+      : `Logo Mode ${MODE_LABELS[resolvedMode] || MODE_LABELS.tech}`);
+
+  // 2. Resolve deterministic index for procedural geometric glyphs
+  const resolvedIndex: number =
+    typeof index === 'number'
+      ? index
+      : project
+      ? Math.max(0, PORTFOLIO_PROJECTS.findIndex((p) => p.id === project.id))
+      : 0;
+
+  // 3. For Tech mode, render the authentic restored DiamondArtifactGlyph
+  if (resolvedMode === 'tech') {
+    return (
+      <DiamondArtifactGlyph
+        visualType={project?.visualType || 'artifact'}
+        index={resolvedIndex}
+        className={`transition-all duration-300 ${className}`}
+        style={style}
+        role="img"
+        aria-label={accessibleAlt}
+      />
+    );
+  }
+
+  // 4. Select asset for Medical / Academic modes
+  const iconAsset = MODE_ICON_MAP[resolvedMode] || MODE_ICON_MAP.tech;
 
   return (
     <Image

@@ -1,88 +1,86 @@
-# Project: Portfolio Hero-Section Enhancement & Cross-Mode UI/UX Refinement
+# Project: Portfolio Performance Optimization & UI/UX Refresh (GitHub Pages)
 
 ## Architecture
 - **Framework**: Next.js 15.5.6 (App Router, Static Export `output: 'export'`) with React 19, TypeScript (strict mode), Tailwind CSS v3, and `tailwindcss-animate`.
 - **Mode & Theme System**:
   - `activeMode`: `'tech' | 'medical' | 'academic'` managed in `src/app/page.tsx` via URL param `?mode=` and `localStorage`.
   - `resolvedTheme`: `'dark' | 'light'` managed via `next-themes` (`ThemeProvider`, `useTheme()`).
-- **Visual Presentation**:
-  - `HeroBackground`: Dynamic multi-layer cross-fading background rendered in `src/components/hero.tsx` using 6 `.avif` assets from `src/assets/image/` with contrast vignettes for WCAG AAA accessibility.
-- **3D Graphics Engine**:
-  - Client-side Three.js canvas in `src/components/hero-3d-scene.tsx` (or updated `crystal-canvas.tsx`) supporting:
-    - Tech: Procedural crystal/polyhedron.
-    - Medical: `model-jantung.glb` (18.14MB) decoded via `MeshoptDecoder`.
-    - Academic: `model-quill.glb` (90.19MB) with progressive loading.
-    - Assets served from `public/models/` for Next.js static export compatibility.
-- **Project Navigation & Data Flow**:
-  - Dataset: `src/data/projects.json` typed via `src/data/portfolio-data.ts`.
-  - Dynamic filter: `p.featured && (p.mode === activeMode || p.secondaryModes?.includes(activeMode))`.
-  - Dynamic indicators matching filtered count; slide index resets to 0 on mode change.
-  - Dynamic icon: `<ProjectModeIcon mode={activeMode} />` using SVG assets from `src/assets/icons/`.
-- **Modal Architecture**:
-  - `src/components/project-modal.tsx`: 3-tier Flexbox layout (`flex flex-col max-h-[90vh] overflow-hidden`) with fixed header (zero jumping), scrollable inner body (confined scrollbar, zero leakage over asymmetric corners), and fixed footer.
-  - Interactive integration: Single-click active card or "Lihat Detail" button opens modal.
-- **Micro-Interactions & Tooltips**:
-  - Slide block transitions driven by reactive React keys and Tailwind animations.
-  - Radix UI tooltips (`src/components/ui/tooltip.tsx`) on all interactive hero buttons for hover and keyboard focus.
+- **3D Graphics Engine (Lightweight Procedural Architecture)**:
+  - Client-side Three.js canvas in `src/components/hero-3d-scene.tsx` (or `crystal-canvas.tsx`):
+    - **Tech**: Procedural crystalline IcosahedronGeometry + outer wireframe cage + orbital quantum nodes (~72 triangles, 0 kB download).
+    - **Medical**: Procedural B-DNA Double Helix using dual `CatmullRomCurve3` tubes, paired nucleotide cylinders, and terminal phosphate beads (~3,500 triangles, 0 kB download).
+    - **Academic**: Procedural Calligraphy Feather Quill (Pena Bulu) with curved spine tube, custom parametric ribbon BufferGeometry vanes with asymmetric barbs, and polished brass calligraphy nib (~730 triangles, 0 kB download).
+    - Instantaneous synchronous transitions; 60 FPS rendering; complete recursive GPU resource disposal (`disposeHierarchy`) on unmount.
+- **Gallery UI/UX & Dynamic Icon Architecture**:
+  - `src/components/projects.tsx`: Responsive dual-track category pills: single-row horizontal scroll (`no-scrollbar`) with left/right fade masks on mobile (< 640px) saving >80% vertical space; spacious wrapping on desktop.
+  - `src/components/achievements.tsx`: Single-row horizontal scroll with dedicated filter row and fade masks on mobile; spacious wrapping on desktop.
+  - Category State Synchronization: Reset `selectedCategory` to `'All'` upon `activeMode` change across both galleries.
+  - Dynamic Mode Icon Resolution: `<ProjectModeIcon mode={activeMode} project={project} />` in `src/components/projects.tsx` replacing `DiamondArtifactGlyph`, dynamically displaying active mode icon for multi-mode projects with fallback to `project.mode` / `'tech'`.
+- **Smart Bento Grid Architecture ("Tentang Saya")**:
+  - `src/components/about.tsx`: 5-Tile 12-Column modular Bento Box:
+    - Tile 1 (Bio & Identity): `lg:col-span-8`
+    - Tile 2 (Coordinates & Contact): `lg:col-span-4`
+    - Tile 3 (Methodology Principles): `lg:col-span-4`
+    - Tile 4 (Formal Education): `lg:col-span-8`
+    - Tile 5 (Smart Adaptive History Bento): `lg:col-span-12` (Full Container Width)
+  - Tile 5 Houses Experience & Committees behind an interactive Segmented Switcher (`Semua`, `Organisasi`, `Kepanitiaan`), rendered in an auto-flowing 3-column subgrid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`) with progressive disclosure toggle ("Tampilkan N Lainnya / Ringkas"). Eliminates vertical imbalance ("timpang sebelah") permanently.
+- **Build & System Stabilization**:
+  - `patch-fs.js`: Includes DrvFs fallback for `middleware-manifest.json` ensuring clean static builds (`npm run build`) execute reliably with exit code 0.
 
 ## Feature Inventory
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| 1 | R1.1 Background AVIF Mapping | Map and pre-render 6 `.avif` background images from `src/assets/image/` for Tech, Academic, Medical in Light and Dark themes | M1 | ORIGINAL_REQUEST § R1 |
-| 2 | R1.2 Hero Background Cross-Fade | Implement smooth cross-fading opacity transitions between backgrounds when changing mode or theme | M1 | ORIGINAL_REQUEST § R1 |
-| 3 | R1.3 Contrast & Vignette Overlays | Add contrast vignettes to ensure text readability on top of environmental backgrounds | M1 | ORIGINAL_REQUEST § R1 |
-| 4 | R2.1 Three.js Infrastructure | Set up Three.js with GLTFLoader and MeshoptDecoder for Next.js static export compatibility | M2 | ORIGINAL_REQUEST § R2 |
-| 5 | R2.2 Medical 3D Heart Model | Render `model-jantung.glb` in Medical mode with Meshopt decompression, scaling, and lighting | M2 | ORIGINAL_REQUEST § R2 |
-| 6 | R2.3 Academic 3D Quill Model | Render `model-quill.glb` in Academic mode with proper lighting, scale, and loading state | M2 | ORIGINAL_REQUEST § R2 |
-| 7 | R2.4 Tech Mode 3D Object | Maintain/render 3D polyhedron for Tech mode aligned on background pedestal | M2 | ORIGINAL_REQUEST § R2 |
-| 8 | R3.1 SVG Icon Integration | Import and integrate SVG icons (`project-tech.svg`, `project-medical.svg`, `project-academic.svg`) from `src/assets/icons/` | M1 | ORIGINAL_REQUEST § R3 |
-| 9 | R3.2 Dynamic Mode Icon Reaction | Dynamically render project icon based on current active mode, supporting multi-mode projects | M1 | ORIGINAL_REQUEST § R3 |
-| 10 | R4.1 JSON Featured Filter | Dynamically filter projects from `src/data/projects.json` using `featured: true` and active/secondary mode | M3 | ORIGINAL_REQUEST § R4 |
-| 11 | R4.2 Dynamic Slide Controls | Replace static '1, 2, 3, 4' buttons with dynamic navigation indicators/tabs matching filtered count | M3 | ORIGINAL_REQUEST § R4 |
-| 12 | R4.3 Slide Index Synchronization | Auto-reset active slide index to 0 when `activeMode` changes | M3 | ORIGINAL_REQUEST § R4 |
-| 13 | R5.1 3-Tier Modal Flexbox Layout | Refactor modal layout into fixed header, scrollable body, and fixed footer to eliminate title jumping | M3 | ORIGINAL_REQUEST § R5 |
-| 14 | R5.2 Scrollbar Boundary Confinement | Confine scrollbar within modal body to eliminate double scrollbars and border-radius leakage | M3 | ORIGINAL_REQUEST § R5 |
-| 15 | R5.3 Responsive Typography & Wrapping | Fix text wrapping, title clamp, metadata ribbon, and list margins across mobile/tablet/desktop | M3 | ORIGINAL_REQUEST § R5 |
-| 16 | R5.4 Hero Modal Trigger Integration | Open modal on single-click of active project card or explicit "Lihat Detail" action button | M3 | ORIGINAL_REQUEST § R5 |
-| 17 | R6.1 Hero Slide Block Animations | Add smooth slide enter/exit transition animations to hero blocks using reactive keys | M3 | ORIGINAL_REQUEST § R6 |
-| 18 | R6.2 Radix UI Tooltips | Equip all interactive buttons in hero section with accessible tooltips for hover and focus | M3 | ORIGINAL_REQUEST § R6 |
-| 19 | R0.1 Windows Build Patch Stability | Relocate `src/app/favicon.ico` to `public/favicon.ico` to permanently resolve Windows WSL `readlink` EISDIR error | M1 | Explorer Survey 2 & 3 |
-| 20 | E2E.1 E2E Test Suite | Comprehensive opaque-box test suite covering Tiers 1-4 with automated test runner | E2E | ORIGINAL_REQUEST § Acceptance Criteria |
-| 21 | E2E.2 100% E2E Verification & Hardening | Implementation track validation passing 100% of E2E tests and Tier 5 adversarial hardening | M4 | Dual Track Final Milestone |
+| 1 | R1.1 Procedural Tech Polyhedron | High-performance crystalline polyhedron with wireframe cage and orbital nodes | M3 | ORIGINAL_REQUEST § R1 |
+| 2 | R1.2 Procedural Medical Helix DNA | Double-helix B-DNA with dual curve tubes, base-pair rungs, and terminal spheres | M3 | ORIGINAL_REQUEST § R1 |
+| 3 | R1.3 Procedural Academic Pena Bulu | Feather quill with arched spine tube, custom ribbon vanes, and brass nib | M3 | ORIGINAL_REQUEST § R1 |
+| 4 | R1.4 Instant 3D Model Transitions | Eliminate GLTFLoader/MeshoptDecoder network latency; instantaneous model switches | M3 | ORIGINAL_REQUEST § R1 |
+| 5 | R1.5 60 FPS Loop & GPU Cleanup | Interactive pointer rotation, smooth animations, and recursive disposal on unmount | M3 | ORIGINAL_REQUEST § R1 |
+| 6 | R1.6 Hero 3D Labels & Captions | Update hero 3D model captions and skeleton loader text per active mode | M3 | ORIGINAL_REQUEST § R1 |
+| 7 | R2.1 Projects Gallery Category Pills | Single-row horizontal scroll with fade masks on mobile; responsive wrap on desktop | M1 | ORIGINAL_REQUEST § R2 |
+| 8 | R2.2 Achievements Category Pills | Dedicated filter row, horizontal scroll with fade masks on mobile; wrap on desktop | M1 | ORIGINAL_REQUEST § R2 |
+| 9 | R2.3 Category Filter Mode Sync | Auto-reset selectedCategory to 'All' when activeMode changes in both galleries | M1 | ORIGINAL_REQUEST § R2 |
+| 10 | R4.1 Project Card Mode Icon | Replace DiamondArtifactGlyph with ProjectModeIcon in projects gallery cards | M1 | ORIGINAL_REQUEST § R4 |
+| 11 | R4.2 Multi-Mode Dynamic Icon Resolution | Dynamically match activeMode on multi-mode projects with reliable fallback | M1 | ORIGINAL_REQUEST § R4 |
+| 12 | R0.1 Build Stabilization Patch | Add middleware-manifest fallback to patch-fs.js for reliable clean static builds | M1 | Survey P2-3 |
+| 13 | R3.1 5-Tile 12-Column Bento Layout | Modular Bento Grid in About section eliminating 7-to-5 column vertical disparity | M2 | ORIGINAL_REQUEST § R3 |
+| 14 | R3.2 Segmented History Track Switcher | Interactive tabs ('Semua', 'Organisasi', 'Kepanitiaan') in Tile 5 | M2 | ORIGINAL_REQUEST § R3 |
+| 15 | R3.3 Auto-Flow Subgrid & Disclosure | 3-column auto-flow grid with progressive disclosure toggle ("Tampilkan N Lainnya") | M2 | ORIGINAL_REQUEST § R3 |
+| 16 | R3.4 Responsive Viewport Balance | Balanced, proportional layout across mobile (<640px), tablet, and desktop | M2 | ORIGINAL_REQUEST § R3 |
+| 17 | E2E.1 Comprehensive E2E Test Suite | Opaque-box test suite for R1-R4 covering Tiers 1-4 with automated test runner | E2E | ORIGINAL_REQUEST § Acceptance Criteria |
+| 18 | E2E.2 100% E2E Pass & Hardening | Pass 100% of E2E test suite + Tier 5 adversarial coverage hardening | M4 | Dual Track Final Milestone |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Visual Backgrounds, Dynamic Project Icons & Build Stabilization | Features 1, 2, 3, 8, 9, 19 (R1, R3, Favicon fix) | none | IN_PROGRESS |
-| M2 | 3D WebGL Canvas & GLB Models Integration | Features 4, 5, 6, 7 (R2: Medical Heart, Academic Quill, Tech Polyhedron) | M1 | PLANNED |
-| M3 | Dynamic Project Navigation, Modal Refactor, Animations & Tooltips | Features 10, 11, 12, 13, 14, 15, 16, 17, 18 (R4, R5, R6) | M1 | PLANNED |
-| M4 | Final Milestone: 100% E2E Test Pass & Adversarial Hardening | Features 21 (Tiers 1-4 pass + Tier 5 coverage audit) | M2, M3, E2E | PLANNED |
+| M1 | Gallery Category Pills, Dynamic Mode Icons & Build Stabilization | Features 7, 8, 9, 10, 11, 12 (R2, R4, R0.1) | none | IN_PROGRESS |
+| M2 | Smart Bento Grid Adaptif pada Bagian Tentang Saya | Features 13, 14, 15, 16 (R3) | none | PLANNED |
+| M3 | Model 3D Hero-Section Ringan per Mode | Features 1, 2, 3, 4, 5, 6 (R1) | none | PLANNED |
+| E2E | E2E Testing Track: Opaque-Box Suite | Feature 17 (Tiers 1-4 test runner & test suites) | none | IN_PROGRESS |
+| M4 | Final Milestone: 100% E2E Test Pass & Adversarial Hardening | Feature 18 (Tiers 1-4 pass + Tier 5 hardening + Forensic Audit) | M1, M2, M3, E2E | PLANNED |
 
 ## Interface Contracts
 ### Mode & Theme State Contract
-- `activeMode: 'tech' | 'medical' | 'academic'` passed to `Hero`, `HeroBackground`, `ProjectModeIcon`, and `Hero3DScene`.
-- `resolvedTheme: 'dark' | 'light'` passed to `HeroBackground` and `Hero3DScene`.
+- `activeMode: 'tech' | 'medical' | 'academic'` passed to `Hero`, `Projects`, `Achievements`, `About`, `ProjectModeIcon`, and `Hero3DScene`.
+- `resolvedTheme: 'dark' | 'light'` passed to `Hero3DScene` and environmental containers.
 
-### Project Data Contract
-- `Project` interface from `src/data/portfolio-data.ts`:
-  - `id: string`
-  - `title: string`
-  - `featured: boolean`
-  - `mode: ModeId`
-  - `secondaryModes?: ModeId[]`
-- Filter contract:
+### Project Mode Icon Contract
+- `<ProjectModeIcon mode={activeMode} project={project} className="..." />`
+- Multi-mode resolution logic:
+  - If `project.mode === activeMode || project.secondaryModes?.includes(activeMode)` -> display `activeMode` icon.
+  - Else -> fallback to `project.mode` (or `'tech'`).
+
+### Category Filter Synchronization Contract
+- When `activeMode` changes:
   ```typescript
-  const featuredHeroProjects = projects.filter(
-    (p) => p.featured && (p.mode === activeMode || p.secondaryModes?.includes(activeMode))
-  );
+  useEffect(() => {
+    setSelectedCategory('All');
+  }, [activeMode]);
   ```
 
-### Modal Trigger Contract
-- `onOpenProject: (project: Project) => void`
-- Triggered by:
-  - Single-click on currently active preview card in `Hero`.
-  - Click on "Lihat Detail" / "Detail Studi Kasus" CTA button in `Hero`.
-  - Click on 3D canvas object in `Hero`.
+### Smart Bento Grid Tile 5 Contract
+- Container: `lg:col-span-12`
+- Segmented control options: `'all' | 'experience' | 'committees'`
+- Initial display: up to 6 cards; expand toggle reveals remainder with smooth animation.
 
 ### 3D Scene Contract
 - Props for `Hero3DScene`:
@@ -94,13 +92,16 @@
     className?: string;
   }
   ```
+- Instant synchronous transition: `createTechPolyhedron(theme)`, `createMedicalHelixDNA(theme)`, `createAcademicPenaBulu(theme)`.
 
 ## Code Layout
-- `src/components/hero.tsx`: Main hero section coordinator.
-- `src/components/hero-background.tsx`: New component dedicated to 6 `.avif` background layers with cross-fading & contrast vignettes.
-- `src/components/hero-3d-scene.tsx`: Three.js canvas supporting Tech polyhedron, Medical heart, Academic quill.
-- `src/components/project-mode-icon.tsx`: Dynamic SVG icon renderer based on `activeMode`.
-- `src/components/project-modal.tsx`: Refactored 3-tier Flexbox modal component.
-- `src/components/ui/tooltip.tsx`: Radix UI tooltip wrapper.
-- `public/models/`: Mirror directory for `model-jantung.glb` and `model-quill.glb` for static export.
-- `public/favicon.ico`: Relocated from `src/app/favicon.ico`.
+- `src/components/hero.tsx`: Main hero section coordinator and 3D caption labels.
+- `src/components/hero-3d-scene.tsx`: Procedural Three.js models (Polyhedron, Helix DNA, Pena Bulu) with recursive disposal.
+- `src/components/hero-3d-skeleton.tsx`: Skeleton loader labels per mode.
+- `src/components/projects.tsx`: Projects gallery with compact mobile category pills and dynamic project mode icons.
+- `src/components/achievements.tsx`: Achievements gallery with dedicated compact mobile category pills.
+- `src/components/project-mode-icon.tsx`: Dynamic SVG mode icon resolver.
+- `src/components/about.tsx`: 5-Tile 12-Column Smart Bento Grid with full-width Adaptive History Track.
+- `src/app/globals.css`: `no-scrollbar` utility support.
+- `patch-fs.js`: Static build DrvFs manifest fallback patch.
+- `tests/e2e/`: Opaque-box test suites (Tiers 1-4, Tier 5).

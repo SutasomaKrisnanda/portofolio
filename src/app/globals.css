@@ -120,3 +120,15 @@ h1, h2, h3, h4, .font-display {
     -webkit-backdrop-filter: blur(16px);
   }
 }
+
+/* No Scrollbar Utility for Clean Horizontal Scrolling */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+

@@ -35,6 +35,7 @@ interface HeroProps {
   onOpenProject: (project: Project) => void;
   onNavigateSection: (sectionId: string) => void;
   onSwitchMode: (mode: ModeId) => void;
+  scrollMode?: 'normal' | 'snap';
 }
 
 export default function Hero({
@@ -42,7 +43,8 @@ export default function Hero({
   activeMode,
   projects,
   onOpenProject,
-  onNavigateSection
+  onNavigateSection,
+  scrollMode = 'normal'
 }: HeroProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
@@ -94,14 +96,16 @@ export default function Hero({
           setHeroParallax({ x: nx * 12, y: ny * 8 });
         }}
         onMouseLeave={() => setHeroParallax({ x: 0, y: 0 })}
-        className="relative w-full min-h-[100dvh] lg:h-screen flex flex-col justify-between pt-16 sm:pt-20 lg:pt-24 pb-4 px-4 sm:px-8 lg:px-12 select-none text-slate-900 dark:text-white scroll-snap-align-start overflow-hidden"
+        className={`relative w-full min-h-[100dvh] lg:min-h-screen flex flex-col justify-between pt-16 lg:pt-20 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 select-none text-slate-900 dark:text-white overflow-hidden ${
+          scrollMode === 'snap' ? 'h-[100dvh] max-h-[100dvh] snap-start snap-always' : ''
+        }`}
       >
         {/* R1: Dynamic Environmental Background with Smooth Cross-Fade & Contrast Vignettes */}
         <HeroBackground activeMode={activeMode} theme={currentTheme} />
 
         {/* Top Status Bar: Minimal & Clean */}
         <div className="relative z-20 max-w-7xl w-full mx-auto flex items-center justify-between gap-3 pt-1">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/75 dark:bg-black/35 backdrop-blur-md border border-slate-900/10 dark:border-white/20 text-xs shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/80 dark:bg-slate-950/50 backdrop-blur-md ring-1 ring-slate-900/5 dark:ring-white/10 text-xs shadow-sm">
             <span
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: modeConfig.palette.accentHex }}
@@ -109,23 +113,23 @@ export default function Hero({
             <span className="font-semibold text-slate-950 dark:text-white tracking-wide">
               {modeConfig.shortLabel}
             </span>
-            <span className="text-slate-600 dark:text-white/60 text-[11px] hidden sm:inline">• {modeConfig.tagline}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">• {modeConfig.tagline}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-2">
             {modeConfig.hero.verifiedHighlights.slice(0, 2).map((item, i) => (
               <div
                 key={i}
-                className="px-3 py-1 rounded-full text-[11px] bg-white/60 dark:bg-white/10 backdrop-blur-md border border-slate-900/10 dark:border-white/15 text-slate-700 dark:text-white/85 shadow-sm"
+                className="px-3 py-1 rounded-full text-[11px] bg-white/70 dark:bg-white/[0.06] backdrop-blur-md ring-1 ring-slate-900/5 dark:ring-white/10 text-slate-700 dark:text-slate-200 shadow-sm"
               >
-                <strong className="text-slate-950 dark:text-white">{item.label}:</strong> {item.value}
+                <strong className="text-slate-950 dark:text-white font-semibold">{item.label}:</strong> {item.value}
               </div>
             ))}
           </div>
         </div>
 
         {/* Main 3-Column Spatial Stage */}
-        <div className="relative z-20 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center flex-1 my-auto">
+        <div className="relative z-20 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-center flex-1 my-auto">
           {/* Left Column: Identity, Kinetic Typography & Actions */}
           <div
             className="lg:col-span-5 space-y-4 text-left z-20"
@@ -142,10 +146,10 @@ export default function Hero({
 
             {/* Balanced Display Typography */}
             <div className="select-none font-bold">
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-wide text-slate-950 dark:text-white leading-tight">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-normal tracking-wide text-slate-950 dark:text-white leading-tight">
                 {modeConfig.fractalShowcase.topWord}
               </div>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-wide text-slate-950 dark:text-white flex items-center mt-1 lg:ml-4">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-normal tracking-wide text-slate-950 dark:text-white flex items-center mt-1 lg:ml-4">
                 <span>{modeConfig.fractalShowcase.bottomWordBeforeA}</span>
                 <PrismTriangleGlyph
                   leftColor={modeConfig.palette.prismLeftHex}
@@ -159,7 +163,7 @@ export default function Hero({
 
             {/* R6: Content Block Transition Animations with Reactive Key */}
             <div className="space-y-2 lg:pl-4 text-slate-700 dark:text-white/90">
-              <p className="text-xs sm:text-sm font-light leading-relaxed max-w-md">
+              <p className="text-xs sm:text-sm font-normal leading-relaxed max-w-md">
                 {modeConfig.hero.supportingDescription}
               </p>
               {currentHeroProject && (
@@ -167,7 +171,7 @@ export default function Hero({
                   key={currentHeroProject.id}
                   className="animate-in fade-in slide-in-from-left-3 duration-500 motion-safe:transition-all motion-reduce:transition-none"
                 >
-                  <p className="text-xs text-slate-600 dark:text-white/80 max-w-md line-clamp-2 pt-1 font-light border-l-2 pl-3 border-slate-400 dark:border-white/30 hidden lg:block">
+                  <p className="text-xs text-slate-600 dark:text-white/80 max-w-md line-clamp-2 pt-1 font-normal border-l-2 pl-3 border-slate-400 dark:border-white/30 hidden lg:block">
                     <strong className="text-slate-950 dark:text-white font-semibold tracking-wide">
                       Projek Terpilih:
                     </strong>{' '}
@@ -198,6 +202,7 @@ export default function Hero({
                     <ProjectModeIcon
                       mode={activeMode}
                       project={currentHeroProject}
+                      index={((activeSlideIndex % heroSlides.length) + heroSlides.length) % heroSlides.length}
                       className="w-6 h-6 object-contain"
                       priority
                     />
@@ -290,19 +295,16 @@ export default function Hero({
             </div>
           </div>
 
-          {/* Center Column: 3D Scene (Enlarged on Desktop, Completely Hidden on Mobile) */}
-          <div className="hidden lg:flex lg:col-span-5 flex-col items-center justify-center relative z-20 my-1 lg:my-0">
+          {/* Center Column: 3D Scene */}
+          <div className="hidden lg:flex lg:col-span-4 flex-col items-center justify-center relative z-20 my-1 lg:my-0">
             <Hero3DScene
               mode={activeMode}
               theme={currentTheme}
               activeSlideIndex={activeSlideIndex}
               baseHue={modeConfig.palette.crystalBaseHue}
               secondaryHue={modeConfig.palette.crystalSecondaryHue}
-              onModelClick={() => {
-                if (currentHeroProject) onOpenProject(currentHeroProject);
-              }}
             />
-            <span className="mt-2 text-[10px] uppercase tracking-widest text-slate-600 dark:text-white/70 bg-white/70 dark:bg-black/30 px-3.5 py-1 rounded-full backdrop-blur-md border border-slate-900/10 dark:border-white/15 shadow-sm">
+            <span className="mt-2 text-[10px] font-medium uppercase tracking-wider text-slate-600 dark:text-slate-300 bg-white/80 dark:bg-slate-900/80 px-3.5 py-1 rounded-full backdrop-blur-md border border-slate-900/10 dark:border-white/15 shadow-sm">
               {activeMode === 'medical'
                 ? 'Interactive 3D Heart • Drag to Rotate'
                 : activeMode === 'academic'
@@ -311,105 +313,105 @@ export default function Hero({
             </span>
           </div>
 
-          {/* Right Column: Diamond Cards + R4 Dynamic Indicators (Desktop Only) */}
-          <div className="hidden lg:flex lg:col-span-2 relative items-center justify-end min-h-[320px]">
-            {/* Diamond Project Cards */}
-            <div className="relative flex flex-col items-center gap-4 mr-10 sm:mr-16">
-              {heroSlides.map((slideProj, idx) => {
-                const arcOffsets = [
-                  '-translate-x-4 sm:-translate-x-8',
-                  '-translate-x-1 sm:-translate-x-2',
-                  'translate-x-2 sm:translate-x-4',
-                  'translate-x-0'
-                ];
-                const isCardActive = (activeSlideIndex % heroSlides.length) === idx;
-                return (
-                  <Tooltip key={slideProj.id}>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (isCardActive) {
-                            onOpenProject(slideProj);
-                          } else {
-                            setActiveSlideIndex(idx);
-                          }
-                        }}
-                        aria-label={`${slideProj.title} — ${isCardActive ? 'Buka detail studi kasus' : 'Pilih slide'}`}
-                        className={`group relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl rotate-45 transition-all duration-300 ease-out motion-safe:transition-all motion-reduce:transition-none flex items-center justify-center shadow-lg cursor-pointer ${
-                          arcOffsets[idx % arcOffsets.length] || ''
-                        } ${
-                          isCardActive
-                            ? 'bg-white ring-4 ring-slate-900/20 dark:ring-white/60 scale-110 z-20 shadow-xl'
-                            : 'bg-white/80 dark:bg-white/70 hover:bg-white dark:hover:bg-white/85 opacity-90 hover:scale-105 z-10'
-                        } backdrop-blur-md border border-slate-900/10 dark:border-white/70`}
-                      >
-                        <div className="-rotate-45 flex flex-col items-center justify-center p-1 text-center">
-                          <ProjectModeIcon
-                            mode={activeMode}
-                            project={slideProj}
-                            className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-md group-hover:scale-110 transition-transform duration-300"
-                            priority={idx === 0}
-                          />
-                          <span className="mt-0.5 text-[7px] uppercase tracking-wider font-bold text-slate-900 truncate max-w-[55px]">
-                            {slideProj.title.split(' ')[0]}
-                          </span>
-                        </div>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left" className="max-w-xs break-words text-xs">
-                      <span className="font-semibold block">{slideProj.title}</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {isCardActive ? 'Klik untuk buka detail studi kasus' : 'Klik untuk fokus slide'}
-                      </span>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              })}
+          {/* Right Column: Refactored Showcase Cards + R4 Dynamic Indicators (Desktop Only) */}
+          <div className="hidden lg:flex lg:col-span-3 flex-col justify-center gap-2.5">
+            <div className="flex items-center justify-between px-1 mb-0.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Sorotan Projek
+              </span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+                0{((activeSlideIndex % heroSlides.length) + 1)} / 0{heroSlides.length}
+              </span>
             </div>
 
-            {/* R4: Numbered Indicators Dynamically Adapting to heroSlides.length */}
             <div
-              className="flex flex-col justify-between h-[280px] sm:h-[320px] items-end select-none"
+              className="flex flex-col gap-2 select-none"
               role="tablist"
               aria-label="Highlight projects navigation"
             >
               {heroSlides.map((slideProj, idx) => {
                 const numLabel = `0${idx + 1}`;
                 const isSelected = (activeSlideIndex % heroSlides.length) === idx;
-                const curveIndent = [
-                  '-translate-x-6 sm:-translate-x-8',
-                  '-translate-x-2 sm:-translate-x-3',
-                  'translate-x-1 sm:translate-x-2',
-                  '-translate-x-1 sm:-translate-x-2'
-                ];
+                const isCardActive = isSelected;
                 return (
-                  <Tooltip key={slideProj.id}>
-                    <TooltipTrigger asChild>
-                      <button
-                        id={`btn-indicator-${idx}`}
-                        data-testid={`btn-indicator-${idx}`}
-                        type="button"
-                        role="tab"
-                        aria-selected={isSelected}
-                        onClick={() => setActiveSlideIndex(idx)}
-                        aria-label={`Pilih slide ${numLabel}: ${slideProj.title}`}
-                        className={`transition-all duration-300 tracking-tighter leading-none focus:outline-none cursor-pointer ${
-                          curveIndent[idx % curveIndent.length]
-                        } ${
-                          isSelected
-                            ? 'text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white drop-shadow scale-110'
-                            : 'text-sm sm:text-base font-light text-slate-400 dark:text-white/50 hover:text-slate-950 dark:hover:text-white/85'
-                        }`}
-                      >
-                        {numLabel}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left" className="max-w-xs break-words text-xs">
-                      <span className="font-semibold block">{slideProj.title}</span>
-                      <span className="text-[10px] text-muted-foreground">{slideProj.category}</span>
-                    </TooltipContent>
-                  </Tooltip>
+                  <div key={slideProj.id} className="flex items-center gap-2">
+                    {/* Number Indicator Button */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          id={`btn-indicator-${idx}`}
+                          data-testid={`btn-indicator-${idx}`}
+                          type="button"
+                          role="tab"
+                          aria-selected={isSelected}
+                          onClick={() => setActiveSlideIndex(idx)}
+                          aria-label={`Pilih slide ${numLabel}: ${slideProj.title}`}
+                          className={`shrink-0 font-mono text-xs font-bold transition-all duration-300 focus:outline-none cursor-pointer w-7 h-7 rounded-lg flex items-center justify-center border ${
+                            isSelected
+                              ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-sm scale-105'
+                              : 'bg-white/40 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-900/10 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/30'
+                          }`}
+                        >
+                          {numLabel}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="text-xs">
+                        {slideProj.title}
+                      </TooltipContent>
+                    </Tooltip>
+
+                    {/* Elevated Showcase Card */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isCardActive) {
+                              onOpenProject(slideProj);
+                            } else {
+                              setActiveSlideIndex(idx);
+                            }
+                          }}
+                          aria-label={`${slideProj.title} — ${isCardActive ? 'Buka detail studi kasus' : 'Pilih slide'}`}
+                          className={`flex-1 flex items-center gap-2.5 p-2 rounded-xl text-left transition-all duration-300 ease-out motion-safe:transition-all motion-reduce:transition-none cursor-pointer border ${
+                            isCardActive
+                              ? 'bg-white/95 dark:bg-slate-900/90 border-slate-900/20 dark:border-white/30 shadow-md ring-1 ring-slate-900/10 dark:ring-white/20 translate-x-1'
+                              : 'bg-white/60 dark:bg-white/[0.04] border-slate-900/5 dark:border-white/10 hover:bg-white/80 dark:hover:bg-white/10 opacity-75 hover:opacity-100'
+                          } backdrop-blur-md`}
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 border border-slate-900/5 dark:border-white/10">
+                            <ProjectModeIcon
+                              mode={activeMode}
+                              project={slideProj}
+                              index={idx}
+                              className="w-5 h-5 object-contain"
+                              priority={idx === 0}
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
+                              {slideProj.category}
+                            </p>
+                            <h4 className="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                              {slideProj.title}
+                            </h4>
+                          </div>
+                          {isCardActive && (
+                            <VectorArrowGlyph
+                              direction="right"
+                              className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0 mr-1"
+                            />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="max-w-xs break-words text-xs">
+                        <span className="font-semibold block">{slideProj.title}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {isCardActive ? 'Klik untuk buka detail studi kasus' : 'Klik untuk fokus slide'}
+                        </span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 );
               })}
             </div>
@@ -418,14 +420,14 @@ export default function Hero({
 
         {/* Bottom Minimal Shelf: "EXPLORE" & Arrow Switchers */}
         <div className="relative z-30 max-w-7xl w-full mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl bg-white/75 dark:bg-black/35 backdrop-blur-xl border border-slate-900/10 dark:border-white/15 px-5 py-3 shadow-lg dark:shadow-xl">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl bg-white/85 dark:bg-slate-900/60 backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10 px-5 py-3 shadow-lg dark:shadow-2xl">
             <div className="flex flex-wrap items-center gap-4 sm:gap-8">
               <button
                 type="button"
                 onClick={() => onNavigateSection('projects')}
                 className="text-left group focus:outline-none cursor-pointer flex items-center gap-2"
               >
-                <span className="text-[11px] font-bold tracking-widest uppercase text-slate-950 dark:text-white">
+                <span className="text-[11px] font-semibold tracking-widest uppercase text-slate-950 dark:text-white">
                   EXPLORE WORK
                 </span>
                 <VectorArrowGlyph direction="right" className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
@@ -442,7 +444,7 @@ export default function Hero({
                     <span className="text-xs font-semibold text-slate-800 dark:text-white/90 group-hover:underline">
                       {col.title}
                     </span>
-                    <span className="text-[10px] text-slate-500 dark:text-white/60 ml-2 font-light">
+                    <span className="text-[10px] text-slate-500 dark:text-white/60 ml-2 font-normal">
                       {col.subtitle}
                     </span>
                   </button>

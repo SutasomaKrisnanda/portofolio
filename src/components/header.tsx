@@ -1,25 +1,62 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ModeId, PORTFOLIO_MODES, GLOBAL_PROFILE } from '@/data/portfolio-data';
 import { PinwheelGlyph, CloseCrossGlyph } from './geometric-glyphs';
 import { ThemeToggle } from '@/components/theme-toggle';
+import {
+  SlidersHorizontal,
+  HelpCircle,
+  Check,
+  Compass,
+  Layers,
+  Sparkles
+} from 'lucide-react';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider
+} from '@/components/ui/tooltip';
 
 interface HeaderProps {
   activeMode: ModeId;
   onSwitchMode: (mode: ModeId) => void;
   activeSection: string;
   onNavigateSection: (sectionId: string) => void;
+  scrollMode?: 'normal' | 'snap';
+  onToggleScrollMode?: (mode: 'normal' | 'snap') => void;
 }
 
 export default function Header({
   activeMode,
   onSwitchMode,
   activeSection,
-  onNavigateSection
+  onNavigateSection,
+  scrollMode = 'normal',
+  onToggleScrollMode
 }: HeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showFaqPopover, setShowFaqPopover] = useState(false);
+  const faqRef = useRef<HTMLDivElement>(null);
   const currentMode = PORTFOLIO_MODES[activeMode];
+
+  // Dismiss FAQ popover on outside click (especially on touch devices)
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      if (faqRef.current && !faqRef.current.contains(e.target as Node)) {
+        setShowFaqPopover(false);
+      }
+    };
+    if (showFaqPopover) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick);
+      return () => {
+        document.removeEventListener('mousedown', handleOutsideClick);
+        document.removeEventListener('touchstart', handleOutsideClick);
+      };
+    }
+  }, [showFaqPopover]);
 
   const navLinks = [
     { id: 'hero', label: 'Origins' },
@@ -54,7 +91,7 @@ export default function Header({
   return (
     <header className="fixed top-0 left-0 right-0 z-40 pointer-events-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4 flex flex-col gap-3">
-        <div className="pointer-events-auto flex items-center justify-between gap-4 px-5 py-2.5 rounded-full bg-white/80 dark:bg-black/45 backdrop-blur-2xl border border-slate-900/10 dark:border-white/20 shadow-lg dark:shadow-2xl transition-all">
+        <div className="pointer-events-auto flex items-center justify-between gap-4 px-5 py-2.5 rounded-full bg-white/80 dark:bg-slate-950/60 backdrop-blur-2xl ring-1 ring-slate-900/5 dark:ring-white/10 shadow-lg dark:shadow-2xl transition-all">
           {/* Brand Wordmark */}
           <button
             type="button"
@@ -65,10 +102,10 @@ export default function Header({
               <PinwheelGlyph className="w-7 h-7" />
             </div>
             <div>
-              <span className="block font-bold text-xs sm:text-sm tracking-[0.18em] uppercase text-slate-950 dark:text-white leading-tight">
+              <span className="block font-semibold text-xs sm:text-sm tracking-[0.16em] uppercase text-slate-950 dark:text-white leading-tight">
                 {GLOBAL_PROFILE.shortName}
               </span>
-              <span className="block text-[10px] tracking-wider uppercase text-slate-600 dark:text-white/70">
+              <span className="block text-[10px] tracking-wider uppercase text-slate-500 dark:text-white/60">
                 {currentMode.shortLabel}
               </span>
             </div>
@@ -85,8 +122,8 @@ export default function Header({
                   onClick={() => onNavigateSection(item.id)}
                   className={`relative py-1 transition-all cursor-pointer ${
                     isActive
-                      ? 'text-slate-950 dark:text-white font-bold'
-                      : 'text-slate-600 dark:text-white/70 hover:text-slate-950 dark:hover:text-white font-light'
+                      ? 'text-slate-950 dark:text-white font-semibold'
+                      : 'text-slate-500 dark:text-white/60 hover:text-slate-900 dark:hover:text-white font-normal'
                   }`}
                 >
                   <span>{item.label}</span>
@@ -101,13 +138,13 @@ export default function Header({
             })}
           </nav>
 
-          {/* Right Mode Switcher Pills + ThemeToggle + Mobile Trigger */}
+          {/* Right Mode Switcher Pills + ThemeToggle + Preferences Drawer Trigger */}
           <div className="flex items-center gap-2">
-            {/* 3 Clean Professional Mode Pills */}
+            {/* 3 Clean Professional Mode Pills (Desktop) */}
             <div
               role="tablist"
               aria-label="Pemilih Mode Portfolio"
-              className="hidden sm:flex items-center gap-1 p-1 rounded-full bg-slate-900/5 dark:bg-white/10 border border-slate-900/10 dark:border-white/20"
+              className="hidden sm:flex items-center gap-1 p-1 rounded-full bg-slate-100/80 dark:bg-white/[0.06] ring-1 ring-slate-900/5 dark:ring-white/10"
             >
               {modePills.map((tab) => {
                 const isSelected = activeMode === tab.id;
@@ -120,8 +157,8 @@ export default function Header({
                     onClick={() => onSwitchMode(tab.id)}
                     className={`px-3 py-1.5 rounded-full text-[11px] tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-bold shadow-md scale-105'
-                        : 'text-slate-700 dark:text-white/80 hover:text-slate-950 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/10 font-light'
+                        ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-md scale-105'
+                        : 'text-slate-600 dark:text-white/70 hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 font-normal'
                     }`}
                   >
                     <span
@@ -137,91 +174,245 @@ export default function Header({
             {/* Dark / Light Theme Toggle */}
             <ThemeToggle />
 
-            {/* Mobile / Tablet Menu Trigger */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle navigasi dan mode"
-              className="p-2.5 rounded-full bg-slate-900/10 dark:bg-white/15 hover:bg-slate-900/15 dark:hover:bg-white/25 border border-slate-900/10 dark:border-white/25 transition-colors cursor-pointer text-slate-950 dark:text-white"
-            >
-              <div className="w-5 flex flex-col items-end gap-1.5">
-                <span className="w-5 h-[2px] bg-slate-950 dark:bg-white rounded-full" />
-                <span className="w-3.5 h-[2px] bg-slate-950/80 dark:bg-white/85 rounded-full" />
-              </div>
-            </button>
+            {/* Hidden Navbar / Customization Drawer Trigger (Desktop & Mobile) */}
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    aria-label="Buka menu navigasi dan kustomisasi preferensi"
+                    className="p-2 sm:px-3 sm:py-2 rounded-full bg-slate-100/80 dark:bg-white/10 hover:bg-slate-200/80 dark:hover:bg-white/20 ring-1 ring-slate-900/5 dark:ring-white/10 transition-all cursor-pointer text-slate-950 dark:text-white flex items-center gap-2"
+                  >
+                    <SlidersHorizontal className="w-4 h-4 text-slate-800 dark:text-white" />
+                    <span className="hidden md:inline text-xs font-semibold tracking-wider">
+                      Preferensi
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse hidden md:inline" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  Kustomisasi Mode Gulir, Tampilan & Navigasi
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
-        {/* Mobile Slide-Out Drawer */}
-        {mobileMenuOpen && (
-          <div className="pointer-events-auto rounded-3xl bg-white/95 dark:bg-black/85 backdrop-blur-2xl border border-slate-900/10 dark:border-white/25 p-5 shadow-2xl space-y-4 animate-in slide-in-from-top-4 duration-200 text-slate-900 dark:text-white">
-            <div className="flex items-center justify-between border-b border-slate-900/10 dark:border-white/15 pb-3">
-              <div>
-                <div className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-white/60">
-                  Mode Aktif
+        {/* Hidden Navbar / Preference & Customization Drawer */}
+        {menuOpen && (
+          <div className="pointer-events-auto rounded-3xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl ring-1 ring-slate-900/10 dark:ring-white/15 p-5 sm:p-6 shadow-2xl space-y-5 animate-in slide-in-from-top-4 duration-200 text-slate-900 dark:text-white max-w-4xl mx-auto w-full">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between border-b border-slate-900/5 dark:border-white/10 pb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/10">
+                  <SlidersHorizontal className="w-4 h-4 text-slate-900 dark:text-white" />
                 </div>
-                <div className="text-xs font-semibold text-slate-950 dark:text-white">
-                  {currentMode.fullLabel}
+                <div>
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-950 dark:text-white">
+                    Pusat Preferensi & Navigasi Tersembunyi
+                  </h3>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                    Sesuaikan pengalaman interaksi dan alur jelajah portofolio
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <ThemeToggle />
                 <button
                   type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full bg-slate-900/10 dark:bg-white/15 border border-slate-900/10 dark:border-white/25 text-slate-950 dark:text-white"
+                  onClick={() => setMenuOpen(false)}
+                  aria-label="Tutup panel preferensi"
+                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-950 dark:text-white cursor-pointer transition-colors"
                 >
                   <CloseCrossGlyph className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* 3 Mode Cards for Mobile */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {modePills.map((m) => (
+            {/* Section 1: Scroll Mode Preference (Normal vs Snap) with FAQ Tooltip */}
+            <div className="rounded-2xl p-4 bg-slate-50/80 dark:bg-white/[0.04] ring-1 ring-slate-900/5 dark:ring-white/10 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                  <span className="text-xs font-semibold text-slate-950 dark:text-white">
+                    Mode Pengguliran Halaman (Scroll Experience)
+                  </span>
+
+                  {/* FAQ Info Button with Hover & Touch Support */}
+                  <div ref={faqRef} className="relative inline-flex items-center">
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => setShowFaqPopover(!showFaqPopover)}
+                            onTouchStart={() => setShowFaqPopover(!showFaqPopover)}
+                            aria-label="Informasi penjelasan mode pengguliran halaman"
+                            className="w-5 h-5 rounded-full bg-slate-200/80 hover:bg-slate-300 dark:bg-white/15 dark:hover:bg-white/25 text-slate-700 dark:text-slate-200 flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-900/20"
+                          >
+                            <HelpCircle className="w-3.5 h-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="top"
+                          align="center"
+                          className="max-w-xs text-xs p-3 leading-relaxed shadow-xl border bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        >
+                          <div className="space-y-1.5 text-left">
+                            <strong className="block font-semibold text-slate-950 dark:text-white border-b border-slate-200 dark:border-white/10 pb-1">
+                              Pilihan Mode Pengguliran:
+                            </strong>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                              <span className="font-semibold text-slate-900 dark:text-white">Mode Normal (Bebas):</span> Halaman mengalir bebas dan berkelanjutan. Navigasi tombol mengarahkan scroll secara presisi memenuhi layar. Cocok untuk membaca santai.
+                            </p>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                              <span className="font-semibold text-slate-900 dark:text-white">Mode Snap (Per Section):</span> Tiap section mengunci tepat satu layar penuh setiap kali digulir, dilengkapi area gulir terpisah di dalam konten tiap section. Cocok untuk navigasi terfokus seperti presentasi slide.
+                            </p>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    {/* Touch-Friendly Popover Fallback for Mobile/Tablet */}
+                    {showFaqPopover && (
+                      <div className="md:hidden absolute left-0 bottom-7 z-50 w-72 p-3.5 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-900/10 dark:border-white/20 shadow-2xl text-xs space-y-2 animate-in fade-in zoom-in-95">
+                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-1.5">
+                          <strong className="font-semibold text-[11px] uppercase tracking-wider text-slate-900 dark:text-white">
+                            Panduan Mode Gulir
+                          </strong>
+                          <button
+                            type="button"
+                            onClick={() => setShowFaqPopover(false)}
+                            className="text-slate-400 hover:text-slate-600"
+                          >
+                            <CloseCrossGlyph className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                          <strong>Normal:</strong> Pengguliran mengalir bebas alami tanpa kuncian snap.
+                        </p>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                          <strong>Snap:</strong> Bergulir 1 section penuh per guliran layar, dengan scroll mandiri di dalam konten tiap section.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-semibold">
+                  Aktif: {scrollMode === 'snap' ? 'Snap' : 'Normal'}
+                </span>
+              </div>
+
+              {/* Segmented Switch Buttons */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
-                  key={m.id}
                   type="button"
-                  onClick={() => {
-                    onSwitchMode(m.id);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`p-3 rounded-2xl text-left border transition-all cursor-pointer ${
-                    activeMode === m.id
-                      ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white font-bold shadow-xl scale-[1.01]'
-                      : 'bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 text-slate-800 dark:text-white border-slate-900/10 dark:border-white/20'
+                  onClick={() => onToggleScrollMode?.('normal')}
+                  className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
+                    scrollMode === 'normal'
+                      ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-md scale-[1.01]'
+                      : 'bg-white dark:bg-white/[0.05] border-slate-900/10 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: m.dotHex }}
-                    />
-                    <span className="text-[10px] tracking-widest uppercase opacity-75">
-                      MODE {m.code}
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold">Normal (Bebas)</span>
+                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                      scrollMode === 'normal' ? 'bg-white/20 text-white dark:bg-slate-950/20 dark:text-slate-950' : 'bg-slate-200/70 dark:bg-white/10 text-slate-600 dark:text-slate-400'
+                    }`}>
+                      Default
                     </span>
                   </div>
-                  <div className="text-xs font-semibold mt-0.5">{m.label}</div>
+                  <p className="text-[10px] opacity-80 leading-relaxed">
+                    Pengguliran bebas kontinu dan mulus antar-section tanpa kuncian.
+                  </p>
                 </button>
-              ))}
+
+                <button
+                  type="button"
+                  onClick={() => onToggleScrollMode?.('snap')}
+                  className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
+                    scrollMode === 'snap'
+                      ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-md scale-[1.01]'
+                      : 'bg-white dark:bg-white/[0.05] border-slate-900/10 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold">Snap (Per Section)</span>
+                    {scrollMode === 'snap' && <Check className="w-3.5 h-3.5" />}
+                  </div>
+                  <p className="text-[10px] opacity-80 leading-relaxed">
+                    Tiap guliran mengunci 1 section penuh layar + scroll mandiri di dalam section.
+                  </p>
+                </button>
+              </div>
             </div>
 
-            {/* Section Jump Grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1 border-t border-slate-900/10 dark:border-white/15">
-              {navLinks.map((sec, idx) => (
-                <button
-                  key={sec.id}
-                  type="button"
-                  onClick={() => {
-                    onNavigateSection(sec.id);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="px-3 py-2 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 border border-slate-900/10 dark:border-white/15 text-left text-slate-800 dark:text-white"
-                >
-                  <span className="block text-[9px] text-slate-500 dark:text-white/60">0{idx + 1}</span>
-                  <span className="block text-xs font-semibold">{sec.label}</span>
-                </button>
-              ))}
+            {/* Section 2: Mode Portofolio Switcher */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-950 dark:text-white">
+                <Sparkles className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                <span>Pilihan Mode Portofolio</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {modePills.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => {
+                      onSwitchMode(m.id);
+                    }}
+                    className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
+                      activeMode === m.id
+                        ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white font-semibold shadow-md scale-[1.01]'
+                        : 'bg-slate-100/70 dark:bg-white/[0.06] border-slate-900/5 dark:border-white/10 hover:bg-slate-200/70 dark:hover:bg-white/15 text-slate-800 dark:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: m.dotHex }}
+                      />
+                      <span className="text-[10px] tracking-widest uppercase opacity-75 font-mono">
+                        MODE {m.code}
+                      </span>
+                    </div>
+                    <div className="text-xs font-semibold mt-1">{m.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Section 3: Section Jump Grid */}
+            <div className="space-y-2 pt-2 border-t border-slate-900/5 dark:border-white/10">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-950 dark:text-white">
+                <Compass className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                <span>Lompat Langsung ke Section Layar Penuh</span>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {navLinks.map((sec, idx) => {
+                  const isCurrent = activeSection === sec.id;
+                  return (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => {
+                        onNavigateSection(sec.id);
+                        setMenuOpen(false);
+                      }}
+                      className={`px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer border ${
+                        isCurrent
+                          ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-sm font-semibold'
+                          : 'bg-slate-100/70 dark:bg-white/[0.06] border-slate-900/5 dark:border-white/10 hover:bg-slate-200/70 dark:hover:bg-white/15 text-slate-800 dark:text-white'
+                      }`}
+                    >
+                      <span className="block text-[9px] font-mono opacity-75">0{idx + 1}</span>
+                      <span className="block text-xs font-semibold truncate">{sec.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

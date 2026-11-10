@@ -56,15 +56,40 @@ export const CloseCrossGlyph: React.FC<{ className?: string }> = ({ className = 
 );
 
 export const DiamondArtifactGlyph: React.FC<{
-  visualType: Project['visualType'];
-  index: number;
+  visualType?: Project['visualType'] | string;
+  index?: number;
   isActive?: boolean;
-}> = ({ visualType, index }) => {
-  if (index % 3 === 0) {
+  className?: string;
+  style?: React.CSSProperties;
+  'aria-label'?: string;
+  role?: string;
+}> = ({
+  visualType = 'artifact',
+  index = 0,
+  className = 'w-12 h-12 sm:w-16 sm:h-16 drop-shadow-md',
+  style,
+  'aria-label': ariaLabel,
+  role,
+}) => {
+  const reactId = React.useId().replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safeType = String(visualType || 'artifact').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  const chromeGradId = `chrome-${safeType}-${index}-${reactId}`;
+  const holoGradId = `holo-${safeType}-${index}-${reactId}`;
+  const holoSideGradId = `holo-side-${safeType}-${index}-${reactId}`;
+
+  const normIndex = Math.abs(Math.floor(index));
+
+  if (normIndex % 3 === 0) {
     return (
-      <svg viewBox="0 0 80 80" className="w-12 h-12 sm:w-16 sm:h-16 drop-shadow-md">
+      <svg
+        viewBox="0 0 80 80"
+        className={className}
+        style={style}
+        role={role}
+        aria-label={ariaLabel}
+      >
         <defs>
-          <linearGradient id={`chrome-${visualType}-${index}`} x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={chromeGradId} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#f8fafc" />
             <stop offset="45%" stopColor="#64748b" />
             <stop offset="75%" stopColor="#cbd5e1" />
@@ -74,7 +99,7 @@ export const DiamondArtifactGlyph: React.FC<{
         <ellipse cx="42" cy="67" rx="16" ry="4" fill="rgba(15,23,42,0.28)" />
         <path
           d="M38 12 C52 14, 56 28, 46 38 C58 46, 54 62, 38 64 C24 62, 24 46, 34 36 C24 26, 28 14, 38 12 Z"
-          fill={`url(#chrome-${visualType}-${index})`}
+          fill={`url(#${chromeGradId})`}
           stroke="#e2e8f0"
           strokeWidth="1.2"
         />
@@ -83,9 +108,15 @@ export const DiamondArtifactGlyph: React.FC<{
       </svg>
     );
   }
-  if (index % 3 === 1) {
+  if (normIndex % 3 === 1) {
     return (
-      <svg viewBox="0 0 80 80" className="w-12 h-12 sm:w-16 sm:h-16 drop-shadow-md">
+      <svg
+        viewBox="0 0 80 80"
+        className={className}
+        style={style}
+        role={role}
+        aria-label={ariaLabel}
+      >
         <ellipse cx="40" cy="64" rx="22" ry="5" fill="rgba(15,23,42,0.25)" />
         <polygon points="40,20 66,34 40,48 14,34" fill="#fbcfe8" stroke="#f9a8d4" strokeWidth="1" />
         <polygon points="14,34 40,48 40,60 14,46" fill="#f472b6" />
@@ -95,22 +126,28 @@ export const DiamondArtifactGlyph: React.FC<{
     );
   }
   return (
-    <svg viewBox="0 0 80 80" className="w-12 h-12 sm:w-16 sm:h-16 drop-shadow-md">
+    <svg
+      viewBox="0 0 80 80"
+      className={className}
+      style={style}
+      role={role}
+      aria-label={ariaLabel}
+    >
       <defs>
-        <linearGradient id={`holo-${visualType}-${index}`} x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={holoGradId} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#22d3ee" />
           <stop offset="50%" stopColor="#c084fc" />
           <stop offset="100%" stopColor="#f472b6" />
         </linearGradient>
-        <linearGradient id={`holo-side-${visualType}-${index}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={holoSideGradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#38bdf8" />
           <stop offset="100%" stopColor="#0f766e" />
         </linearGradient>
       </defs>
       <ellipse cx="42" cy="67" rx="14" ry="4" fill="rgba(15,23,42,0.28)" />
       <polygon points="38,14 58,22 44,30 24,22" fill="#e0f2fe" />
-      <polygon points="24,22 44,30 44,58 24,50" fill={`url(#holo-${visualType}-${index})`} />
-      <polygon points="44,30 58,22 58,50 44,58" fill={`url(#holo-side-${visualType}-${index})`} />
+      <polygon points="24,22 44,30 44,58 24,50" fill={`url(#${holoGradId})`} />
+      <polygon points="44,30 58,22 58,50 44,58" fill={`url(#${holoSideGradId})`} />
       <rect x="40" y="56" width="4" height="8" rx="1.5" fill="#334155" />
     </svg>
   );

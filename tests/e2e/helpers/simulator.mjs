@@ -1,23 +1,73 @@
-import { loadProjects, BACKGROUND_ASSETS, MODEL_ASSETS, ICON_ASSETS, VIEWPORTS } from './fixtures.mjs';
-import { filterFeaturedProjects, calculateSlideIndex } from './oracle.mjs';
+import {
+  loadProjects,
+  loadAchievements,
+  loadExperience,
+  loadCommittees,
+  VIEWPORTS,
+  MODES,
+  THEMES,
+  BENTO_GRID_SPECS,
+  CATEGORY_PILL_LAYOUT_SPECS
+} from './fixtures.mjs';
+
+import {
+  resolveExpected3DModelSpec,
+  buildProcedural3DModel,
+  disposeHierarchy,
+  filterProjects,
+  filterAchievements,
+  filterBentoHistory,
+  sliceProgressiveDisclosure,
+  resolveExpectedProjectMode,
+  resolveExpectedProjectIconAsset,
+  resolveExpectedProjectAltText
+} from './oracle.mjs';
 
 /**
- * Headless E2E Portfolio State Simulator
- * Accurately models state transitions and interactions defined in ORIGINAL_REQUEST.md & PROJECT.md
+ * Headless E2E Portfolio State Simulator for Requirements R1, R2, R3, R4
+ * Accurately models reactive state transitions and invariant constraints across:
+ * - R1: Procedural 3D Hero Scenes (Polyhedron, Helix DNA, Pena Bulu)
+ * - R2: Compact Category Pills & Filter Reset Invariant across Galleries
+ * - R3: Smart Bento Grid 5-Tile Layout & Progressive History Disclosure
+ * - R4: Dynamic Project Mode Icons with Multi-Mode Resolution & Fallback
  */
 export class PortfolioSimulator {
   constructor(initialOptions = {}) {
     this.projects = initialOptions.projects || loadProjects();
-    this.activeMode = ['tech', 'medical', 'academic'].includes(initialOptions.mode) ? initialOptions.mode : 'tech';
-    this.resolvedTheme = ['dark', 'light'].includes(initialOptions.theme) ? initialOptions.theme : 'dark';
-    this.activeSlideIndex = 0;
-    this.isModalOpen = false;
-    this.activeModalProject = null;
-    this.hoveredElement = null;
-    this.focusedElement = null;
-    this.activeTooltip = null;
+    this.achievements = initialOptions.achievements || loadAchievements();
+    this.experience = initialOptions.experience || loadExperience();
+    this.committees = initialOptions.committees || loadCommittees();
+
+    this.activeMode = MODES.includes(initialOptions.mode) ? initialOptions.mode : 'tech';
+    this.resolvedTheme = THEMES.includes(initialOptions.theme) ? initialOptions.theme : 'dark';
     this.viewport = initialOptions.viewport || { ...VIEWPORTS.desktop };
+
+    // R2 State: Category selection & search
+    this.projectsSelectedCategory = 'All';
+    this.projectsSearchQuery = '';
+    this.projectsSortBy = 'featured';
+    this.achievementsSelectedCategory = 'All';
+
+    // R3 State: Bento grid history tab & disclosure
+    this.bentoActiveTab = 'all';
+    this.bentoIsExpanded = false;
+
+    // R1 State: Three.js simulation
+    this.fps = 60;
+    this.isWebGLAvailable = initialOptions.webGLAvailable !== false;
+    this.active3DScene = null;
+    this.lastDisposedStats = null;
+
     this.transitionHistory = [];
+    this._init3DModel();
+  }
+
+  _init3DModel() {
+    if (this.isWebGLAvailable && this.viewport.width >= 1024) {
+      this.active3DScene = buildProcedural3DModel(this.activeMode);
+    } else {
+      this.active3DScene = null;
+    }
   }
 
   recordTransition(action, payload) {
@@ -28,29 +78,38 @@ export class PortfolioSimulator {
       state: {
         mode: this.activeMode,
         theme: this.resolvedTheme,
-        slideIndex: this.activeSlideIndex,
-        isModalOpen: this.isModalOpen
+        projectsCategory: this.projectsSelectedCategory,
+        achievementsCategory: this.achievementsSelectedCategory,
+        bentoTab: this.bentoActiveTab,
+        bentoIsExpanded: this.bentoIsExpanded
       }
     });
   }
 
-  // --- Mode & Theme Actions ---
+  // =========================================================================
+  // Mode & Theme Controls
+  // =========================================================================
 
   switchMode(newMode) {
-    if (!['tech', 'medical', 'academic'].includes(newMode)) {
-      // Graceful fallback to default 'tech'
-      newMode = 'tech';
+    if (!MODES.includes(newMode)) {
+      newMode = 'tech'; // Safe fallback
     }
     const prevMode = this.activeMode;
     this.activeMode = newMode;
-    // R4 requirement: auto-reset slide index to 0 when mode changes
-    this.activeSlideIndex = 0;
+
+    // R2 Invariant: Category filter MUST reset to 'All' on mode change
+    this.projectsSelectedCategory = 'All';
+    this.achievementsSelectedCategory = 'All';
+
+    // R1 Invariant: 3D scene transitions instantly
+    this._init3DModel();
+
     this.recordTransition('switchMode', { from: prevMode, to: newMode });
     return this;
   }
 
   switchTheme(newTheme) {
-    if (!['dark', 'light'].includes(newTheme)) {
+    if (!THEMES.includes(newTheme)) {
       newTheme = 'dark';
     }
     const prevTheme = this.resolvedTheme;
@@ -59,160 +118,143 @@ export class PortfolioSimulator {
     return this;
   }
 
-  // --- Slide Navigation Actions ---
-
-  getFeaturedProjects() {
-    return filterFeaturedProjects(this.projects, this.activeMode);
-  }
-
-  getCurrentHeroProject() {
-    const list = this.getFeaturedProjects();
-    if (list.length === 0) return null;
-    const safeIndex = ((this.activeSlideIndex % list.length) + list.length) % list.length;
-    return list[safeIndex];
-  }
-
-  nextSlide() {
-    const list = this.getFeaturedProjects();
-    if (list.length === 0) return this;
-    const nextIdx = calculateSlideIndex(this.activeSlideIndex, 1, list.length);
-    this.activeSlideIndex = nextIdx;
-    this.recordTransition('nextSlide', { newIndex: nextIdx });
-    return this;
-  }
-
-  prevSlide() {
-    const list = this.getFeaturedProjects();
-    if (list.length === 0) return this;
-    const prevIdx = calculateSlideIndex(this.activeSlideIndex, -1, list.length);
-    this.activeSlideIndex = prevIdx;
-    this.recordTransition('prevSlide', { newIndex: prevIdx });
-    return this;
-  }
-
-  goToSlide(index) {
-    const list = this.getFeaturedProjects();
-    if (list.length === 0) {
-      this.activeSlideIndex = 0;
-      return this;
-    }
-    // Clamped/wrapped safe index
-    const safeIdx = ((index % list.length) + list.length) % list.length;
-    this.activeSlideIndex = safeIdx;
-    this.recordTransition('goToSlide', { index: safeIdx });
-    return this;
-  }
-
-  // --- Modal Integration Actions (R5) ---
-
-  clickActiveProjectCard() {
-    // Single-click active card triggers modal opening
-    const project = this.getCurrentHeroProject();
-    if (project) {
-      this.isModalOpen = true;
-      this.activeModalProject = project;
-      this.recordTransition('clickActiveProjectCard', { projectId: project.id });
-    }
-    return this;
-  }
-
-  clickLihatDetailButton() {
-    // Single-click "Lihat Detail" button triggers modal opening
-    const project = this.getCurrentHeroProject();
-    if (project) {
-      this.isModalOpen = true;
-      this.activeModalProject = project;
-      this.recordTransition('clickLihatDetailButton', { projectId: project.id });
-    }
-    return this;
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-    this.activeModalProject = null;
-    this.recordTransition('closeModal', {});
-    return this;
-  }
-
-  pressEscape() {
-    if (this.isModalOpen) {
-      this.closeModal();
-    }
-    return this;
-  }
-
-  clickBackdrop() {
-    if (this.isModalOpen) {
-      this.closeModal();
-    }
-    return this;
-  }
-
-  clickModalContent() {
-    // Clicking inside modal content must NOT close the modal
-    this.recordTransition('clickModalContent', {});
-    return this;
-  }
-
-  // --- Tooltip & Focus Actions (R6) ---
-
-  hoverButton(buttonId, tooltipText) {
-    this.hoveredElement = buttonId;
-    this.activeTooltip = tooltipText;
-    this.recordTransition('hoverButton', { buttonId, tooltipText });
-    return this;
-  }
-
-  focusButton(buttonId, tooltipText) {
-    this.focusedElement = buttonId;
-    this.activeTooltip = tooltipText;
-    this.recordTransition('focusButton', { buttonId, tooltipText });
-    return this;
-  }
-
-  blurButton() {
-    this.focusedElement = null;
-    this.hoveredElement = null;
-    this.activeTooltip = null;
-    this.recordTransition('blurButton', {});
-    return this;
-  }
-
   setViewport(width, height) {
     this.viewport = { width, height };
+    this._init3DModel();
     this.recordTransition('setViewport', { width, height });
     return this;
   }
 
-  // --- Observable State Getters ---
+  // =========================================================================
+  // R1: 3D Hero Model Simulation
+  // =========================================================================
 
-  getVisibleBackgroundAsset() {
-    return BACKGROUND_ASSETS[this.activeMode]?.[this.resolvedTheme] || null;
+  getActive3DModelSpec() {
+    return resolveExpected3DModelSpec(this.activeMode);
   }
 
-  getVisible3DModelSpec() {
-    return MODEL_ASSETS[this.activeMode] || null;
+  get3DGeometryStats() {
+    if (!this.active3DScene) {
+      // Mobile skip or WebGL unavailable: 0 triangles
+      return { triangleCount: 0, networkBytes: 0, isSkipped: true };
+    }
+    return {
+      triangleCount: this.active3DScene.triangleCount,
+      networkBytes: this.active3DScene.networkBytes,
+      isSkipped: false
+    };
   }
 
-  getVisibleProjectIcon() {
-    return ICON_ASSETS[this.activeMode] || null;
+  unmount3DScene() {
+    if (this.active3DScene && this.active3DScene.group) {
+      this.lastDisposedStats = disposeHierarchy(this.active3DScene.group);
+      this.active3DScene = null;
+    }
+    return this.lastDisposedStats;
   }
 
-  getNavigationIndicatorCount() {
-    return this.getFeaturedProjects().length;
+  // =========================================================================
+  // R2: Projects & Achievements Galleries Category Pills
+  // =========================================================================
+
+  selectProjectsCategory(category) {
+    this.projectsSelectedCategory = category;
+    this.recordTransition('selectProjectsCategory', { category });
+    return this;
   }
 
-  isModalActive() {
-    return this.isModalOpen && Boolean(this.activeModalProject);
+  setProjectsSearchQuery(query) {
+    this.projectsSearchQuery = query;
+    this.recordTransition('setProjectsSearchQuery', { query });
+    return this;
   }
 
-  isScrollbarConfined() {
-    // 3-tier Flexbox layout contract: body has overflow-y-auto and parent container has overflow-hidden
-    return true;
+  setProjectsSortBy(sortBy) {
+    this.projectsSortBy = sortBy;
+    this.recordTransition('setProjectsSortBy', { sortBy });
+    return this;
   }
 
-  isTitlePinned() {
-    // Header flex-shrink-0 ensures title is positioned stably
-    return true;
+  selectAchievementsCategory(category) {
+    this.achievementsSelectedCategory = category;
+    this.recordTransition('selectAchievementsCategory', { category });
+    return this;
+  }
+
+  getFilteredProjects() {
+    return filterProjects(
+      this.projects,
+      this.activeMode,
+      this.projectsSelectedCategory,
+      this.projectsSearchQuery,
+      this.projectsSortBy
+    );
+  }
+
+  getFilteredAchievements() {
+    return filterAchievements(
+      this.achievements,
+      this.activeMode,
+      this.achievementsSelectedCategory
+    );
+  }
+
+  getPillLayoutMode() {
+    if (this.viewport.width <= CATEGORY_PILL_LAYOUT_SPECS.mobile.maxWidth) {
+      return 'mobile-horizontal-scroll';
+    }
+    return 'desktop-wrap';
+  }
+
+  // =========================================================================
+  // R3: Smart Bento Grid ("Tentang Saya")
+  // =========================================================================
+
+  selectBentoTab(tab) {
+    if (['all', 'experience', 'committees'].includes(tab)) {
+      this.bentoActiveTab = tab;
+      this.recordTransition('selectBentoTab', { tab });
+    }
+    return this;
+  }
+
+  toggleBentoExpansion() {
+    this.bentoIsExpanded = !this.bentoIsExpanded;
+    this.recordTransition('toggleBentoExpansion', { isExpanded: this.bentoIsExpanded });
+    return this;
+  }
+
+  getAllBentoHistoryItems() {
+    return filterBentoHistory(this.experience, this.committees, this.activeMode, this.bentoActiveTab);
+  }
+
+  getVisibleBentoHistoryItems() {
+    const allItems = this.getAllBentoHistoryItems();
+    return sliceProgressiveDisclosure(allItems, this.bentoIsExpanded, BENTO_GRID_SPECS.initialVisibleItemsCount);
+  }
+
+  shouldShowBentoDisclosureButton() {
+    const allItems = this.getAllBentoHistoryItems();
+    return allItems.length > BENTO_GRID_SPECS.initialVisibleItemsCount;
+  }
+
+  getBentoTileSpecs() {
+    return BENTO_GRID_SPECS.tiles;
+  }
+
+  // =========================================================================
+  // R4: Dynamic Project Mode Icons
+  // =========================================================================
+
+  resolveProjectMode(project) {
+    return resolveExpectedProjectMode(this.activeMode, project);
+  }
+
+  getProjectModeIconAsset(project) {
+    return resolveExpectedProjectIconAsset(this.activeMode, project);
+  }
+
+  getProjectModeIconAlt(project) {
+    return resolveExpectedProjectAltText(this.activeMode, project);
   }
 }

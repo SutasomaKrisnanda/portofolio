@@ -1,0 +1,129 @@
+--- patch-fs.js
++++ patch-fs.js
+@@ -37,5 +37,17 @@
+ }
+ 
++function isAppPathsManifestPath(p) {
++  if (!p) return false;
++  let str = typeof p === 'string' ? p : Buffer.isBuffer(p) ? p.toString() : p && p.pathname ? p.pathname : String(p);
++  const normalized = str.replace(/\\/g, '/').toLowerCase();
++  return (
++    normalized.endsWith('/server/app-paths-manifest.json') ||
++    normalized.endsWith('/app-paths-manifest.json') ||
++    normalized === 'app-paths-manifest.json' ||
++    /(?:^|[\\/])app-paths-manifest\.json(?:$|[\\/?#])/.test(str)
++  );
++}
++
+ function isNftJsonPath(p) {
+   if (!p) return false;
+   let str = typeof p === 'string' ? p : Buffer.isBuffer(p) ? p.toString() : p && p.pathname ? p.pathname : String(p);
+@@ -45,3 +57,14 @@
+ 
+-const DEFAULT_PAGES_MANIFEST = '{}';
++const DEFAULT_PAGES_MANIFEST = JSON.stringify(
++  {
++    "/_app": "pages/_app.js",
++    "/_error": "pages/_error.js",
++    "/_document": "pages/_document.js",
++    "/404": "pages/404.html"
++  },
++  null,
++  2
++);
++
++const DEFAULT_APP_PATHS_MANIFEST = JSON.stringify(
++  {
++    "/_not-found/page": "app/_not-found/page.js",
++    "/page": "app/page.js",
++    "/_not-found": "app/_not-found/page.js"
++  },
++  null,
++  2
++);
+ 
+@@ -80,4 +103,26 @@
+ }
+ 
++function ensureAppPathsManifestOnDisk(filePath) {
++  try {
++    const strPath =
++      typeof filePath === 'string'
++        ? filePath
++        : Buffer.isBuffer(filePath)
++        ? filePath.toString()
++        : filePath && filePath.pathname
++        ? filePath.pathname
++        : String(filePath);
++    const dir = path.dirname(strPath);
++    if (!fs.existsSync(dir)) {
++      fs.mkdirSync(dir, { recursive: true });
++    }
++    if (!fs.existsSync(strPath)) {
++      fs.writeFileSync(strPath, DEFAULT_APP_PATHS_MANIFEST, 'utf8');
++    }
++  } catch (_) {
++    // Ignore DrvFs lock / permission race
++  }
++}
++
+ function ensureMiddlewareManifestOnDisk(filePath) {
+@@ -198,2 +243,18 @@
+     }
++    if (isAppPathsManifestPath(request)) {
++      ensureAppPathsManifestOnDisk(request);
++      try {
++        return origRequire.apply(this, arguments);
++      } catch (reqErr) {
++        if (reqErr && (reqErr.code === 'MODULE_NOT_FOUND' || reqErr.code === 'ENOENT')) {
++          ensureAppPathsManifestOnDisk(request);
++          try {
++            return origRequire.apply(this, arguments);
++          } catch (_) {
++            return JSON.parse(DEFAULT_APP_PATHS_MANIFEST);
++          }
++        }
++        throw reqErr;
++      }
++    }
+     return origRequire.apply(this, arguments);
+@@ -843,4 +904,14 @@
+       }
++      if (err && err.code === 'ENOENT' && isAppPathsManifestPath(p)) {
++        ensureAppPathsManifestOnDisk(p);
++        const options = args.length > 1 ? args[0] : null;
++        const encoding = typeof options === 'string' ? options : options?.encoding;
++        const result =
++          encoding === 'utf8' || encoding === 'utf-8'
++            ? DEFAULT_APP_PATHS_MANIFEST
++            : Buffer.from(DEFAULT_APP_PATHS_MANIFEST, 'utf8');
++        return cb(null, result);
++      }
+       if (err && err.code === 'ENOENT' && isNftJsonPath(p)) {
+@@ -882,4 +953,12 @@
+     }
++    if (err && err.code === 'ENOENT' && isAppPathsManifestPath(p)) {
++      ensureAppPathsManifestOnDisk(p);
++      const encoding = typeof options === 'string' ? options : options?.encoding;
++      if (encoding === 'utf8' || encoding === 'utf-8') {
++        return DEFAULT_APP_PATHS_MANIFEST;
++      }
++      return Buffer.from(DEFAULT_APP_PATHS_MANIFEST, 'utf8');
++    }
+     if (err && err.code === 'ENOENT' && isNftJsonPath(p)) {
+@@ -916,4 +995,12 @@
+       }
++      if (err && err.code === 'ENOENT' && isAppPathsManifestPath(p)) {
++        ensureAppPathsManifestOnDisk(p);
++        const encoding = typeof options === 'string' ? options : options?.encoding;
++        if (encoding === 'utf8' || encoding === 'utf-8') {
++          return DEFAULT_APP_PATHS_MANIFEST;
++        }
++        return Buffer.from(DEFAULT_APP_PATHS_MANIFEST, 'utf8');
++      }
+       if (err && err.code === 'ENOENT' && isNftJsonPath(p)) {
+@@ -976,3 +1063,3 @@
+     (err.syscall === 'open' || err.syscall === 'read') &&
+-    (isPagesManifestPath(err.path) || isMiddlewareManifestPath(err.path) || isNftJsonPath(err.path))
++    (isPagesManifestPath(err.path) || isAppPathsManifestPath(err.path) || isMiddlewareManifestPath(err.path) || isNftJsonPath(err.path))
+   ) {

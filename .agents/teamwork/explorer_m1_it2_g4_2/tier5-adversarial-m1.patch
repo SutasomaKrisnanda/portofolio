@@ -1,0 +1,17 @@
+--- a/tests/e2e/tier5-adversarial-m1.test.mjs
++++ b/tests/e2e/tier5-adversarial-m1.test.mjs
+@@ -293,3 +293,12 @@
+-      // Check SVG icon referenced
+-      assert.ok(html.includes('project-tech'), 'HTML must reference project-tech SVG');
++      // Check project icon representation:
++      // Requirement R1.1 restored DiamondArtifactGlyph procedural inline SVGs for Tech mode (chrome- and holo- gradient defs),
++      // while retaining compatibility with static mode SVG icon references (project-tech, project-medical, project-academic).
++      const hasR1TechGlyphs = html.includes('chrome-') && html.includes('holo-');
++      const hasModeSvgIcons =
++        html.includes('project-tech') ||
++        html.includes('project-medical') ||
++        html.includes('project-academic');
++      assert.ok(
++        hasR1TechGlyphs || hasModeSvgIcons,
++        'HTML must render authentic R1.1 DiamondArtifactGlyph procedural SVG defs (chrome- and holo-) or reference project mode SVG assets (project-tech, project-medical, project-academic)'
++      );

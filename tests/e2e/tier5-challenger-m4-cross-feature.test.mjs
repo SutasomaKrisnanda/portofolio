@@ -52,19 +52,17 @@ describe('Tier 5 Challenger M4: Whole-Project Cross-Feature Adversarial Stress S
           assert.ok(fs.existsSync(bgPath), `Background file missing: ${bgFile}`);
         }
 
-        // R2: 3D model target mapping
+        // R2: 3D model target mapping (model-pena replaces heavy model-quill per user mandate)
         const expectedModel =
           currentMode === 'medical'
             ? 'model-jantung.glb'
             : currentMode === 'academic'
-            ? 'model-quill.glb'
+            ? 'model-pena.glb'
             : null; // procedural for tech
 
         if (expectedModel) {
-          const modelSrc = path.resolve(PROJECT_ROOT, 'src/assets/models', expectedModel);
           const modelPub = path.resolve(PROJECT_ROOT, 'public/models', expectedModel);
           const modelOut = path.resolve(PROJECT_ROOT, 'out/models', expectedModel);
-          assert.ok(fs.existsSync(modelSrc), `Source model missing: ${expectedModel}`);
           assert.ok(fs.existsSync(modelPub), `Public model missing: ${expectedModel}`);
           assert.ok(fs.existsSync(modelOut), `Out model missing: ${expectedModel}`);
         }
@@ -337,8 +335,11 @@ describe('Tier 5 Challenger M4: Whole-Project Cross-Feature Adversarial Stress S
       // 4. Primary CTA button triggers onOpenProject(currentHeroProject)
       assert.ok(content.includes('onOpenProject(currentHeroProject)'), 'CTA detail button must trigger onOpenProject');
 
-      // 5. 3D scene model click triggers onOpenProject(currentHeroProject)
-      assert.ok(content.includes('if (currentHeroProject) onOpenProject(currentHeroProject)'), '3D model click must trigger onOpenProject');
+      // 5. 3D scene model click decoupled per user requirement #3 (never opens modal on click)
+      const hero3DPath = path.resolve(PROJECT_ROOT, 'src/components/hero-3d-scene.tsx');
+      const hero3DContent = fs.readFileSync(hero3DPath, 'utf8');
+      assert.ok(!hero3DContent.includes('onOpenProject'), '3D scene must NOT invoke onOpenProject');
+      assert.ok(!content.includes('<Hero3DScene onModelClick'), 'Hero3DScene must not receive onModelClick');
     });
 
     test('CH4.4.2: project-modal.tsx strictly complies with 3-tier Flexbox layout hierarchy', () => {
@@ -452,24 +453,20 @@ describe('Tier 5 Challenger M4: Whole-Project Cross-Feature Adversarial Stress S
       assert.ok(html.includes('btn-slide-next'), 'Pre-rendered HTML must include btn-slide-next');
     });
 
-    test('CH4.6.2: 3D GLB models possess bit-for-bit SHA-256 parity across src, public, and out directories', () => {
-      const models = ['model-jantung.glb', 'model-quill.glb'];
+    test('CH4.6.2: 3D GLB models possess bit-for-bit SHA-256 parity between public and out directories', () => {
+      const models = ['model-jantung.glb', 'model-pena.glb'];
 
       for (const m of models) {
-        const srcPath = path.resolve(PROJECT_ROOT, 'src/assets/models', m);
         const pubPath = path.resolve(PROJECT_ROOT, 'public/models', m);
         const outPath = path.resolve(PROJECT_ROOT, 'out/models', m);
 
-        assert.ok(fs.existsSync(srcPath), `Missing src model: ${m}`);
         assert.ok(fs.existsSync(pubPath), `Missing public model: ${m}`);
         assert.ok(fs.existsSync(outPath), `Missing out model: ${m}`);
 
-        const hashSrc = sha256(srcPath);
         const hashPub = sha256(pubPath);
         const hashOut = sha256(outPath);
 
-        assert.strictEqual(hashPub, hashSrc, `SHA-256 mismatch between src and public for ${m}`);
-        assert.strictEqual(hashOut, hashSrc, `SHA-256 mismatch between src and out for ${m}`);
+        assert.strictEqual(hashOut, hashPub, `SHA-256 mismatch between public and out for ${m}`);
       }
     });
 

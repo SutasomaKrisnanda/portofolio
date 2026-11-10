@@ -1,0 +1,187 @@
+--- a/patch-fs.js
++++ b/patch-fs.js
+@@ -36,18 +36,17 @@ function isMiddlewareManifestPath(p) {
+   );
+ }
+ 
+-const DEFAULT_PAGES_MANIFEST = JSON.stringify(
+-  {
+-    '/_app': 'pages/_app.js',
+-    '/_error': 'pages/_error.js',
+-    '/_document': 'pages/_document.js',
+-    '/404': 'pages/404.html'
+-  },
+-  null,
+-  2
+-);
++function isNftJsonPath(p) {
++  if (!p) return false;
++  let str = typeof p === 'string' ? p : Buffer.isBuffer(p) ? p.toString() : p && p.pathname ? p.pathname : String(p);
++  const normalized = str.replace(/\\/g, '/').toLowerCase();
++  return normalized.endsWith('.nft.json');
++}
++
++const DEFAULT_PAGES_MANIFEST = '{}';
+ 
+ const DEFAULT_MIDDLEWARE_MANIFEST = JSON.stringify(
+   {
+     version: 3,
+     middleware: {},
+     functions: {},
+@@ -57,6 +56,8 @@ const DEFAULT_MIDDLEWARE_MANIFEST = JSON.stringify(
+   2
+ );
+ 
++const DEFAULT_NFT_JSON = JSON.stringify({ version: 1, files: [] });
++
+ function ensurePagesManifestOnDisk(filePath) {
+   try {
+     const strPath =
+@@ -101,6 +102,26 @@ function ensureMiddlewareManifestOnDisk(filePath) {
+   } catch (_) {
+     // Ignore DrvFs lock / permission race
+   }
+ }
+ 
++function ensureNftJsonOnDisk(filePath) {
++  try {
++    const strPath =
++      typeof filePath === 'string'
++        ? filePath
++        : Buffer.isBuffer(filePath)
++        ? filePath.toString()
++        : filePath && filePath.pathname
++        ? filePath.pathname
++        : String(filePath);
++    const dir = path.dirname(strPath);
++    if (!fs.existsSync(dir)) {
++      fs.mkdirSync(dir, { recursive: true });
++    }
++    if (!fs.existsSync(strPath)) {
++      fs.writeFileSync(strPath, DEFAULT_NFT_JSON, 'utf8');
++    }
++  } catch (_) {
++    // Ignore DrvFs lock / permission race
++  }
++}
++
+ // 1b. Module loader hook: ensure sharp native loader resilience across Linux, WSL, and Windows
+@@ -318,6 +339,19 @@ fs.open = function (p, ...args) {
+     }
+   }
++  if (isNftJsonPath(p)) {
++    ensureNftJsonOnDisk(p);
++    if (typeof cb === 'function') {
++      const wrappedCb = (err, fd) => {
++        if (err && err.code === 'ENOENT') {
++          ensureNftJsonOnDisk(p);
++          return origOpen.apply(fs, [p, ...args]);
++        }
++        return cb(err, fd);
++      };
++      const newArgs = [...args.slice(0, args.length - 1), wrappedCb];
++      return origOpen.apply(fs, [p, ...newArgs]);
++    }
++  }
+   if (isTracePath(p) && typeof cb === 'function') {
+     const wrappedCb = (err, fd) => {
+       if (err && isLockingError(err)) {
+@@ -359,6 +393,18 @@ fs.openSync = function (p, ...args) {
+     }
+   }
++  if (isNftJsonPath(p)) {
++    ensureNftJsonOnDisk(p);
++    try {
++      return origOpenSync.apply(fs, [p, ...args]);
++    } catch (err) {
++      if (err && err.code === 'ENOENT') {
++        ensureNftJsonOnDisk(p);
++        return origOpenSync.apply(fs, [p, ...args]);
++      }
++      throw err;
++    }
++  }
+   try {
+     return origOpenSync.apply(fs, [p, ...args]);
+   } catch (err) {
+@@ -397,6 +443,18 @@ if (fs.promises && fs.promises.open) {
+     }
++    if (isNftJsonPath(p)) {
++      ensureNftJsonOnDisk(p);
++      try {
++        return await origPromisesOpen.apply(fs.promises, [p, ...args]);
++      } catch (err) {
++        if (err && err.code === 'ENOENT') {
++          ensureNftJsonOnDisk(p);
++          return await origPromisesOpen.apply(fs.promises, [p, ...args]);
++        }
++        throw err;
++      }
++    }
+     try {
+       return await origPromisesOpen.apply(fs.promises, [p, ...args]);
+     } catch (err) {
+@@ -616,6 +674,16 @@ fs.readFile = function (p, ...args) {
+         return cb(null, result);
+       }
++      if (err && err.code === 'ENOENT' && isNftJsonPath(p)) {
++        ensureNftJsonOnDisk(p);
++        const options = args.length > 1 ? args[0] : null;
++        const encoding = typeof options === 'string' ? options : options?.encoding;
++        const result =
++          encoding === 'utf8' || encoding === 'utf-8'
++            ? DEFAULT_NFT_JSON
++            : Buffer.from(DEFAULT_NFT_JSON, 'utf8');
++        return cb(null, result);
++      }
+       return cb(err, data);
+     };
+     const newArgs = [...args.slice(0, args.length - 1), wrappedCb];
+@@ -645,6 +713,14 @@ fs.readFileSync = function (p, options) {
+       return Buffer.from(DEFAULT_PAGES_MANIFEST, 'utf8');
+     }
++    if (err && err.code === 'ENOENT' && isNftJsonPath(p)) {
++      ensureNftJsonOnDisk(p);
++      const encoding = typeof options === 'string' ? options : options?.encoding;
++      if (encoding === 'utf8' || encoding === 'utf-8') {
++        return DEFAULT_NFT_JSON;
++      }
++      return Buffer.from(DEFAULT_NFT_JSON, 'utf8');
++    }
+     throw err;
+   }
+ };
+@@ -671,6 +747,14 @@ if (fs.promises && fs.promises.readFile) {
+         return Buffer.from(DEFAULT_PAGES_MANIFEST, 'utf8');
+       }
++      if (err && err.code === 'ENOENT' && isNftJsonPath(p)) {
++        ensureNftJsonOnDisk(p);
++        const encoding = typeof options === 'string' ? options : options?.encoding;
++        if (encoding === 'utf8' || encoding === 'utf-8') {
++          return DEFAULT_NFT_JSON;
++        }
++        return Buffer.from(DEFAULT_NFT_JSON, 'utf8');
++      }
+       throw err;
+     }
+   };
+@@ -710,7 +794,8 @@ process.on('uncaughtException', (err) => {
+     err &&
+     err.code === 'ENOENT' &&
+     (err.syscall === 'open' || err.syscall === 'read') &&
+-    (isPagesManifestPath(err.path) || isMiddlewareManifestPath(err.path))
++    (isPagesManifestPath(err.path) || isMiddlewareManifestPath(err.path) || isNftJsonPath(err.path))
+   ) {
+     return;
+   }
+--- a/src/components/achievements.tsx
++++ b/src/components/achievements.tsx
+@@ -137,7 +137,7 @@ export default function Achievements({
+                   type="button"
+                   aria-pressed={isSelected}
+                   onClick={(e) => handleSelectCategory(cat.name, e)}
+-                  className={`group inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs tracking-wider transition-all cursor-pointer whitespace-nowrap shrink-0 ${
++                  className={`group inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs tracking-wider transition-all cursor-pointer whitespace-nowrap shrink-0 sm:shrink ${
+                     isSelected
+                       ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-md scale-105'
+                       : 'bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 dark:bg-white/[0.06] dark:hover:bg-white/15 dark:text-slate-300 font-normal'

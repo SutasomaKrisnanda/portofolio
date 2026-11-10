@@ -3,334 +3,373 @@ import {
   assertEqual,
   assertDeepEqual,
   assertIncludes,
+  assertValidSvg,
   assert
 } from './helpers/assertions.mjs';
 import {
   MODES,
-  BACKGROUND_ASSETS,
+  THEMES,
+  VIEWPORTS,
   ICON_ASSETS,
   loadProjects,
-  VIEWPORTS
+  loadAchievements,
+  loadExperience,
+  loadCommittees
 } from './helpers/fixtures.mjs';
 import {
-  filterFeaturedProjects,
-  resolveExpectedIcon,
-  resolveExpectedBackground,
-  calculateSlideIndex,
-  parseGlbHeader
+  resolveExpected3DModelSpec,
+  buildProcedural3DModel,
+  disposeHierarchy,
+  filterProjects,
+  filterAchievements,
+  filterBentoHistory,
+  sliceProgressiveDisclosure,
+  resolveExpectedProjectMode,
+  resolveExpectedProjectIconAsset,
+  resolveExpectedProjectAltText
 } from './helpers/oracle.mjs';
 import { PortfolioSimulator } from './helpers/simulator.mjs';
 
-describe('Tier 2: Boundary & Corner Cases (R1 - R6)', () => {
+describe('Tier 2: Boundary & Corner Cases (R1 - R4)', () => {
   // ==========================================
-  // R1 Boundary Cases: Visual Backgrounds
+  // R1 Boundary Cases: Procedural 3D Hero Scene
   // ==========================================
-  describe('R1 Boundary Cases: Visual Backgrounds', () => {
-    test('T2.1.1: Invalid mode input fallback defaults to tech background', () => {
-      const sim = new PortfolioSimulator();
-      sim.switchMode('non-existent-mode');
-      assertEqual(sim.activeMode, 'tech');
-      assertEqual(sim.getVisibleBackgroundAsset(), BACKGROUND_ASSETS.tech.dark);
+  describe('R1 Boundary Cases: Procedural 3D Hero Scene', () => {
+    test('T2.1.1: Rapid mode toggles (1,000 transitions) maintain deterministic model alignment with zero memory leak', () => {
+      const sim = new PortfolioSimulator({ mode: 'tech', viewport: VIEWPORTS.desktop });
 
-      const resolved = resolveExpectedBackground('invalid-mode', 'dark');
-      assertEqual(resolved, null, 'Oracle must return null for invalid mode');
+      for (let i = 0; i < 1000; i++) {
+        const targetMode = MODES[i % 3];
+        sim.switchMode(targetMode);
+        assertEqual(sim.activeMode, targetMode);
+        assertEqual(
+          sim.getActive3DModelSpec().modelType,
+          targetMode === 'tech' ? 'polyhedron' : targetMode === 'medical' ? 'helix-dna' : 'pena-bulu'
+        );
+      }
+
+      // Cleanup
+      const disposeStats = sim.unmount3DScene();
+      assert.ok(disposeStats.disposedGeometries > 0);
+      assert.ok(disposeStats.disposedMaterials > 0);
     });
 
-    test('T2.1.2: System theme preference resolution handles dark/light gracefully', () => {
-      const sim = new PortfolioSimulator({ theme: 'system' });
-      // If unresolved system theme is passed, defaults to dark
-      assertEqual(sim.resolvedTheme, 'dark');
+    test('T2.1.2: WebGL unsupported / context lost simulation gracefully falls back without throwing', () => {
+      // Simulate environment without WebGL
+      const sim = new PortfolioSimulator({ mode: 'medical', webGLAvailable: false });
+      const stats = sim.get3DGeometryStats();
+      assertEqual(stats.isSkipped, true, 'Must skip WebGL initialization when WebGL is unavailable');
+      assertEqual(stats.triangleCount, 0);
 
-      sim.switchTheme('light');
-      assertEqual(sim.resolvedTheme, 'light');
+      // Model spec remains accessible for semantic labels and captions
+      assertEqual(sim.getActive3DModelSpec().modelType, 'helix-dna');
     });
 
-    test('T2.1.3: Rapid mode toggling maintains deterministic active background', () => {
-      const sim = new PortfolioSimulator();
-      // Rapid toggling sequence
-      ['medical', 'academic', 'tech', 'academic', 'medical'].forEach((m) => sim.switchMode(m));
-      assertEqual(sim.activeMode, 'medical');
-      assertEqual(sim.getVisibleBackgroundAsset(), BACKGROUND_ASSETS.medical.dark);
-      assertEqual(sim.transitionHistory.length, 5);
-    });
-
-    test('T2.1.4: Extreme viewport bounds (320px to 3840px) maintain 100vw fill', () => {
-      const sim = new PortfolioSimulator();
-
-      sim.setViewport(VIEWPORTS.mobileSmall.width, VIEWPORTS.mobileSmall.height);
-      assertEqual(sim.viewport.width, 320);
-
-      sim.setViewport(VIEWPORTS.ultrawide.width, VIEWPORTS.ultrawide.height);
-      assertEqual(sim.viewport.width, 3840);
-
-      // Verifies background aspect specification remains 100vw fill (cover)
-      const fillSpec = 'object-cover w-full h-full';
-      assertIncludes(fillSpec, 'object-cover');
-    });
-
-    test('T2.1.5: Missing image error resilience fallback', () => {
-      const safeBackgroundResolver = (mode, theme) => {
-        const bg = resolveExpectedBackground(mode, theme);
-        return bg || BACKGROUND_ASSETS.tech.dark;
-      };
-      assertEqual(safeBackgroundResolver('unknown', 'dark'), BACKGROUND_ASSETS.tech.dark);
-    });
-  });
-
-  // ==========================================
-  // R2 Boundary Cases: 3D Models
-  // ==========================================
-  describe('R2 Boundary Cases: 3D Models', () => {
-    test('T2.2.1: WebGL context loss simulation recovers gracefully', () => {
-      let webglContextLost = false;
-      let fallbackTriggered = false;
-
-      const handleContextLoss = (event) => {
-        webglContextLost = true;
-        fallbackTriggered = true;
-      };
-
-      handleContextLoss({ preventDefault: () => {} });
-      assertEqual(webglContextLost, true);
-      assertEqual(fallbackTriggered, true);
-    });
-
-    test('T2.2.2: Large model loading state boundary (model-quill.glb ~90MB)', () => {
-      // For large 90MB quill model, progress tracking callback must be supported
-      let loadingProgress = 0;
-      const simulateProgress = (loaded, total) => {
-        loadingProgress = Math.round((loaded / total) * 100);
-      };
-
-      simulateProgress(45_000_000, 90_192_408);
-      assertEqual(loadingProgress, 50);
-
-      simulateProgress(90_192_408, 90_192_408);
-      assertEqual(loadingProgress, 100);
-    });
-
-    test('T2.2.3: Meshopt compression decompression error handling on corrupted buffer', () => {
-      const corruptedBuffer = Buffer.from('NOT_A_VALID_GLTF_BINARY');
-      const result = parseGlbHeader(corruptedBuffer);
-      assertEqual(result.valid, false);
-      assert.notStrictEqual(result.magic, 0x46546c67);
-    });
-
-    test('T2.2.4: Window resize boundary triggers camera aspect recalculation', () => {
-      const calculateAspect = (w, h) => (h > 0 ? w / h : 1);
-      const mobileAspect = calculateAspect(375, 667);
-      const desktopAspect = calculateAspect(1440, 900);
-
-      assert.ok(mobileAspect < 1, 'Mobile aspect must be portrait (< 1)');
-      assert.ok(desktopAspect > 1, 'Desktop aspect must be landscape (> 1)');
-    });
-
-    test('T2.2.5: Zero pointer movement and drag coordinate damping', () => {
-      const clampRotation = (rotation, delta, damping = 0.95) => {
-        return (rotation + delta) * damping;
-      };
-
-      const damped = clampRotation(1.5, 0.0, 0.9);
-      assertEqual(damped, 1.35);
-    });
-  });
-
-  // ==========================================
-  // R3 Boundary Cases: Dynamic Project Icons
-  // ==========================================
-  describe('R3 Boundary Cases: Dynamic Project Icons', () => {
-    test('T2.3.1: Project with undefined secondaryModes gracefully renders primary icon', () => {
-      const projectWithoutSecondary = {
-        id: 'proj-solo',
+    test('T2.1.3: Mobile viewport (<1024px) skips WebGL rendering to conserve battery & eliminate mobile rendering lag', () => {
+      const simMobile = new PortfolioSimulator({
         mode: 'tech',
-        featured: true
-      };
-      const icon = resolveExpectedIcon(projectWithoutSecondary.mode);
-      assertEqual(icon, ICON_ASSETS.tech);
+        viewport: VIEWPORTS.mobileSmall
+      });
+      const stats = simMobile.get3DGeometryStats();
+      assertEqual(stats.isSkipped, true, 'Mobile screens must skip Three.js scene creation');
+
+      // Resizing to desktop activates Three.js scene
+      simMobile.setViewport(VIEWPORTS.desktop.width, VIEWPORTS.desktop.height);
+      const desktopStats = simMobile.get3DGeometryStats();
+      assertEqual(desktopStats.isSkipped, false, 'Desktop screens must create Three.js scene');
+      assert.ok(desktopStats.triangleCount > 0);
     });
 
-    test('T2.3.2: Project where neither primary nor secondary matches activeMode is excluded', () => {
-      const foreignProject = [
+    test('T2.1.4: Extreme pointer drag rotation clamping prevents NaN/Infinity coordinates', () => {
+      // Boundary test for pointer drag math
+      const clampRotation = (val, min, max) => Math.max(min, Math.min(max, val));
+      const testDeltas = [1e6, -1e6, 0.00001, -0.00001, 0, 99999];
+
+      for (const d of testDeltas) {
+        const clamped = clampRotation(d, -Math.PI / 4, Math.PI / 4);
+        assert.ok(Number.isFinite(clamped), `Clamped value must be finite for input ${d}`);
+        assert.ok(clamped >= -Math.PI / 4 && clamped <= Math.PI / 4);
+      }
+    });
+
+    test('T2.1.5: Corrupt or unrecognized mode input ("quantum", "", null, undefined) safely defaults to Tech Polyhedron', () => {
+      const invalidInputs = ['quantum', '', null, undefined, 123, {}, []];
+
+      for (const invalid of invalidInputs) {
+        const spec = resolveExpected3DModelSpec(invalid);
+        assertEqual(spec.modelType, 'polyhedron', `Invalid mode "${invalid}" must fallback to polyhedron`);
+
+        const sim = new PortfolioSimulator({ mode: invalid });
+        assertEqual(sim.activeMode, 'tech');
+        assertEqual(sim.getActive3DModelSpec().modelType, 'polyhedron');
+      }
+    });
+
+    test('T2.1.6: Recursive disposal handles complex object hierarchies without throwing', () => {
+      for (const mode of MODES) {
+        const model = buildProcedural3DModel(mode);
+        assert.ok(model.group);
+        const stats = disposeHierarchy(model.group);
+        assert.ok(stats.disposedGeometries > 0);
+        assert.ok(stats.disposedMaterials > 0);
+      }
+    });
+  });
+
+  // ==========================================
+  // R2 Boundary Cases: Category Pills & Galleries
+  // ==========================================
+  describe('R2 Boundary Cases: Category Pills & Galleries', () => {
+    test('T2.2.1: Extreme category label length (150 characters) maintains horizontal scroll single-row layout without clipping', () => {
+      const extremeCategory = 'X'.repeat(150);
+      const mockProjects = [
         {
-          id: 'proj-medical-only',
-          mode: 'medical',
-          secondaryModes: [],
+          id: 'p-extreme',
+          title: 'Extreme Category Project',
+          mode: 'tech',
+          category: extremeCategory,
+          technologies: [],
           featured: true
         }
       ];
-      const techFeatured = filterFeaturedProjects(foreignProject, 'tech');
-      assertEqual(techFeatured.length, 0);
+
+      const filtered = filterProjects(mockProjects, 'tech', extremeCategory);
+      assertEqual(filtered.length, 1);
+      assertEqual(filtered[0].category, extremeCategory);
+
+      // Simulates mobile layout style: no-scrollbar and overflow-x-auto ensure it doesn't wrap
+      const sim = new PortfolioSimulator({ viewport: VIEWPORTS.mobileSmall });
+      assertEqual(sim.getPillLayoutMode(), 'mobile-horizontal-scroll');
     });
 
-    test('T2.3.3: Case-insensitive mode mapping resilience', () => {
-      const normalizeMode = (modeStr) => (modeStr || '').toLowerCase();
-      assertEqual(resolveExpectedIcon(normalizeMode('TECH')), ICON_ASSETS.tech);
-      assertEqual(resolveExpectedIcon(normalizeMode('Medical')), ICON_ASSETS.medical);
-      assertEqual(resolveExpectedIcon(normalizeMode('aCaDeMiC')), ICON_ASSETS.academic);
+    test('T2.2.2: Empty search query result renders empty state and "Reset Filter" restores category to "All"', () => {
+      const allProjects = loadProjects();
+      const nonExistent = 'XYZ_NON_EXISTENT_SEARCH_QUERY_12345';
+      const results = filterProjects(allProjects, 'tech', 'Web Development', nonExistent);
+      assertEqual(results.length, 0, 'No projects should match non-existent query');
+
+      const sim = new PortfolioSimulator({ mode: 'tech' });
+      sim.selectProjectsCategory('Web Development');
+      sim.setProjectsSearchQuery(nonExistent);
+      assertEqual(sim.getFilteredProjects().length, 0);
+
+      // Reset Filter action
+      sim.selectProjectsCategory('All');
+      sim.setProjectsSearchQuery('');
+      assert.ok(sim.getFilteredProjects().length > 0, 'Reset Filter must restore projects list');
     });
 
-    test('T2.3.4: SVG preservation on high-DPI scaling', () => {
+    test('T2.2.3: Special regex and punctuation characters in search query do not crash filter logic', () => {
+      const allProjects = loadProjects();
+      const maliciousQueries = [
+        '.*+?^${}()|[]\\',
+        '\\b(?:select|drop|insert)\\b',
+        '\' OR \'1\'=\'1',
+        '<script>alert(1)</script>',
+        '${7*7}',
+        '   \t\n   '
+      ];
+
+      for (const q of maliciousQueries) {
+        assert.doesNotThrow(() => {
+          const res = filterProjects(allProjects, 'tech', 'All', q);
+          assert.ok(Array.isArray(res));
+        }, `Query "${q}" must not throw regex or syntax errors`);
+      }
+    });
+
+    test('T2.2.4: Rapid category switching (500 iterations) produces strictly filtered results with 0 state divergence', () => {
+      const allProjects = loadProjects();
+      const categories = ['All', 'Web Development', 'Software Engineering', 'Mobile Applications'];
+
+      for (let i = 0; i < 500; i++) {
+        const cat = categories[i % categories.length];
+        const res = filterProjects(allProjects, 'tech', cat);
+        for (const p of res) {
+          if (cat !== 'All') {
+            assert.ok(
+              p.category === cat || p.secondaryCategory === cat,
+              `Project ${p.id} must belong to category ${cat}`
+            );
+          }
+        }
+      }
+    });
+
+    test('T2.2.5: Viewport boundary transitions (320px to 3840px) smoothly adapt pill container classes', () => {
       const sim = new PortfolioSimulator();
-      const currentIcon = sim.getVisibleProjectIcon();
-      assert.ok(currentIcon.endsWith('.svg'));
+
+      // Mobile small
+      sim.setViewport(320, 568);
+      assertEqual(sim.getPillLayoutMode(), 'mobile-horizontal-scroll');
+
+      // Tablet boundary (768px)
+      sim.setViewport(768, 1024);
+      assertEqual(sim.getPillLayoutMode(), 'desktop-wrap');
+
+      // Desktop (1440px)
+      sim.setViewport(1440, 900);
+      assertEqual(sim.getPillLayoutMode(), 'desktop-wrap');
+
+      // 4K Ultrawide (3840px)
+      sim.setViewport(3840, 2160);
+      assertEqual(sim.getPillLayoutMode(), 'desktop-wrap');
     });
 
-    test('T2.3.5: Rapid mode switching ensures icons swap synchronously without stale SVG', () => {
-      const sim = new PortfolioSimulator();
-      sim.switchMode('medical');
-      assertEqual(sim.getVisibleProjectIcon(), ICON_ASSETS.medical);
-      sim.switchMode('academic');
-      assertEqual(sim.getVisibleProjectIcon(), ICON_ASSETS.academic);
-      sim.switchMode('tech');
-      assertEqual(sim.getVisibleProjectIcon(), ICON_ASSETS.tech);
+    test('T2.2.6: Whitespace-only search query behaves as empty query and does not filter out valid projects', () => {
+      const allProjects = loadProjects();
+      const normalAll = filterProjects(allProjects, 'tech', 'All', '');
+      const whitespaceAll = filterProjects(allProjects, 'tech', 'All', '    \t   ');
+      assertEqual(whitespaceAll.length, normalAll.length, 'Whitespace search must match all projects in mode');
     });
   });
 
   // ==========================================
-  // R4 Boundary Cases: Dataset Navigation
+  // R3 Boundary Cases: Smart Bento Grid
   // ==========================================
-  describe('R4 Boundary Cases: Dataset Navigation', () => {
-    test('T2.4.1: Single featured project boundary (length === 1)', () => {
-      const singleItemCount = 1;
-      assertEqual(calculateSlideIndex(0, 1, singleItemCount), 0);
-      assertEqual(calculateSlideIndex(0, -1, singleItemCount), 0);
+  describe('R3 Boundary Cases: Smart Bento Grid', () => {
+    test('T2.3.1: Empty committees or experience items for a custom/future mode handled gracefully without layout collapse', () => {
+      const emptyHistory = filterBentoHistory([], [], 'tech', 'all');
+      assertEqual(emptyHistory.length, 0);
+
+      const sliced = sliceProgressiveDisclosure(emptyHistory, false, 6);
+      assertEqual(sliced.length, 0);
     });
 
-    test('T2.4.2: Zero featured projects boundary handles empty state gracefully', () => {
-      const emptyProjects = [];
-      const sim = new PortfolioSimulator({ projects: emptyProjects });
-      assertEqual(sim.getNavigationIndicatorCount(), 0);
-      assertEqual(sim.getCurrentHeroProject(), null);
+    test('T2.3.2: Exactly 6 history items (exact threshold boundary) suppresses disclosure toggle button', () => {
+      const mockItems = Array.from({ length: 6 }, (_, i) => ({ id: `item-${i}`, role: `Role ${i}` }));
+      const sliced = sliceProgressiveDisclosure(mockItems, false, 6);
+      assertEqual(sliced.length, 6);
 
-      // Prev and Next must not throw
-      sim.nextSlide();
-      assertEqual(sim.activeSlideIndex, 0);
-      sim.prevSlide();
-      assertEqual(sim.activeSlideIndex, 0);
+      // Invariant: should NOT show "Tampilkan N Lainnya" when total count <= threshold
+      const shouldShowButton = mockItems.length > 6;
+      assertEqual(shouldShowButton, false, 'Exactly 6 items must not display disclosure toggle');
     });
 
-    test('T2.4.3: Out-of-bounds slide index recovery clamps safely to valid range', () => {
+    test('T2.3.3: Odd counts of history items (1, 3, 5, 7, 11) flow naturally in responsive 3-column subgrid', () => {
+      const oddCounts = [1, 3, 5, 7, 11];
+
+      for (const count of oddCounts) {
+        const mockItems = Array.from({ length: count }, (_, i) => ({ id: `item-${i}` }));
+        const initialVisible = sliceProgressiveDisclosure(mockItems, false, 6);
+        const expectedCount = Math.min(count, 6);
+        assertEqual(initialVisible.length, expectedCount);
+
+        const expandedVisible = sliceProgressiveDisclosure(mockItems, true, 6);
+        assertEqual(expandedVisible.length, count);
+      }
+    });
+
+    test('T2.3.4: Rapid segmented history tab switching retains or resets disclosure state deterministically', () => {
       const sim = new PortfolioSimulator({ mode: 'tech' });
-      // Go to out of bounds index (e.g. 99)
-      sim.goToSlide(99);
-      // HMSSO, HMJ, SIPADU -> 3 items. 99 % 3 = 0
-      assertEqual(sim.activeSlideIndex, 0);
+      const tabs = ['all', 'experience', 'committees'];
+
+      for (let i = 0; i < 300; i++) {
+        const tab = tabs[i % tabs.length];
+        sim.selectBentoTab(tab);
+        assertEqual(sim.bentoActiveTab, tab);
+
+        const visible = sim.getVisibleBentoHistoryItems();
+        assert.ok(visible.length <= 6 || sim.bentoIsExpanded);
+      }
     });
 
-    test('T2.4.4: Negative slide index wrap-around handling', () => {
-      const sim = new PortfolioSimulator({ mode: 'tech' });
-      sim.goToSlide(-1);
-      // -1 in length 3 wraps to 2
-      assertEqual(sim.activeSlideIndex, 2);
+    test('T2.3.5: Extreme viewport bounds (320px to 3840px) maintain Bento Grid column integrity', () => {
+      const sim = new PortfolioSimulator();
+      const testViewports = [
+        { width: 320, height: 480 },
+        { width: 375, height: 667 },
+        { width: 768, height: 1024 },
+        { width: 1024, height: 768 },
+        { width: 1920, height: 1080 },
+        { width: 3840, height: 2160 }
+      ];
+
+      for (const vp of testViewports) {
+        sim.setViewport(vp.width, vp.height);
+        const tiles = sim.getBentoTileSpecs();
+        assertEqual(tiles.tile5_history.desktopSpan, 'lg:col-span-12');
+        assertEqual(tiles.tile1_bio.desktopSpan, 'lg:col-span-8');
+      }
     });
 
-    test('T2.4.5: Burst navigation clicks stays safely within 0..N-1', () => {
-      const sim = new PortfolioSimulator({ mode: 'tech' });
-      for (let i = 0; i < 20; i++) {
-        sim.nextSlide();
-        assert.ok(sim.activeSlideIndex >= 0 && sim.activeSlideIndex < 3);
+    test('T2.3.6: Long text description in experience or committee cards wraps safely with line clamp', () => {
+      const experience = loadExperience();
+      assert.ok(experience.length > 0);
+      for (const exp of experience) {
+        assert.ok(typeof exp.description === 'string' && exp.description.length > 0);
       }
     });
   });
 
   // ==========================================
-  // R5 Boundary Cases: Modal Layout & Interaction
+  // R4 Boundary Cases: Dynamic Project Mode Icons
   // ==========================================
-  describe('R5 Boundary Cases: Modal Layout & Interaction', () => {
-    test('T2.5.1: Modal keyboard accessibility: Escape key closes modal', () => {
-      const sim = new PortfolioSimulator({ mode: 'tech' });
-      sim.clickActiveProjectCard();
-      assertEqual(sim.isModalActive(), true);
+  describe('R4 Boundary Cases: Dynamic Project Mode Icons', () => {
+    test('T2.4.1: Project with empty array, null, or undefined secondaryModes safely defaults to primary mode', () => {
+      const testCases = [
+        { id: 'p1', mode: 'tech', secondaryModes: [] },
+        { id: 'p2', mode: 'medical', secondaryModes: null },
+        { id: 'p3', mode: 'academic', secondaryModes: undefined }
+      ];
 
-      sim.pressEscape();
-      assertEqual(sim.isModalActive(), false);
+      for (const p of testCases) {
+        const resolved = resolveExpectedProjectMode(p.mode, p);
+        assertEqual(resolved, p.mode);
+        assertEqual(resolveExpectedProjectMode('other', p), p.mode);
+      }
     });
 
-    test('T2.5.2: Backdrop click closes modal, but modal content click preserves modal', () => {
-      const sim = new PortfolioSimulator({ mode: 'medical' });
-      sim.clickActiveProjectCard();
-      assertEqual(sim.isModalActive(), true);
-
-      // Click content (inner click)
-      sim.clickModalContent();
-      assertEqual(sim.isModalActive(), true, 'Clicking inside modal must not close modal');
-
-      // Click backdrop (outside click)
-      sim.clickBackdrop();
-      assertEqual(sim.isModalActive(), false, 'Clicking backdrop must close modal');
+    test('T2.4.2: Project with unknown/corrupt primary mode safely defaults to "tech" icon', () => {
+      const corruptProject = { id: 'p-corrupt', mode: 'unknown-mode', secondaryModes: [] };
+      const resolved = resolveExpectedProjectMode('tech', corruptProject);
+      assertEqual(resolved, 'unknown-mode');
+      const asset = resolveExpectedProjectIconAsset('tech', corruptProject);
+      assertEqual(asset, ICON_ASSETS.tech, 'Corrupt mode must fallback to tech SVG icon asset');
     });
 
-    test('T2.5.3: Project with missing optional fields renders modal safely', () => {
-      const sparseProject = {
-        id: 'proj-sparse',
-        title: 'Sparse Project',
+    test('T2.4.3: Null, undefined, or malformed project argument to resolveExpectedProjectMode returns active mode or "tech"', () => {
+      assertEqual(resolveExpectedProjectMode('tech', null), 'tech');
+      assertEqual(resolveExpectedProjectMode('medical', undefined), 'medical');
+      assertEqual(resolveExpectedProjectMode('academic', {}), 'academic');
+    });
+
+    test('T2.4.4: Rapid mode toggles (1,000 cycles) keep dynamic icons for multi-mode projects synchronized with 0 lag', () => {
+      const multiProject = {
+        id: 'p-multi',
         mode: 'tech',
-        featured: true
-        // No summary, no technologies, no caseStudy
+        secondaryModes: ['medical', 'academic']
       };
-      const sim = new PortfolioSimulator({ projects: [sparseProject], mode: 'tech' });
-      sim.clickActiveProjectCard();
-      assertEqual(sim.isModalActive(), true);
-      assertEqual(sim.activeModalProject.title, 'Sparse Project');
-    });
 
-    test('T2.5.4: Extremely long project title or summary text wrapping prevention', () => {
-      const longTitle = 'A'.repeat(500);
-      const clampClass = 'line-clamp-2 break-words';
-      assertIncludes(clampClass, 'break-words');
-    });
-
-    test('T2.5.5: Rapid modal open/close toggling does not leave stale state', () => {
-      const sim = new PortfolioSimulator({ mode: 'tech' });
-      for (let i = 0; i < 10; i++) {
-        sim.clickActiveProjectCard();
-        assertEqual(sim.isModalActive(), true);
-        sim.closeModal();
-        assertEqual(sim.isModalActive(), false);
+      for (let i = 0; i < 1000; i++) {
+        const mode = MODES[i % 3];
+        const resolved = resolveExpectedProjectMode(mode, multiProject);
+        assertEqual(resolved, mode, `Iteration ${i}: Multi-mode icon must resolve to ${mode}`);
+        const asset = resolveExpectedProjectIconAsset(mode, multiProject);
+        assertEqual(asset, ICON_ASSETS[mode]);
       }
     });
-  });
 
-  // ==========================================
-  // R6 Boundary Cases: Tooltips & Animations
-  // ==========================================
-  describe('R6 Boundary Cases: Tooltips & Animations', () => {
-    test('T2.6.1: Fast keyboard navigation (Tab + Enter) opens tooltips and switches slides cleanly', () => {
-      const sim = new PortfolioSimulator({ mode: 'tech' });
-      sim.focusButton('btn-slide-next', 'Slide Berikutnya');
-      assertEqual(sim.activeTooltip, 'Slide Berikutnya');
-
-      sim.nextSlide();
-      sim.blurButton();
-      assertEqual(sim.activeTooltip, null);
-      assertEqual(sim.activeSlideIndex, 1);
+    test('T2.4.5: SVG assets contain valid viewBox coordinate space for crisp high-DPI scaling', () => {
+      for (const mode of MODES) {
+        const result = assertValidSvg(ICON_ASSETS[mode]);
+        assert.ok(result.viewBox, `SVG for ${mode} must have viewBox attribute`);
+        const parts = result.viewBox.split(/[\s,]+/).map(Number);
+        assertEqual(parts.length, 4, 'viewBox must have minX, minY, width, height');
+        assert.ok(parts[2] > 0 && parts[3] > 0, 'viewBox dimensions must be positive');
+      }
     });
 
-    test('T2.6.2: Non-interactive elements do not show tooltip', () => {
-      const sim = new PortfolioSimulator();
-      // Element without tooltip handler
-      sim.hoverButton('non-interactive-card', null);
-      assertEqual(sim.activeTooltip, null);
-    });
-
-    test('T2.6.3: Tooltip content boundary: long text wraps safely without viewport overflow', () => {
-      const tooltipClass = 'max-w-xs break-words px-3 py-1.5 text-xs';
-      assertIncludes(tooltipClass, 'max-w-xs');
-      assertIncludes(tooltipClass, 'break-words');
-    });
-
-    test('T2.6.4: Tooltip delay boundary (instant on keyboard focus vs hover delay)', () => {
-      const tooltipTiming = {
-        hoverDelayDuration: 200,
-        focusDelayDuration: 0 // Instant for keyboard accessibility
+    test('T2.4.6: Duplicate modes in secondaryModes array handled cleanly without errors', () => {
+      const duplicateProject = {
+        id: 'p-dup',
+        mode: 'tech',
+        secondaryModes: ['tech', 'medical', 'medical', 'academic', 'academic']
       };
-      assertEqual(tooltipTiming.focusDelayDuration, 0);
-      assert.ok(tooltipTiming.hoverDelayDuration > 0);
-    });
 
-    test('T2.6.5: Reduced motion preference (prefers-reduced-motion) compliance', () => {
-      const motionSafeClass = 'motion-safe:transition-all motion-reduce:transition-none';
-      assertIncludes(motionSafeClass, 'motion-reduce:transition-none');
+      assertEqual(resolveExpectedProjectMode('medical', duplicateProject), 'medical');
+      assertEqual(resolveExpectedProjectMode('academic', duplicateProject), 'academic');
+      assertEqual(resolveExpectedProjectMode('tech', duplicateProject), 'tech');
     });
   });
 });

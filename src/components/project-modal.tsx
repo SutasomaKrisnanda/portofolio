@@ -105,7 +105,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               {/* Responsive Typography & Clamping (T1.5.6, T2.5.4) */}
               <h2
                 id="case-study-title"
-                className="text-lg sm:text-2xl lg:text-3xl font-light text-slate-950 dark:text-white tracking-wide break-words line-clamp-2"
+                className="text-lg sm:text-2xl lg:text-3xl font-normal text-slate-950 dark:text-white tracking-wide break-words line-clamp-2"
                 title={project.title}
               >
                 {project.title}
@@ -148,7 +148,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             </div>
 
             {/* 9-Point Structured Case Study */}
-            <div className="space-y-6 text-xs sm:text-sm font-light leading-relaxed text-slate-700 dark:text-white/90">
+            <div className="space-y-6 text-xs sm:text-sm font-normal leading-relaxed text-slate-700 dark:text-white/90">
               {/* 1. Ringkasan */}
               {caseStudy.overview && (
                 <div>

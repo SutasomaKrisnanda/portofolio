@@ -9,15 +9,13 @@ interface IridescentCrystalCanvasProps {
   activeSlideIndex: number;
   baseHue: number;
   secondaryHue: number;
-  onCrystalClick?: () => void;
 }
 
 export const IridescentCrystalCanvas: React.FC<IridescentCrystalCanvasProps> = ({
   mode,
   activeSlideIndex,
   baseHue,
-  secondaryHue,
-  onCrystalClick
+  secondaryHue
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rotationRef = useRef({ rx: 0.25, ry: 0.6, vx: 0.003, vy: 0.009 });
@@ -331,8 +329,9 @@ export const IridescentCrystalCanvas: React.FC<IridescentCrystalCanvasProps> = (
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
-        onClick={onCrystalClick}
-        title="Geser mouse untuk memutar Kristal 3D, atau klik untuk melihat studi kasus projek aktif"
+        role="img"
+        aria-label="Visualisasi Kristal 3D Interaktif - Geser kursor untuk memutar"
+        title="Geser kursor untuk memutar Kristal 3D"
         className="w-[260px] h-[280px] sm:w-[330px] sm:h-[350px] cursor-grab active:cursor-grabbing relative z-10"
       />
     </div>

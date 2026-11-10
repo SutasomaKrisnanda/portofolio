@@ -34,6 +34,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [activeProjectSlug, setActiveProjectSlug] = useState<string | null>(null);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
+  const [scrollMode, setScrollMode] = useState<'normal' | 'snap'>('normal');
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -58,6 +59,11 @@ export default function Home() {
         if (saved === 'tech' || saved === 'medical' || saved === 'academic') {
           setActiveMode(saved);
         }
+      }
+
+      const savedScroll = window.localStorage.getItem('portfolio_scroll_mode');
+      if (savedScroll === 'normal' || savedScroll === 'snap') {
+        setScrollMode(savedScroll);
       }
 
       if (urlProject) {
@@ -96,6 +102,32 @@ export default function Home() {
     updateUrlHistory(newMode, activeProjectSlug);
   }, [activeProjectSlug, updateUrlHistory]);
 
+  // 3b. Toggle Scroll Mode Handler (Normal vs Snap)
+  const handleToggleScrollMode = useCallback((mode: 'normal' | 'snap') => {
+    setScrollMode(mode);
+    try {
+      window.localStorage.setItem('portfolio_scroll_mode', mode);
+    } catch {
+      // Ignore storage error
+    }
+  }, []);
+
+  // Lock root document scrollbar when snap mode is active to prevent double-scroll
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (scrollMode === 'snap') {
+      document.documentElement.classList.add('overflow-hidden', 'h-screen');
+      document.body.classList.add('overflow-hidden', 'h-screen');
+    } else {
+      document.documentElement.classList.remove('overflow-hidden', 'h-screen');
+      document.body.classList.remove('overflow-hidden', 'h-screen');
+    }
+    return () => {
+      document.documentElement.classList.remove('overflow-hidden', 'h-screen');
+      document.body.classList.remove('overflow-hidden', 'h-screen');
+    };
+  }, [scrollMode]);
+
   // 4. Project Modal Handlers
   const handleOpenProject = useCallback((project: Project) => {
     // If project belongs to another mode, switch mode to match
@@ -113,43 +145,67 @@ export default function Home() {
     updateUrlHistory(activeMode, null);
   }, [activeMode, updateUrlHistory]);
 
-  // 5. Scroll & Active Section Navigation
+  // 5. Scroll & Active Section Navigation (Smoothly scrolls until section completely fills the viewport)
   const handleNavigateSection = useCallback((sectionId: string) => {
     const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!el) return;
+
+    if (scrollMode === 'snap') {
+      if (containerRef.current) {
+        containerRef.current.scrollTo({
+          top: el.offsetTop,
+          behavior: 'smooth'
+        });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      // Reset independent inner scroll of target section to top
+      const innerScroll = el.querySelector('[data-section-scroll]');
+      if (innerScroll) {
+        innerScroll.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      if (sectionId === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const rect = el.getBoundingClientRect();
+        const targetTop = rect.top + window.scrollY;
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+      }
     }
-  }, []);
+    setActiveSection(sectionId);
+  }, [scrollMode]);
 
   const handleScrollToTop = useCallback(() => {
-    if (containerRef.current) {
+    if (scrollMode === 'snap' && containerRef.current) {
       containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, []);
+    setActiveSection('hero');
+  }, [scrollMode]);
 
-  // 6. Section Scroll Spy (Tracks snapping container scroll)
+  // 6. Section Scroll Spy (Tracks scroll position in window or snap container)
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
     const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      setShowBackToTop(scrollTop > 350);
+      const isSnap = scrollMode === 'snap';
+      const scrollY = isSnap && containerRef.current
+        ? containerRef.current.scrollTop
+        : (window.scrollY || document.documentElement.scrollTop);
 
-      const containerHeight = container.clientHeight;
+      setShowBackToTop(scrollY > 400);
+
       const sectionIds = ['hero', 'projects', 'about', 'skills', 'achievements', 'contact'];
+      const viewHeight = isSnap && containerRef.current
+        ? containerRef.current.clientHeight
+        : window.innerHeight;
+      const scrollPosition = scrollY + viewHeight * 0.45;
 
-      for (let i = 0; i < sectionIds.length; i++) {
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(sectionIds[i]);
         if (el) {
           const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (
-            scrollTop >= top - containerHeight * 0.4 &&
-            scrollTop < top + height - containerHeight * 0.4
-          ) {
+          if (scrollPosition >= top) {
             setActiveSection(sectionIds[i]);
             break;
           }
@@ -157,9 +213,20 @@ export default function Home() {
       }
     };
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+    const container = containerRef.current;
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    if (container) {
+      container.addEventListener('scroll', handleScroll, { passive: true });
+    }
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [scrollMode]);
 
   // 7. Keyboard Navigation for Slide Snapping (ArrowDown, ArrowUp, PageDown, PageUp)
   useEffect(() => {
@@ -250,14 +317,14 @@ export default function Home() {
   );
 
   return (
-    <div className="relative h-screen w-full overflow-hidden text-slate-900 dark:text-white selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-slate-950 font-sans">
+    <div className="relative min-h-screen w-full overflow-x-hidden text-slate-900 dark:text-white selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-slate-950 font-sans">
       {/* Morphing Fixed Ambient Background across sections & modes */}
       <FixedBackground activeMode={activeMode} activeSectionIndex={activeSectionIndex} />
 
       {/* Skip to Main Content Link for Screen Readers & Keyboard Users */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-6 focus:py-3 focus:rounded-full focus:bg-white focus:text-slate-950 focus:font-bold shadow-2xl"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-6 focus:py-3 focus:rounded-full focus:bg-white focus:text-slate-950 focus:font-semibold shadow-2xl"
       >
         Lewati ke Konten Utama
       </a>
@@ -268,6 +335,8 @@ export default function Home() {
         onSwitchMode={handleSwitchMode}
         activeSection={activeSection}
         onNavigateSection={handleNavigateSection}
+        scrollMode={scrollMode}
+        onToggleScrollMode={handleToggleScrollMode}
       />
 
       {/* Interactive Page Pagination Dots on the right */}
@@ -278,11 +347,15 @@ export default function Home() {
         onNavigateSection={handleNavigateSection}
       />
 
-      {/* Full-Page Snap Scroll Stream */}
+      {/* Main Document Stream (Flows naturally in normal mode, snaps precisely 1-full-section per scroll in snap mode) */}
       <main
         id="main-content"
         ref={containerRef}
-        className="relative z-10 h-screen w-full overflow-y-scroll overflow-x-hidden snap-y snap-mandatory scroll-smooth custom-scrollbar"
+        className={`relative z-10 w-full ${
+          scrollMode === 'snap'
+            ? 'h-screen max-h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth overscroll-contain'
+            : 'min-h-screen scroll-smooth'
+        }`}
       >
         {/* Section 1: Hero */}
         <Hero
@@ -292,6 +365,7 @@ export default function Home() {
           onOpenProject={handleOpenProject}
           onNavigateSection={handleNavigateSection}
           onSwitchMode={handleSwitchMode}
+          scrollMode={scrollMode}
         />
 
         {/* Section 2: Projects Gallery */}
@@ -300,12 +374,14 @@ export default function Home() {
           activeMode={activeMode}
           projects={PORTFOLIO_PROJECTS}
           onOpenProject={handleOpenProject}
+          scrollMode={scrollMode}
         />
 
         {/* Section 3: About Me, Biography, CV & Coordinates */}
         <About
           modeConfig={currentModeConfig}
           activeMode={activeMode}
+          scrollMode={scrollMode}
         />
 
         {/* Section 4: Skills & Collaboration Services */}
@@ -313,12 +389,14 @@ export default function Home() {
           modeConfig={currentModeConfig}
           activeMode={activeMode}
           onSelectService={handleSelectService}
+          scrollMode={scrollMode}
         />
 
         {/* Section 5: Achievements & Verified Credentials */}
         <Achievements
           modeConfig={currentModeConfig}
           activeMode={activeMode}
+          scrollMode={scrollMode}
         />
 
         {/* Section 6: Contact & Inquiry Form with Docked Footer */}
@@ -329,6 +407,7 @@ export default function Home() {
           prefilledMessage={contactPrefill.message}
           onSwitchMode={handleSwitchMode}
           onScrollToTop={handleScrollToTop}
+          scrollMode={scrollMode}
         />
       </main>
 

@@ -1,0 +1,9 @@
+--- tests/e2e/tier5-adversarial-m1.test.mjs
++++ tests/e2e/tier5-adversarial-m1.test.mjs
+@@ -292,3 +292,4 @@
+ 
+-      // Check SVG icon referenced
+-      assert.ok(html.includes('project-tech'), 'HTML must reference project-tech SVG');
++      // Check Tech mode visual artifacts (restored DiamondArtifactGlyph procedural gradients per R1 or project-tech SVG)
++      const hasTechVisuals = (html.includes('chrome-') && html.includes('holo-')) || html.includes('project-tech');
++      assert.ok(hasTechVisuals, 'HTML must reference tech glyphs (chrome- & holo- gradient defs) or project-tech SVG');

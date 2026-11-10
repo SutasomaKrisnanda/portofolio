@@ -1,26 +1,15 @@
-## 2026-11-05T13:08:12Z
-You are teamwork_explorer 2 for Milestone 1 Iteration 2: 404 & Prerender Architect.
-Your working directory is: w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\explorer_m1_it2_2\
-Parent orchestrator conversation ID: 514f318a-382e-4a4c-bf5e-58e0d0eff1f1
+# Dispatch — Explorer M1-It2-2 (patch-fs.js Clean Build Resilience & DrvFs Locking)
 
-MANDATORY FIRST STEP:
-Read the user request at:
-w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\ORIGINAL_REQUEST.md
-Also read:
-w:\home\krisnanda\Code\Project\Personal - github\portofolio\PROJECT.md
-w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\orchestrator\GATE_STATUS.md
-w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\reviewer_m1_2\handoff.md
+## 2026-11-08T01:29:00Z
+Sender: 296675c5-70ba-4b3d-9b05-cade43b440a6 (Project Orchestrator)
 
-MISSION:
-Gate for Milestone 1 Iteration 1 reported that missing `src/app/not-found.tsx` triggers Next.js App Router static export warnings and prerendering issues for `/404.html`.
-Your task:
-1. Design a clean, responsive `src/app/not-found.tsx` component that:
-   - Matches the portfolio's glassmorphic design, typography, and dark/light theme support.
-   - Provides a friendly "Halaman Tidak Ditemukan" message and a link back to `/`.
-   - Compiles cleanly in Next.js 15.5 static export (`output: 'export'`) generating `out/404.html`.
-2. Detail exact code and integration instructions for the Worker.
+### Task Assignment
+You are Explorer M1-It2-2 for Milestone 1 Iteration 2.
+Your working directory is: `w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\explorer_m1_it2_2\`
+Read `w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\ORIGINAL_REQUEST.md`, `w:\home\krisnanda\Code\Project\Personal - github\portofolio\PROJECT.md`, and Gate Status `w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\orchestrator\GATE_STATUS.md`.
 
-OUTPUT:
-Write your recommendation report to:
-`w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\explorer_m1_it2_2\recommendations.md`
-and write `handoff.md`. Notify orchestrator via send_message.
+### Investigation Focus:
+In Iteration 1 Gate, Challenger M1-2 identified that during rapid rebuild loops on Windows DrvFs, `clean.js` or Next.js static export can intermittently experience directory file locking (`ENOTEMPTY` on `.next\export`).
+Investigate `scripts/clean.js` and `patch-fs.js` to formulate retry-with-backoff for directory removal (`rmSync(..., { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })`) or `rmdir` hooks to make consecutive clean builds 100% resilient.
+
+Provide exact code diff in `analysis.md` and deliver `handoff.md`.

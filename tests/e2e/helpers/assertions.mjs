@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
-import { PROJECT_ROOT } from './fixtures.mjs';
-import { parseGlbHeader, parseAvifHeader, validateSvgMarkup } from './oracle.mjs';
+import { PROJECT_ROOT, BENTO_GRID_SPECS, CATEGORY_PILL_LAYOUT_SPECS } from './fixtures.mjs';
+import { validateSvgMarkup } from './oracle.mjs';
 
 export { assert };
 
@@ -16,37 +16,6 @@ export function assertFileExists(relativePath, minBytes = 1) {
     `File size too small: ${relativePath} is ${stat.size} bytes, expected >= ${minBytes}`
   );
   return { fullPath, size: stat.size };
-}
-
-export function assertValidAvif(relativePath) {
-  const { fullPath } = assertFileExists(relativePath, 16);
-  const buffer = fs.readFileSync(fullPath);
-  const result = parseAvifHeader(buffer);
-  assert.ok(
-    result.valid,
-    `File is not a valid AVIF image: ${relativePath} (boxType: ${result.boxType}, brand: ${result.majorBrand})`
-  );
-  return result;
-}
-
-export function assertValidGlb(relativePath, expectedExtensions = []) {
-  const { fullPath } = assertFileExists(relativePath, 20);
-  const buffer = fs.readFileSync(fullPath);
-  const result = parseGlbHeader(buffer);
-  assert.ok(
-    result.valid,
-    `File is not a valid glTF 2.0 binary (GLB): ${relativePath} (valid: ${result.valid}, magic: 0x${result.magic?.toString(16)}, version: ${result.version})`
-  );
-
-  for (const ext of expectedExtensions) {
-    const isUsed = result.extensionsUsed.includes(ext) || result.extensionsRequired.includes(ext);
-    assert.ok(
-      isUsed,
-      `GLB model ${relativePath} missing required extension: ${ext} (found: ${result.extensionsUsed.join(', ')})`
-    );
-  }
-
-  return result;
 }
 
 export function assertValidSvg(relativePath) {
@@ -84,4 +53,20 @@ export function assertIncludes(actual, element, message) {
   } else {
     assert.fail(`assertIncludes called on unsupported type: ${typeof actual}`);
   }
+}
+
+export function assertValidProceduralModel(spec, mode) {
+  assert.ok(spec, `Procedural model spec must exist for mode ${mode}`);
+  assertEqual(spec.procedural, true, `Model for mode ${mode} must be procedural`);
+  assertEqual(spec.networkCostBytes, 0, `Model for mode ${mode} must have 0 network cost`);
+  assert.ok(spec.estimatedTriangles > 0 && spec.estimatedTriangles < 10000, `Triangles must be in lightweight budget`);
+}
+
+export function assertValidBentoLayout(tiles) {
+  const t = tiles || BENTO_GRID_SPECS.tiles;
+  assertEqual(t.tile1_bio.desktopSpan, 'lg:col-span-8', 'Tile 1 must span 8 columns on desktop');
+  assertEqual(t.tile2_contact.desktopSpan, 'lg:col-span-4', 'Tile 2 must span 4 columns on desktop');
+  assertEqual(t.tile3_principles.desktopSpan, 'lg:col-span-4', 'Tile 3 must span 4 columns on desktop');
+  assertEqual(t.tile4_education.desktopSpan, 'lg:col-span-8', 'Tile 4 must span 8 columns on desktop');
+  assertEqual(t.tile5_history.desktopSpan, 'lg:col-span-12', 'Tile 5 must span full width (12 columns) on desktop');
 }

@@ -26,49 +26,84 @@ function findProjectRoot(startDir) {
 const PROJECT_ROOT = findProjectRoot(__dirname);
 const TARGETS = ['.next', 'out', 'tsconfig.tsbuildinfo'];
 
-function removeDirectory(dirName) {
-  const dirPath = path.join(PROJECT_ROOT, dirName);
+function removeTarget(targetName) {
+  const targetPath = path.join(PROJECT_ROOT, targetName);
 
-  if (!fs.existsSync(dirPath)) {
+  if (!fs.existsSync(targetPath)) {
     return;
   }
 
   const startTime = Date.now();
   let attempts = 0;
-  const maxAttempts = 3;
+  const maxAttempts = 5;
 
   while (attempts < maxAttempts) {
     attempts++;
     try {
-      // fs.rmSync with maxRetries handles Windows DrvFs transient file locks
-      fs.rmSync(dirPath, {
+      // fs.rmSync with maxRetries handles Windows DrvFs transient file locks natively
+      fs.rmSync(targetPath, {
         recursive: true,
         force: true,
         maxRetries: 10,
-        retryDelay: 100,
+        retryDelay: 150,
       });
 
       // Verify removal
-      if (!fs.existsSync(dirPath)) {
+      if (!fs.existsSync(targetPath)) {
         const elapsed = Date.now() - startTime;
-        console.log(`[clean] Successfully removed ${dirName} (${elapsed}ms)`);
+        console.log(`[clean] Successfully removed ${targetName} (${elapsed}ms)`);
         return;
       }
     } catch (err) {
       if (attempts >= maxAttempts) {
-        console.error(`[clean] Error: Unable to remove ${dirName}: ${err.message}`);
-        if (fs.existsSync(dirPath)) {
+        console.error(`[clean] Error: Unable to remove ${targetName}: ${err.message}`);
+        if (fs.existsSync(targetPath)) {
           throw err;
         }
-      }
-      // Synchronous backoff before retry to allow background lock release
-      const waitTill = Date.now() + 200;
-      while (Date.now() < waitTill) {
-        /* wait */
+        return;
       }
     }
+
+    // Windows DrvFs Fallback: If directory remains stubbornly locked on attempt >= 3,
+    // try renaming to a temporary trash folder to vacate the target path immediately.
+    if (attempts >= 3 && fs.existsSync(targetPath)) {
+      try {
+        const stat = fs.statSync(targetPath);
+        if (stat.isDirectory()) {
+          const trashPath = `${targetPath}.trash.${Date.now()}`;
+          fs.renameSync(targetPath, trashPath);
+          console.log(`[clean] Renamed locked directory ${targetName} -> ${path.basename(trashPath)}`);
+          try {
+            fs.rmSync(trashPath, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+          } catch (_) {
+            // Background cleanup will handle any leftover trash folder
+          }
+          if (!fs.existsSync(targetPath)) {
+            const elapsed = Date.now() - startTime;
+            console.log(`[clean] Successfully vacated ${targetName} via rename fallback (${elapsed}ms)`);
+            return;
+          }
+        }
+      } catch (_) {
+        // Ignore rename failure and proceed to exponential backoff wait
+      }
+    }
+
+    // Synchronous exponential backoff before retry (200ms, 300ms, 450ms, 675ms, 1000ms)
+    // Ensures Windows DrvFs / NTFS has sufficient time to release background file handles
+    const delay = Math.min(Math.round(200 * Math.pow(1.5, attempts - 1)), 1000);
+    const waitTill = Date.now() + delay;
+    while (Date.now() < waitTill) {
+      /* wait */
+    }
+  }
+
+  if (fs.existsSync(targetPath)) {
+    throw new Error(`[clean] Target "${targetName}" still exists after ${maxAttempts} attempts.`);
   }
 }
+
+const removeDirectory = removeTarget;
 
 function ensureBinPermissions() {
   if (process.platform === 'win32') {

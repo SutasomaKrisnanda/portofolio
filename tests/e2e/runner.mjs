@@ -1,16 +1,22 @@
 #!/usr/bin/env node
 
 /**
- * Portfolio Enhancement E2E Test Suite Runner
+ * Portfolio Performance Optimization & UI/UX Refresh — E2E Test Suite Runner
  *
- * Systematic 4-tier opaque-box test runner covering R1 through R6
+ * Systematic 4-tier opaque-box test runner covering Requirements R1 through R4
  * across Tech, Medical, and Academic modes in light & dark themes.
+ *
+ * Requirements Covered:
+ *   - R1: Model 3D Hero-Section Ringan per Mode (Polyhedron, Helix DNA, Pena Bulu)
+ *   - R2: Peringkasan Category Pill Galeri (Projects & Achievements compact scroll & reset sync)
+ *   - R3: Sistem Smart Bento Grid Adaptif pada Bagian Tentang Saya (5-Tile 12-Column layout & history)
+ *   - R4: Penyesuaian Logo Icon Proyek Berdasarkan Mode Aktif (Dynamic ProjectModeIcon)
  *
  * Usage:
  *   node tests/e2e/runner.mjs
  *   node tests/e2e/runner.mjs --tier 1
  *   node tests/e2e/runner.mjs --tier 1,2
- *   node tests/e2e/runner.mjs --filter "Medical"
+ *   node tests/e2e/runner.mjs --filter "Bento"
  *   node tests/e2e/runner.mjs --list
  */
 
@@ -26,37 +32,41 @@ const PROJECT_ROOT = path.resolve(__dirname, '../..');
 const SUITES = [
   {
     tier: 1,
-    name: 'Tier 1: Feature Coverage (R1 - R6)',
+    name: 'Tier 1: Feature Coverage (R1 - R4)',
     file: 'tests/e2e/tier1-feature-coverage.test.mjs',
-    minTests: 30,
-    description: 'Validates primary behavior & acceptance criteria for R1 to R6'
+    minTests: 20,
+    actualTests: 24,
+    description: 'Validates primary behavior & acceptance criteria for R1 to R4 (>=5 tests per feature)'
   },
   {
     tier: 2,
-    name: 'Tier 2: Boundary & Corner Cases (R1 - R6)',
+    name: 'Tier 2: Boundary & Corner Cases (R1 - R4)',
     file: 'tests/e2e/tier2-boundary-corner.test.mjs',
-    minTests: 30,
-    description: 'Validates edge cases, invalid inputs, clamping, and extreme states'
+    minTests: 20,
+    actualTests: 24,
+    description: 'Validates edge cases, invalid inputs, clamping, rapid toggles, and viewport bounds'
   },
   {
     tier: 3,
-    name: 'Tier 3: Cross-Feature Combinations',
+    name: 'Tier 3: Cross-Feature Interactions',
     file: 'tests/e2e/tier3-cross-feature.test.mjs',
-    minTests: 8,
-    description: 'Validates pairwise cross-feature state interactions'
+    minTests: 5,
+    actualTests: 8,
+    description: 'Validates pairwise & systemic cross-feature state interactions'
   },
   {
     tier: 4,
     name: 'Tier 4: Real-World Application Scenarios',
     file: 'tests/e2e/tier4-application-scenarios.test.mjs',
-    minTests: 5,
-    description: 'Validates end-to-end full user journeys and walkthroughs'
+    minTests: 3,
+    actualTests: 5,
+    description: 'Validates end-to-end full user journeys across Tech, Medical, and Academic modes'
   }
 ];
 
 function printBanner() {
   console.log('\n' + '='.repeat(80));
-  console.log('   PORTFOLIO HERO-SECTION ENHANCEMENT — E2E TEST RUNNER');
+  console.log('   PORTFOLIO PERFORMANCE & UI/UX REFRESH — E2E TEST RUNNER');
   console.log('   Derived from ORIGINAL_REQUEST.md & PROJECT.md');
   console.log('='.repeat(80));
   console.log(`Node.js: ${process.version} | Platform: ${process.platform} | Root: ${PROJECT_ROOT}`);
@@ -106,7 +116,7 @@ Examples:
   node tests/e2e/runner.mjs
   node tests/e2e/runner.mjs --tier 1
   node tests/e2e/runner.mjs --tier 1,2
-  node tests/e2e/runner.mjs --filter "Medical"
+  node tests/e2e/runner.mjs --filter "Bento"
 `);
 }
 
@@ -116,7 +126,7 @@ function listInventory() {
   for (const s of SUITES) {
     console.log(`[Tier ${s.tier}] ${s.name}`);
     console.log(`  File: ${s.file}`);
-    console.log(`  Min tests: >= ${s.minTests}`);
+    console.log(`  Tests: ${s.actualTests} (min required >= ${s.minTests})`);
     console.log(`  Purpose: ${s.description}`);
   }
   console.log('-'.repeat(80));
@@ -148,12 +158,30 @@ function runSuites(selectedSuites, filterPattern) {
   console.log('='.repeat(80));
 
   const reqTable = [
-    { req: 'R1', title: 'Visual Hero-Section per Mode (6 AVIF assets)', status: 'COVERED', tiers: 'Tier 1, Tier 2, Tier 3, Tier 4' },
-    { req: 'R2', title: '3D Models for Medical & Academic (GLB + Meshopt)', status: 'COVERED', tiers: 'Tier 1, Tier 2, Tier 3, Tier 4' },
-    { req: 'R3', title: 'Dynamic Project SVG Icons (Tech, Medical, Academic)', status: 'COVERED', tiers: 'Tier 1, Tier 2, Tier 3, Tier 4' },
-    { req: 'R4', title: 'Dynamic Highlight Nav from Dataset JSON', status: 'COVERED', tiers: 'Tier 1, Tier 2, Tier 3, Tier 4' },
-    { req: 'R5', title: 'Project Modal Refactor & Single-Click Trigger', status: 'COVERED', tiers: 'Tier 1, Tier 2, Tier 3, Tier 4' },
-    { req: 'R6', title: 'Slide Block Transitions & Accessible Tooltips', status: 'COVERED', tiers: 'Tier 1, Tier 2, Tier 3, Tier 4' }
+    {
+      req: 'R1',
+      title: 'Model 3D Hero-Section Ringan per Mode (Polyhedron, Helix DNA, Pena Bulu)',
+      status: 'COVERED',
+      tiers: 'Tier 1, Tier 2, Tier 3, Tier 4'
+    },
+    {
+      req: 'R2',
+      title: 'Peringkasan Category Pill Galeri (Projects & Achievements compact scroll)',
+      status: 'COVERED',
+      tiers: 'Tier 1, Tier 2, Tier 3, Tier 4'
+    },
+    {
+      req: 'R3',
+      title: 'Sistem Smart Bento Grid Adaptif pada Bagian Tentang Saya (5-Tile Layout)',
+      status: 'COVERED',
+      tiers: 'Tier 1, Tier 2, Tier 3, Tier 4'
+    },
+    {
+      req: 'R4',
+      title: 'Penyesuaian Logo Icon Proyek Berdasarkan Mode Aktif (ProjectModeIcon)',
+      status: 'COVERED',
+      tiers: 'Tier 1, Tier 2, Tier 3, Tier 4'
+    }
   ];
 
   console.table(reqTable);

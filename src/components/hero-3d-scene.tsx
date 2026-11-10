@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { ModeId } from '@/data/portfolio-data';
 import { IridescentCrystalCanvas } from './crystal-canvas';
 
@@ -13,7 +13,6 @@ export interface Hero3DSceneProps {
   activeSlideIndex?: number;
   baseHue?: number;
   secondaryHue?: number;
-  onModelClick?: () => void;
   className?: string;
 }
 
@@ -38,54 +37,69 @@ interface CachedModel {
 
 // Global in-memory cache for loaded scenes across mode switches
 const modelSceneCache = new Map<ModeId, CachedModel>();
-let isMeshoptInitialized = false;
 
-async function getInitializedLoader(): Promise<GLTFLoader> {
-  const loader = new GLTFLoader();
-  if (!isMeshoptInitialized) {
-    if (MeshoptDecoder.ready) {
+let gltfLoaderInstance: GLTFLoader | null = null;
+let loaderPromise: Promise<GLTFLoader> | null = null;
+
+async function getGLTFLoader(): Promise<GLTFLoader> {
+  if (gltfLoaderInstance) return gltfLoaderInstance;
+  if (!loaderPromise) {
+    loaderPromise = (async () => {
       await MeshoptDecoder.ready;
-    }
-    isMeshoptInitialized = true;
+      const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+      gltfLoaderInstance = loader;
+      return loader;
+    })();
   }
-  loader.setMeshoptDecoder(MeshoptDecoder);
-  return loader;
+  return loaderPromise;
 }
 
-function normalizeAndPivotModel(
+export function normalizeLoadedModel(
   modelScene: THREE.Object3D,
-  targetSize: number = 2.85
+  targetSize = 2.10
 ): { pivotGroup: THREE.Group; baseScale: number } {
-  // Compute bounding box
+  const pivotGroup = new THREE.Group();
+
   const box = new THREE.Box3().setFromObject(modelScene);
-  const size = new THREE.Vector3();
-  box.getSize(size);
-  const center = new THREE.Vector3();
-  box.getCenter(center);
-
-  // Center model origin at geometric center (0, 0, 0)
-  modelScene.position.set(-center.x, -center.y, -center.z);
-
-  // Compute uniform scale factor to match targetSize across all models
+  const size = box.getSize(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z);
   const scale = maxDim > 0 ? targetSize / maxDim : 1.0;
 
-  const pivotGroup = new THREE.Group();
-  pivotGroup.add(modelScene);
-  pivotGroup.scale.setScalar(scale);
+  const center = box.getCenter(new THREE.Vector3());
+  modelScene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+  modelScene.scale.setScalar(scale);
 
-  return { pivotGroup, baseScale: scale };
+  modelScene.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) {
+      const mesh = child as THREE.Mesh;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      if (mesh.material) {
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach((m) => {
+            m.needsUpdate = true;
+          });
+        } else {
+          mesh.material.needsUpdate = true;
+        }
+      }
+    }
+  });
+
+  pivotGroup.add(modelScene);
+  return { pivotGroup, baseScale: 1.0 };
 }
 
 function createTechPolyhedron(): { pivotGroup: THREE.Group; baseScale: number } {
   const pivotGroup = new THREE.Group();
 
-  // Core crystal: Icosahedron with physical glass material (enlarged for prominent desktop presence)
+  // Core crystal: Icosahedron with physical glass material
   const innerGeo = new THREE.IcosahedronGeometry(1.35, 0);
   const innerMat = new THREE.MeshPhysicalMaterial({
     color: 0x38bdf8,
     emissive: 0x0284c7,
-    emissiveIntensity: 0.2,
+    emissiveIntensity: 0.25,
     roughness: 0.12,
     metalness: 0.15,
     transmission: 0.6,
@@ -130,6 +144,240 @@ function createTechPolyhedron(): { pivotGroup: THREE.Group; baseScale: number } 
   return { pivotGroup, baseScale: 1.0 };
 }
 
+function createMedicalDNA(): { pivotGroup: THREE.Group; baseScale: number } {
+  const pivotGroup = new THREE.Group();
+
+  const numBasePairs = 24;
+  const height = 3.2;
+  const radius = 0.95;
+  const totalTurns = 2.4 * Math.PI; // ~1.2 full revolutions
+
+  const nodeGeo = new THREE.SphereGeometry(0.08, 12, 12);
+  const strand1Mat = new THREE.MeshStandardMaterial({
+    color: 0xff4d6d,
+    emissive: 0x9f1239,
+    emissiveIntensity: 0.6,
+    roughness: 0.25,
+    metalness: 0.3,
+  });
+  const strand2Mat = new THREE.MeshStandardMaterial({
+    color: 0xf43f5e,
+    emissive: 0x881337,
+    emissiveIntensity: 0.6,
+    roughness: 0.25,
+    metalness: 0.3,
+  });
+
+  const rungMatA = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    emissive: 0x0284c7,
+    emissiveIntensity: 0.4,
+    roughness: 0.3,
+    metalness: 0.2,
+  });
+  const rungMatB = new THREE.MeshStandardMaterial({
+    color: 0xfb7185,
+    emissive: 0xe11d48,
+    emissiveIntensity: 0.4,
+    roughness: 0.3,
+    metalness: 0.2,
+  });
+
+  const rungsGroup = new THREE.Group();
+
+  for (let i = 0; i <= numBasePairs; i++) {
+    const t = i / numBasePairs;
+    const y = (t - 0.5) * height;
+    const angle = t * totalTurns * 2;
+
+    const x1 = Math.cos(angle) * radius;
+    const z1 = Math.sin(angle) * radius;
+    const x2 = Math.cos(angle + Math.PI) * radius;
+    const z2 = Math.sin(angle + Math.PI) * radius;
+
+    // Node on Strand 1
+    const node1 = new THREE.Mesh(nodeGeo, strand1Mat);
+    node1.position.set(x1, y, z1);
+    pivotGroup.add(node1);
+
+    // Node on Strand 2
+    const node2 = new THREE.Mesh(nodeGeo, strand2Mat);
+    node2.position.set(x2, y, z2);
+    pivotGroup.add(node2);
+
+    // Base pair connecting rod (half A, half B)
+    if (i < numBasePairs) {
+      const midX = (x1 + x2) / 2;
+      const midZ = (z1 + z2) / 2;
+
+      // Segment 1 (Strand 1 to Midpoint)
+      const rungGeo1 = new THREE.CylinderGeometry(0.024, 0.024, radius, 8);
+      const rungMesh1 = new THREE.Mesh(rungGeo1, i % 2 === 0 ? rungMatA : rungMatB);
+      rungMesh1.position.set((x1 + midX) / 2, y, (z1 + midZ) / 2);
+      rungMesh1.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(midX - x1, 0, midZ - z1).normalize()
+      );
+      rungsGroup.add(rungMesh1);
+
+      // Segment 2 (Midpoint to Strand 2)
+      const rungGeo2 = new THREE.CylinderGeometry(0.024, 0.024, radius, 8);
+      const rungMesh2 = new THREE.Mesh(rungGeo2, i % 2 === 0 ? rungMatB : rungMatA);
+      rungMesh2.position.set((midX + x2) / 2, y, (midZ + z2) / 2);
+      rungMesh2.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(x2 - midX, 0, z2 - midZ).normalize()
+      );
+      rungsGroup.add(rungMesh2);
+    }
+  }
+
+  pivotGroup.add(rungsGroup);
+
+  // Subtle floating bio-luminescent particles
+  const particlesGroup = new THREE.Group();
+  const particleGeo = new THREE.OctahedronGeometry(0.045, 0);
+  const particleMat = new THREE.MeshBasicMaterial({
+    color: 0xffa5ba,
+    transparent: true,
+    opacity: 0.65,
+  });
+  for (let j = 0; j < 8; j++) {
+    const p = new THREE.Mesh(particleGeo, particleMat);
+    const pAngle = (j / 8) * Math.PI * 2;
+    const pRadius = radius + 0.35 + (j % 3) * 0.12;
+    const pY = ((j % 4) / 4 - 0.5) * height * 0.9;
+    p.position.set(Math.cos(pAngle) * pRadius, pY, Math.sin(pAngle) * pRadius);
+    particlesGroup.add(p);
+  }
+  pivotGroup.add(particlesGroup);
+  pivotGroup.rotation.y = 0.15 + Math.PI / 2;
+
+  return { pivotGroup, baseScale: 1.0 };
+}
+
+function createAcademicQuill(): { pivotGroup: THREE.Group; baseScale: number } {
+  const pivotGroup = new THREE.Group();
+
+  // 1. Slender curved shaft / rachis
+  const curvePoints: THREE.Vector3[] = [];
+  const segments = 24;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const y = -1.5 + t * 3.2; // total length ~3.2
+    const x = Math.sin(t * Math.PI * 0.65) * 0.38;
+    const z = -Math.pow(t, 1.8) * 0.25;
+    curvePoints.push(new THREE.Vector3(x, y, z));
+  }
+  const shaftCurve = new THREE.CatmullRomCurve3(curvePoints);
+  const shaftGeo = new THREE.TubeGeometry(shaftCurve, 32, 0.038, 10, false);
+  const shaftMat = new THREE.MeshStandardMaterial({
+    color: 0xfef9c3,
+    emissive: 0x78350f,
+    emissiveIntensity: 0.2,
+    roughness: 0.35,
+    metalness: 0.15,
+  });
+  const shaftMesh = new THREE.Mesh(shaftGeo, shaftMat);
+  pivotGroup.add(shaftMesh);
+
+  // 2. Calligraphic golden metallic nib (nib tip at y = -1.62)
+  const nibGroup = new THREE.Group();
+  const nibTipGeo = new THREE.ConeGeometry(0.065, 0.35, 4);
+  const nibMat = new THREE.MeshStandardMaterial({
+    color: 0xfbbf24,
+    emissive: 0xb45309,
+    emissiveIntensity: 0.4,
+    roughness: 0.15,
+    metalness: 0.9,
+  });
+  const nibMesh = new THREE.Mesh(nibTipGeo, nibMat);
+  nibMesh.rotation.x = Math.PI; // point downwards
+  nibMesh.position.set(0, -1.62, 0);
+  nibGroup.add(nibMesh);
+
+  // Nib collar / ferrule ring
+  const ringGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.08, 12);
+  const ringMesh = new THREE.Mesh(ringGeo, nibMat);
+  ringMesh.position.set(0, -1.45, 0);
+  nibGroup.add(ringMesh);
+  pivotGroup.add(nibGroup);
+
+  // 3. Feather barbs / vanes (left and right wings radiating gracefully from shaft)
+  const featherGroup = new THREE.Group();
+  const vaneMatLeft = new THREE.MeshStandardMaterial({
+    color: 0xfef08a,
+    emissive: 0xd97706,
+    emissiveIntensity: 0.25,
+    roughness: 0.4,
+    metalness: 0.1,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.92,
+  });
+  const vaneMatRight = new THREE.MeshStandardMaterial({
+    color: 0xfde047,
+    emissive: 0x9333ea,
+    emissiveIntensity: 0.2,
+    roughness: 0.45,
+    metalness: 0.1,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.9,
+  });
+
+  // Generate stylized feather barbs along the shaft
+  for (let i = 4; i < segments - 1; i += 1) {
+    const t = i / segments;
+    const origin = curvePoints[i];
+    const widthFactor = Math.sin(t * Math.PI) * 0.75;
+
+    // Right vane barb
+    const rightLen = widthFactor * 0.65;
+    const barbGeoR = new THREE.CylinderGeometry(0.012, 0.004, rightLen, 6);
+    const barbMeshR = new THREE.Mesh(barbGeoR, vaneMatRight);
+    barbMeshR.position.set(origin.x + rightLen * 0.45, origin.y - 0.04, origin.z + 0.02);
+    barbMeshR.rotation.z = -Math.PI / 3.2;
+    barbMeshR.rotation.x = 0.15;
+    featherGroup.add(barbMeshR);
+
+    // Left vane barb (asymmetric silhouette)
+    const leftLen = widthFactor * 0.45;
+    const barbGeoL = new THREE.CylinderGeometry(0.01, 0.004, leftLen, 6);
+    const barbMeshL = new THREE.Mesh(barbGeoL, vaneMatLeft);
+    barbMeshL.position.set(origin.x - leftLen * 0.45, origin.y - 0.03, origin.z - 0.02);
+    barbMeshL.rotation.z = Math.PI / 3.4;
+    barbMeshL.rotation.x = -0.15;
+    featherGroup.add(barbMeshL);
+  }
+  pivotGroup.add(featherGroup);
+
+  // 4. Floating scholarly ink droplets
+  const inkGroup = new THREE.Group();
+  const dropGeo = new THREE.DodecahedronGeometry(0.035, 0);
+  const dropMat = new THREE.MeshStandardMaterial({
+    color: 0xf59e0b,
+    emissive: 0xf59e0b,
+    emissiveIntensity: 0.7,
+    roughness: 0.2,
+    metalness: 0.8,
+  });
+  for (let k = 0; k < 5; k++) {
+    const drop = new THREE.Mesh(dropGeo, dropMat);
+    const angle = (k / 5) * Math.PI * 2;
+    drop.position.set(Math.cos(angle) * 0.6, -1.35 + (k % 3) * 0.35, Math.sin(angle) * 0.6);
+    inkGroup.add(drop);
+  }
+  pivotGroup.add(inkGroup);
+
+  // Initial calligraphic tilt
+  pivotGroup.rotation.z = -0.22;
+  pivotGroup.rotation.x = 0.18;
+  pivotGroup.rotation.y = Math.PI + Math.PI / 2; // 270 degrees horizontal rotation at initial load
+
+  return { pivotGroup, baseScale: 1.0 };
+}
+
 interface SceneLights {
   ambient: THREE.AmbientLight;
   key: THREE.DirectionalLight;
@@ -143,7 +391,6 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
   activeSlideIndex = 0,
   baseHue = 200,
   secondaryHue = 220,
-  onModelClick,
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -152,6 +399,9 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
   const [webGLSupported, setWebGLSupported] = useState<boolean>(true);
   const [isContextLost, setIsContextLost] = useState<boolean>(false);
   const [loadingProgress, setLoadingProgress] = useState<number | null>(null);
+
+  // Active request ID to prevent race conditions during rapid mode toggles
+  const activeRequestIdRef = useRef<number>(0);
 
   // Three.js instances refs
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -172,6 +422,11 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
   const totalDragDistRef = useRef<number>(0);
   const dragRotationRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const dragVelocityRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Physics-based cursor tracking refs (window-wide smooth spring tracking)
+  const cursorTargetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const cursorCurrentRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const cursorVelocityRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Update refs when props change
   useEffect(() => {
@@ -228,9 +483,9 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
     }
   }, []);
 
-  // Switch model in Three.js scene
+  // Switch model in Three.js scene (authentic GLB assets for Medical/Academic, procedural Polyhedron for Tech)
   const switchModel = useCallback(
-    async (targetMode: ModeId) => {
+    (targetMode: ModeId) => {
       // Mobile optimization: Skip Three.js scene and model loading on mobile (< 1024px)
       if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
 
@@ -253,73 +508,84 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
         return;
       }
 
-      // 2. Tech mode: procedural crystal (0 network bytes, instant render)
+      // 2. Tech mode: procedural Polyhedron
       if (targetMode === 'tech') {
-        const { pivotGroup, baseScale } = createTechPolyhedron();
-        modelSceneCache.set('tech', { pivotGroup, baseScale });
-        activePivotRef.current = pivotGroup;
-        activeBaseScaleRef.current = baseScale;
-        scene.add(pivotGroup);
+        const modelData = createTechPolyhedron();
+        modelSceneCache.set('tech', modelData);
+        activePivotRef.current = modelData.pivotGroup;
+        activeBaseScaleRef.current = modelData.baseScale;
+        scene.add(modelData.pivotGroup);
         setLoadingProgress(null);
         return;
       }
 
-      // 3. Medical or Academic: Load GLB model from static public mirror
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-      const modelFileName = targetMode === 'medical' ? 'model-jantung.glb' : 'model-quill.glb';
-      const modelPath = `${basePath}/models/${modelFileName}`;
-
-      const KNOWN_SIZES: Record<string, number> = {
-        medical: 18_141_244,
-        academic: 90_192_408
-      };
+      // 3. Medical & Academic modes: load authentic GLB models via GLTFLoader with MeshoptDecoder
+      const requestId = ++activeRequestIdRef.current;
+      const assetPath =
+        targetMode === 'medical'
+          ? '/models/model-jantung.glb'
+          : '/models/model-pena.glb';
 
       setLoadingProgress(0);
 
-      try {
-        const loader = await getInitializedLoader();
-
-        loader.load(
-          modelPath,
-          (gltf) => {
-            // Guard: ensure mode hasn't changed while loading
-            if (currentModeRef.current !== targetMode) {
-              const { pivotGroup, baseScale } = normalizeAndPivotModel(gltf.scene, 2.85);
-              modelSceneCache.set(targetMode, { pivotGroup, baseScale });
-              return;
+      getGLTFLoader()
+        .then((loader) => {
+          if (activeRequestIdRef.current !== requestId) return;
+          loader.load(
+            assetPath,
+            (gltf) => {
+              if (activeRequestIdRef.current !== requestId) return;
+              const modelData = normalizeLoadedModel(gltf.scene, 2.40);
+              if (targetMode === 'academic') {
+                modelData.pivotGroup.rotation.y = Math.PI + Math.PI / 2;
+              } else if (targetMode === 'medical') {
+                modelData.pivotGroup.rotation.y = 0.15 + Math.PI / 2;
+              }
+              modelSceneCache.set(targetMode, modelData);
+              if (currentModeRef.current === targetMode && sceneRef.current) {
+                if (activePivotRef.current) {
+                  sceneRef.current.remove(activePivotRef.current);
+                }
+                activePivotRef.current = modelData.pivotGroup;
+                activeBaseScaleRef.current = modelData.baseScale;
+                sceneRef.current.add(modelData.pivotGroup);
+              }
+              setLoadingProgress(null);
+            },
+            (progressEvent) => {
+              if (activeRequestIdRef.current !== requestId) return;
+              if (progressEvent.total && progressEvent.total > 0) {
+                const pct = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                setLoadingProgress(pct);
+              }
+            },
+            (error) => {
+              console.warn(`Failed to load ${assetPath}, falling back to procedural model:`, error);
+              if (activeRequestIdRef.current !== requestId) return;
+              const fallbackData =
+                targetMode === 'medical' ? createMedicalDNA() : createAcademicQuill();
+              modelSceneCache.set(targetMode, fallbackData);
+              if (currentModeRef.current === targetMode && sceneRef.current) {
+                activePivotRef.current = fallbackData.pivotGroup;
+                activeBaseScaleRef.current = fallbackData.baseScale;
+                sceneRef.current.add(fallbackData.pivotGroup);
+              }
+              setLoadingProgress(null);
             }
-
-            const { pivotGroup, baseScale } = normalizeAndPivotModel(gltf.scene, 2.85);
-            modelSceneCache.set(targetMode, { pivotGroup, baseScale });
-
-            activePivotRef.current = pivotGroup;
-            activeBaseScaleRef.current = baseScale;
-            scene.add(pivotGroup);
-            setLoadingProgress(null);
-          },
-          (xhr) => {
-            const total = xhr.total || KNOWN_SIZES[targetMode] || 1;
-            const percent = Math.min(99, Math.round((xhr.loaded / total) * 100));
-            setLoadingProgress(percent);
-          },
-          (error) => {
-            console.warn(`Failed to load GLB model for ${targetMode}, using fallback:`, error);
-            // Fallback to procedural polyhedron if asset loading fails
-            const { pivotGroup, baseScale } = createTechPolyhedron();
-            activePivotRef.current = pivotGroup;
-            activeBaseScaleRef.current = baseScale;
-            scene.add(pivotGroup);
-            setLoadingProgress(null);
+          );
+        })
+        .catch((err) => {
+          console.warn('Failed to get GLTFLoader:', err);
+          const fallbackData =
+            targetMode === 'medical' ? createMedicalDNA() : createAcademicQuill();
+          modelSceneCache.set(targetMode, fallbackData);
+          if (currentModeRef.current === targetMode && sceneRef.current) {
+            activePivotRef.current = fallbackData.pivotGroup;
+            activeBaseScaleRef.current = fallbackData.baseScale;
+            sceneRef.current.add(fallbackData.pivotGroup);
           }
-        );
-      } catch (err) {
-        console.warn('Error initializing GLTFLoader:', err);
-        const { pivotGroup, baseScale } = createTechPolyhedron();
-        activePivotRef.current = pivotGroup;
-        activeBaseScaleRef.current = baseScale;
-        scene.add(pivotGroup);
-        setLoadingProgress(null);
-      }
+          setLoadingProgress(null);
+        });
     },
     []
   );
@@ -345,8 +611,8 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
     sceneRef.current = scene;
 
     // 2. Camera setup: PerspectiveCamera with FOV 45
-    const initialWidth = container.clientWidth || 480;
-    const initialHeight = container.clientHeight || 500;
+    const initialWidth = container.clientWidth || 360;
+    const initialHeight = container.clientHeight || 380;
     const aspect = initialHeight > 0 ? initialWidth / initialHeight : 1;
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
     camera.position.set(0, 0.15, 4.3);
@@ -420,7 +686,15 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
     });
     resizeObserver.observe(container);
 
-    // 8. Animation & Render Loop
+    // 8. Global pointer tracking for physics cursor following
+    const handleGlobalPointerMove = (e: PointerEvent) => {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = (e.clientY / window.innerHeight) * 2 - 1;
+      cursorTargetRef.current = { x: nx, y: ny };
+    };
+    window.addEventListener('pointermove', handleGlobalPointerMove, { passive: true });
+
+    // 9. Animation & Render Loop
     let animFrameId: number;
     const clock = new THREE.Clock();
 
@@ -434,9 +708,21 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Damping on drag velocities
-      dragVelocityRef.current.x *= 0.92;
-      dragVelocityRef.current.y *= 0.92;
+      // 1. Spring-damper physics for cursor-following orientation and subtle parallax
+      const springK = 0.06;
+      const cursorDamping = 0.82;
+      const ax = (cursorTargetRef.current.x - cursorCurrentRef.current.x) * springK;
+      const ay = (cursorTargetRef.current.y - cursorCurrentRef.current.y) * springK;
+      cursorVelocityRef.current.x = (cursorVelocityRef.current.x + ax) * cursorDamping;
+      cursorVelocityRef.current.y = (cursorVelocityRef.current.y + ay) * cursorDamping;
+      cursorCurrentRef.current.x += cursorVelocityRef.current.x;
+      cursorCurrentRef.current.y += cursorVelocityRef.current.y;
+
+      // 2. Viscous friction & acceleration damping on drag velocity
+      if (!isDraggingRef.current) {
+        dragVelocityRef.current.x *= 0.94;
+        dragVelocityRef.current.y *= 0.94;
+      }
       if (Math.abs(dragVelocityRef.current.x) < 0.00001) dragVelocityRef.current.x = 0;
       if (Math.abs(dragVelocityRef.current.y) < 0.00001) dragVelocityRef.current.y = 0;
 
@@ -446,68 +732,95 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
       );
       dragRotationRef.current.y += dragVelocityRef.current.y;
 
+      const cursorTiltX = cursorCurrentRef.current.y * 0.22; // pitch facing cursor
+      const cursorTiltY = cursorCurrentRef.current.x * 0.38; // yaw facing cursor
+      const cursorShiftX = cursorCurrentRef.current.x * 0.08; // subtle floating shift
+      const cursorShiftY = -cursorCurrentRef.current.y * 0.05;
+
       const currentPivot = activePivotRef.current;
       const currentBaseScale = activeBaseScaleRef.current;
       const activeMode = currentModeRef.current;
 
       if (currentPivot) {
         if (activeMode === 'tech') {
+          // Zero constant auto-spin! Only responds to cursor orientation, inertia, and subtle micro-breathing
           if (!prefersReducedMotion) {
-            currentPivot.rotation.y += 0.007;
-            currentPivot.rotation.x = Math.sin(elapsedTime * 0.8) * 0.04 + dragRotationRef.current.x;
-            currentPivot.position.y = Math.sin(elapsedTime * 1.5) * 0.05;
+            currentPivot.rotation.x = dragRotationRef.current.x + cursorTiltX + Math.sin(elapsedTime * 0.8) * 0.02;
+            currentPivot.rotation.y = dragRotationRef.current.y + cursorTiltY;
+            currentPivot.position.x = cursorShiftX;
+            currentPivot.position.y = cursorShiftY + Math.sin(elapsedTime * 1.5) * 0.03;
           } else {
-            currentPivot.rotation.x = dragRotationRef.current.x;
+            currentPivot.rotation.x = dragRotationRef.current.x + cursorTiltX;
+            currentPivot.rotation.y = dragRotationRef.current.y + cursorTiltY;
+            currentPivot.position.x = cursorShiftX;
+            currentPivot.position.y = cursorShiftY;
           }
-          currentPivot.rotation.y += dragVelocityRef.current.y;
         } else if (activeMode === 'medical') {
-          let pulse = 0;
+          // Physiological 72 BPM cardiac pulse (Lub-Dub cycle: systole, early diastole rebound, atrial kick)
+          const T = 60 / 72; // ~0.8333s per cardiac cycle at 72 BPM
+          const phase = (elapsedTime % T) / T; // normalized cardiac phase [0, 1)
+
+          // 3-Gaussian hemodynamic pulse wave
+          const s1Systole = Math.exp(-Math.pow((phase - 0.12) / (Math.SQRT2 * 0.05), 2));
+          const s2Dub = 0.42 * Math.exp(-Math.pow((phase - 0.32) / (Math.SQRT2 * 0.045), 2));
+          const atrialKick = 0.22 * Math.exp(-Math.pow((phase - 0.92) / (Math.SQRT2 * 0.04), 2));
+          const cardiacPulse = s1Systole + s2Dub + atrialKick;
+
+          // Anatomical heart resting posture (apical slant to the left, anterior inclination)
+          const restTiltZ = -0.32;
+          const restTiltX = 0.20;
+          const restTiltY = 0.15 + Math.PI / 2; // +90 degrees horizontal rotation (counter-clockwise)
+
           if (!prefersReducedMotion) {
-            // Physiological Lub-Dub cardiac pulse rhythm (72 BPM = 1.2 Hz)
-            const cycleDuration = 1.0 / 1.2;
-            const cycle = (elapsedTime % cycleDuration) / cycleDuration;
-            if (cycle < 0.16) {
-              // Ventricular Systole (Lub)
-              pulse = Math.sin((cycle / 0.16) * Math.PI) * 0.075;
-            } else if (cycle >= 0.22 && cycle < 0.36) {
-              // Atrial Kick (Dub)
-              pulse = Math.sin(((cycle - 0.22) / 0.14) * Math.PI) * 0.045;
-            } else {
-              pulse = 0;
+            // Systolic apical wringing twist
+            const twistY = 0.045 * cardiacPulse;
+            const twistZ = 0.025 * cardiacPulse;
+
+            currentPivot.rotation.z = restTiltZ + twistZ;
+            currentPivot.rotation.x = restTiltX + dragRotationRef.current.x + cursorTiltX;
+            currentPivot.rotation.y = restTiltY + twistY + dragRotationRef.current.y + cursorTiltY;
+            currentPivot.position.x = cursorShiftX;
+            currentPivot.position.y = cursorShiftY + Math.sin(elapsedTime * 1.2) * 0.02;
+            currentPivot.scale.setScalar(currentBaseScale * (1.0 + 0.075 * cardiacPulse));
+
+            if (lightsRef.current?.point) {
+              lightsRef.current.point.intensity = 0.8 + 1.2 * cardiacPulse;
             }
-          }
-
-          currentPivot.scale.setScalar(currentBaseScale * (1.0 + pulse));
-          if (lightsRef.current?.point) {
-            lightsRef.current.point.intensity = 0.8 + pulse * 18.0;
-          }
-
-          if (!prefersReducedMotion) {
-            currentPivot.rotation.y += 0.004;
-            currentPivot.rotation.z = -0.18; // anatomical apex tilt
-            currentPivot.rotation.x = 0.15 + dragRotationRef.current.x;
           } else {
-            currentPivot.rotation.z = -0.18;
-            currentPivot.rotation.x = 0.15 + dragRotationRef.current.x;
+            currentPivot.rotation.z = restTiltZ;
+            currentPivot.rotation.x = restTiltX + dragRotationRef.current.x + cursorTiltX;
+            currentPivot.rotation.y = restTiltY + dragRotationRef.current.y + cursorTiltY;
+            currentPivot.position.x = cursorShiftX;
+            currentPivot.position.y = cursorShiftY;
+            currentPivot.scale.setScalar(currentBaseScale);
           }
-          currentPivot.rotation.y += dragVelocityRef.current.y;
         } else if (activeMode === 'academic') {
-          if (!prefersReducedMotion) {
-            // Harmonic vertical levitation
-            currentPivot.position.y = Math.sin(elapsedTime * 1.6) * 0.09;
-            const baseTiltZ = -0.38;
-            const baseTiltX = 0.22;
-            const scribeWobbleZ = Math.sin(elapsedTime * 2.5) * 0.05;
-            const scribeWobbleX = Math.cos(elapsedTime * 2.0) * 0.03;
+          // Academic Pena: Harmonic levitation and organic calligraphic scribe wobble
+          const baseTiltZ = -0.28; // Calligraphic writing slant
+          const baseTiltX = 0.18;  // Forward pitch toward parchment
+          const baseTiltY = Math.PI + Math.PI / 2; // 180 + 90 = 270 degrees horizontal rotation (counter-clockwise)
 
+          if (!prefersReducedMotion) {
+            // Harmonic vertical levitation: Y = sin(1.6t) * 0.06
+            const levitationY = Math.sin(elapsedTime * 1.6) * 0.06;
+
+            // Lissajous calligraphic micro-wobble
+            const scribeWobbleX = Math.cos(elapsedTime * 1.8) * 0.025;
+            const scribeWobbleZ = Math.sin(elapsedTime * 2.2 + 0.4) * 0.03;
+            const scribeWobbleY = Math.sin(elapsedTime * 0.9) * 0.015;
+
+            currentPivot.position.x = cursorShiftX;
+            currentPivot.position.y = cursorShiftY + levitationY;
             currentPivot.rotation.z = baseTiltZ + scribeWobbleZ;
-            currentPivot.rotation.x = baseTiltX + scribeWobbleX + dragRotationRef.current.x;
-            currentPivot.rotation.y += 0.004;
+            currentPivot.rotation.x = baseTiltX + scribeWobbleX + dragRotationRef.current.x + cursorTiltX;
+            currentPivot.rotation.y = baseTiltY + dragRotationRef.current.y + cursorTiltY + scribeWobbleY;
           } else {
-            currentPivot.rotation.z = -0.38;
-            currentPivot.rotation.x = 0.22 + dragRotationRef.current.x;
+            currentPivot.position.x = cursorShiftX;
+            currentPivot.position.y = cursorShiftY;
+            currentPivot.rotation.z = baseTiltZ;
+            currentPivot.rotation.x = baseTiltX + dragRotationRef.current.x + cursorTiltX;
+            currentPivot.rotation.y = baseTiltY + dragRotationRef.current.y + cursorTiltY;
           }
-          currentPivot.rotation.y += dragVelocityRef.current.y;
         }
       }
 
@@ -518,9 +831,10 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
 
     animate();
 
-    // 9. Cleanup & GPU Disposal
+    // 10. Cleanup & GPU Disposal
     return () => {
       cancelAnimationFrame(animFrameId);
+      window.removeEventListener('pointermove', handleGlobalPointerMove);
       resizeObserver.disconnect();
       canvas.removeEventListener('webglcontextlost', handleContextLost);
       canvas.removeEventListener('webglcontextrestored', handleContextRestored);
@@ -576,9 +890,10 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
       // ignore
     }
 
-    // Click discrimination: if pointer travelled less than 5px, it's a click
+    // Pointer release: Model click decoupled from modal per R1 follow-up.
+    // Even if totalDragDistRef.current < 5, zero modal or navigation actions are dispatched.
     if (totalDragDistRef.current < 5) {
-      onModelClick?.();
+      // Decoupled: clicking 3D model never opens project modal
     }
   };
 
@@ -590,7 +905,6 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
         activeSlideIndex={activeSlideIndex}
         baseHue={baseHue}
         secondaryHue={secondaryHue}
-        onCrystalClick={onModelClick}
       />
     );
   }
@@ -601,8 +915,8 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
       className={`relative flex items-center justify-center select-none ${className}`}
     >
       {/* Concentric ambient pedestal rings */}
-      <div className="pointer-events-none absolute w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[480px] lg:h-[480px] xl:w-[560px] xl:h-[560px] rounded-full border border-slate-900/10 dark:border-white/20" />
-      <div className="pointer-events-none absolute w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] lg:w-[580px] lg:h-[580px] xl:w-[680px] xl:h-[680px] rounded-full border border-slate-900/5 dark:border-white/10" />
+      <div className="pointer-events-none absolute w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] lg:w-[360px] lg:h-[360px] xl:w-[400px] xl:h-[400px] rounded-full border border-slate-900/10 dark:border-white/20" />
+      <div className="pointer-events-none absolute w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] lg:w-[420px] lg:h-[420px] xl:w-[460px] xl:h-[460px] rounded-full border border-slate-900/5 dark:border-white/10" />
 
       {/* Progressive loading badge during large model streaming */}
       {loadingProgress !== null && (
@@ -619,8 +933,10 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className="w-[320px] h-[340px] md:w-[420px] md:h-[440px] lg:w-[480px] lg:h-[500px] xl:w-[560px] xl:h-[580px] cursor-grab active:cursor-grabbing relative z-10 touch-none"
-        title="Geser mouse untuk memutar model 3D, atau klik untuk melihat studi kasus projek aktif"
+        role="img"
+        aria-label="Model 3D Interaktif - Geser kursor atau drag untuk memutar"
+        className="w-[300px] h-[320px] sm:w-[340px] sm:h-[360px] lg:w-[360px] lg:h-[380px] xl:w-[400px] xl:h-[420px] cursor-grab active:cursor-grabbing relative z-10 touch-none"
+        title="Geser kursor atau drag untuk memutar model 3D"
       />
     </div>
   );

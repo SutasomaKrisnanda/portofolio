@@ -1,9 +1,9 @@
 # Test Infrastructure Specification (TEST_INFRA.md)
 
 ## 1. Overview & Mission
-This document defines the test infrastructure, architecture, and verification methodology for the Portfolio Hero-Section Enhancement & Cross-Mode UI/UX Refinement project, derived directly from `ORIGINAL_REQUEST.md` and `PROJECT.md`.
+This document defines the test infrastructure, architecture, and verification methodology for the Portfolio Performance Optimization & UI/UX Refresh project, derived directly from `ORIGINAL_REQUEST.md` and `PROJECT.md`.
 
-The test suite is built on an **opaque-box methodology**, evaluating the system against observable user requirements, explicit interface contracts, and authoritative data sources rather than transient implementation internals.
+The test suite is built on an **opaque-box requirement-driven methodology**, evaluating the system against observable user requirements, explicit interface contracts, and authoritative data sources rather than transient implementation internals.
 
 ---
 
@@ -14,55 +14,79 @@ The test suite implements a systematic 4-tier testing hierarchy guaranteeing com
 tests/e2e/
 ├── runner.mjs                            # Central CLI test runner & reporter
 ├── helpers/
-│   ├── fixtures.mjs                      # Asset paths, mode configs, and dataset loader
+│   ├── fixtures.mjs                      # Asset paths, mode configs, and dataset loaders
 │   ├── oracle.mjs                        # Authoritative requirement oracles and format parsers
 │   ├── simulator.mjs                     # Headless state machine simulating user interactions
-│   └── assertions.mjs                    # Assertions for binary GLB, AVIF, SVG, and contracts
-├── tier1-feature-coverage.test.mjs       # Tier 1: 35 tests (>=5 tests per feature R1-R6)
-├── tier2-boundary-corner.test.mjs        # Tier 2: 30 tests (5 tests per feature R1-R6)
-├── tier3-cross-feature.test.mjs          # Tier 3: 8 pairwise combination tests
+│   └── assertions.mjs                    # Assertions for 3D procedural models, layouts, SVG, and contracts
+├── tier1-feature-coverage.test.mjs       # Tier 1: 24 tests (6 tests per feature for R1-R4)
+├── tier2-boundary-corner.test.mjs        # Tier 2: 24 tests (6 tests per feature for R1-R4)
+├── tier3-cross-feature.test.mjs          # Tier 3: 8 pairwise & systemic interaction tests
 └── tier4-application-scenarios.test.mjs  # Tier 4: 5 full user walkthrough scenarios
 ```
 
-### Tier 1: Feature Coverage (>=5 test cases per feature across R1 - R6)
-- **R1: Visual Hero-Section per Mode** (6 tests): Validates presence and ISOBMFF header integrity of all 6 `.avif` background images (`bg-tech-dark.avif`, `bg-tech-light.avif`, `bg-medical-dark.avif`, `bg-medical-light.avif`, `bg-academic-dark.avif`, `bg-academic-light.avif`), background resolution oracle mapping, cross-fade transitions, and contrast vignettes.
-- **R2: 3D Model Integration for Medical & Academic** (6 tests): Validates binary glTF 2.0 format of `model-jantung.glb` and `model-quill.glb`, verifies `EXT_meshopt_compression` and `KHR_mesh_quantization` on the medical heart model, mode-to-model dispatch contract (Tech procedural crystal vs Medical heart vs Academic quill), 3D pointer drag rotation, and public model mirror paths.
-- **R3: Dynamic Project SVG Icons** (6 tests): Validates presence and XML markup of `project-tech.svg`, `project-medical.svg`, and `project-academic.svg`, dynamic icon resolution per active mode, and dynamic icon morphing on multi-mode projects (e.g. `proj-hmsso`).
-- **R4: Dynamic Highlight Navigation from Dataset JSON** (6 tests): Validates dynamic filtering by `p.featured && (p.mode === activeMode || p.secondaryModes.includes(activeMode))`, elimination of static '1, 2, 3, 4' buttons in favor of dynamic count (3 items per mode), Next/Prev cyclic bounds math, slide index auto-reset to 0 on mode change, and active slide synchronization.
-- **R5: Project Modal Refactor & Integration** (6 tests): Validates single-click modal opening from active project cards, click opening from "Lihat Detail" CTA, 3-tier Flexbox layout constraints (fixed header, scrollable body, fixed footer), scrollbar boundary confinement (zero border-radius leakage), and responsive viewport constraints.
-- **R6: Animations, Block Transitions & Accessible Tooltips** (5 tests): Validates reactive animation keys (`key={currentHeroProject?.id}`), Radix Tooltip integration across all interactive buttons, tooltip hover activation, keyboard focus tooltip activation, and smooth transition classes.
+### Tier 1: Feature Coverage (>=5 test cases per feature across R1 - R4)
+- **R1: Model 3D Hero-Section Ringan per Mode** (6 tests):
+  - T1.1.1: Tech mode procedural Polyhedron geometry, wireframe cage, orbital nodes (0 kB download).
+  - T1.1.2: Medical mode procedural Helix DNA dual curve tubes, base-pair rungs, terminal spheres (0 kB download).
+  - T1.1.3: Academic mode procedural Pena Bulu curved spine tube, ribbon vanes, brass nib (0 kB download).
+  - T1.1.4: Instantaneous synchronous 3D model transitions across all 3 modes.
+  - T1.1.5: 60 FPS rendering loop & complete recursive GPU resource disposal (`disposeHierarchy`) on unmount.
+  - T1.1.6: Hero 3D captions & skeleton loader text per mode.
 
-### Tier 2: Boundary & Corner Cases (>=5 test cases per feature across R1 - R6)
-- **R1 Boundary**: Unknown mode fallback to 'tech', system theme resolution, rapid mode toggling, extreme viewports (320px mobile to 3840px ultrawide), and missing image resilience.
-- **R2 Boundary**: WebGL context loss recovery, large 90MB quill model progressive loading state, corrupted glTF buffer handling, window resize camera aspect recalculation, and zero pointer movement drag damping.
-- **R3 Boundary**: Projects with undefined `secondaryModes`, unassociated project exclusion, case-insensitive mode mapping resilience, SVG high-DPI scaling, and rapid mode icon swapping.
-- **R4 Boundary**: Single featured project handling (count === 1), empty dataset handling, out-of-bounds slide index clamping, negative slide index wrap-around, and burst navigation clicks.
-- **R5 Boundary**: Escape key modal closing, backdrop click vs modal content click isolation, projects with missing optional fields, long text line clamping, and rapid open/close toggle stability.
-- **R6 Boundary**: Fast keyboard navigation (`Tab` + `Enter`), non-interactive element ignoring, tooltip max-width wrapping, instant focus delay vs hover delay, and reduced motion preference (`prefers-reduced-motion`) compliance.
+- **R2: Peringkasan Category Pill Galeri** (6 tests):
+  - T1.2.1: Projects gallery category pills single-row horizontal scroll on mobile (<640px) saving >80% vertical space.
+  - T1.2.2: Achievements gallery dedicated compact filter row with horizontal scroll on mobile.
+  - T1.2.3: Category filter mode synchronization: auto-reset `selectedCategory` to `'All'` on `activeMode` change across both galleries.
+  - T1.2.4: Projects gallery filter execution by category matches expected items.
+  - T1.2.5: Achievements gallery filter execution by category matches expected items.
+  - T1.2.6: Search query and sorting controls work concurrently with category filtering.
 
-### Tier 3: Cross-Feature Combinations (Pairwise Interactions)
-- **T3.1**: Mode Change + Modal Lifecycle Interaction
-- **T3.2**: Mode Change + Slide Navigation Index Reset to 0
-- **T3.3**: Multi-Mode Project Icon Morphing (`proj-hmsso` in Tech -> Medical -> Academic)
-- **T3.4**: Mode Switch + 3D Model Swap + Background Image Synchronous State Update
-- **T3.5**: Modal Open Blocks Background Keyboard Slide Navigation
-- **T3.6**: Slide Navigation + Tooltip Reactive Synchronization
-- **T3.7**: Theme Switch (Dark <-> Light) across all 3 modes preserving contrast & 3D lighting
-- **T3.8**: Direct URL / LocalStorage Mode Initialization (`?mode=medical`)
+- **R3: Sistem Smart Bento Grid Adaptif pada Bagian Tentang Saya** (6 tests):
+  - T1.3.1: 5-Tile 12-Column modular Bento Grid layout contracts eliminating vertical disparity ("timpang sebelah").
+  - T1.3.2: Tile 5 full container width (`lg:col-span-12`) for adaptive history track.
+  - T1.3.3: Interactive Segmented History Switcher (`Semua`, `Organisasi`, `Kepanitiaan`) in Tile 5.
+  - T1.3.4: Auto-flowing 3-column subgrid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`).
+  - T1.3.5: Progressive disclosure toggle ("Tampilkan N Lainnya / Ringkas") with threshold of 6 items.
+  - T1.3.6: Balanced layout adaptation across mobile, tablet, and desktop viewports.
+
+- **R4: Penyesuaian Logo Icon Proyek Berdasarkan Mode Aktif** (6 tests):
+  - T1.4.1: Project card mode icon SVG assets presence and validity (Tech, Medical, Academic).
+  - T1.4.2: Single-mode project displays icon matching its primary mode.
+  - T1.4.3: Multi-mode project dynamically matches `activeMode` when activeMode is in `secondaryModes`.
+  - T1.4.4: Multi-mode project falls back to primary `project.mode` when `activeMode` is not supported.
+  - T1.4.5: Fallback behavior for null/missing project reference defaults to `activeMode` / `'tech'`.
+  - T1.4.6: Accessible alt text generation per project and active mode.
+
+### Tier 2: Boundary & Corner Cases (>=5 test cases per feature across R1 - R4)
+- **R1 Boundary**: Rapid mode toggles (1,000 transitions) with zero memory leak, WebGL unsupported/context lost graceful fallback, mobile screen size (<1024px) skip to eliminate lag, pointer drag rotation bounds clamping, corrupt mode input fallback, and recursive disposal of deep hierarchies.
+- **R2 Boundary**: Extreme category label length (150 chars) layout preservation, empty search query result with "Reset Filter" restoration, special regex/SQL injection strings safety, rapid category switching without state divergence, viewport boundary transitions (320px to 3840px), and whitespace-only search handling.
+- **R3 Boundary**: Custom/empty history list handling, exactly 6 items boundary suppressing disclosure button, odd counts (1, 3, 5, 7, 11) natural subgrid flowing, rapid tab switching state determinism, extreme viewport bounds (320px to 3840px) maintaining column integrity, and long text description wrapping.
+- **R4 Boundary**: Project with empty/null `secondaryModes`, corrupt primary mode fallback to `'tech'`, null/undefined project reference safety, rapid mode toggles (1,000 cycles) zero-lag icon synchronization, SVG viewBox attributes for high-DPI scaling, and duplicate mode entries deduplication.
+
+### Tier 3: Cross-Feature Combinations (Pairwise & Systemic Interactions)
+- **T3.1**: Mode Switch + Category Pill Auto-Reset + Dynamic Project Icon Synchronous Update
+- **T3.2**: Mode Switch + 3D Model Geometry Change + Bento History Track Refresh
+- **T3.3**: Multi-Mode Project Filtering by Category + Dynamic Icon Morphing across Tech, Medical, Academic
+- **T3.4**: Mobile Viewport + Horizontal Scroll Category Pills + 3-Column Bento Grid Responsive Stacking
+- **T3.5**: Search Filter + Category Filter + Dynamic Project Mode Icon Alignment
+- **T3.6**: Bento Segmented Tab Switch + Progressive Disclosure + Mode Change Interaction
+- **T3.7**: Theme Switch (Dark <-> Light) across all 3 modes preserving 3D scene & icon contracts
+- **T3.8**: Direct URL Parameter Initialization (`?mode=medical`) hydrates all 4 features synchronously
 
 ### Tier 4: Real-World Application Scenarios (Full User Walkthroughs)
-- **T4.1**: Complete Tech Portfolio Exploration Walkthrough (Dark theme, polyhedron, HMSSO modal deep-dive)
-- **T4.2**: Complete Medical Portfolio Clinical Walkthrough (Heart GLB, Bunda Bahagia community health modal)
-- **T4.3**: Complete Academic Portfolio Research Walkthrough (Quill GLB, SIPADU RI scholarly modal)
-- **T4.4**: Complete Theme Inversion Matrix (All 3 modes in Light & Dark themes)
-- **T4.5**: Responsive Mobile to Desktop Viewport Adaptation Walkthrough (320px to 3840px)
+- **T4.1**: Complete Tech Portfolio End-to-End Walkthrough (Polyhedron 3D -> Web Development filter -> Tech Bento -> Tech icons)
+- **T4.2**: Complete Medical Portfolio Clinical Walkthrough (Helix DNA 3D -> Category auto-reset -> Clinical filter -> Medical Bento history -> Medical icons)
+- **T4.3**: Complete Academic Portfolio Scholarly Walkthrough (Pena Bulu 3D -> Scholarly publications filter -> Academic committees history -> Academic icons)
+- **T4.4**: Cross-Disciplinary Recruiter Walkthrough across All 3 Modes with interactive filter & disclosure expansions
+- **T4.5**: Responsive Viewport & Multi-Theme Matrix Validation (Mobile, Tablet, Desktop across Dark & Light)
 
 ---
 
 ## 3. Technology Stack & Execution Environment
 - **Runtime**: Node.js v26.7.0 with native ESM (`import/export`).
-- **Test Framework**: Native `node:test` and `node:assert/strict` — zero heavy external testing dependencies, fast execution (< 2 seconds for 78 tests), cross-platform compatibility.
-- **Binary & Format Parsers**: Native Node.js `Buffer` parsing for ISOBMFF AVIF headers and glTF 2.0 binary chunks.
+- **Test Framework**: Native `node:test` and `node:assert/strict` — zero external test runner dependencies, ultra-fast execution (~2.3s for 61 tests), deterministic cross-platform compatibility.
+- **Graphics & Geometry Engine**: Three.js in-memory geometry generation and mesh traversal for 3D model validation.
+- **Dataset Integration**: Direct JSON dataset parsing (`projects.json`, `achievements.json`, `experience.json`, `committees.json`, `education.json`, `profile.json`).
 
 ---
 
@@ -81,37 +105,29 @@ node tests/e2e/runner.mjs --tier 1
 # Run Tier 2 only (Boundary & Corner Cases)
 node tests/e2e/runner.mjs --tier 2
 
-# Run Tiers 1 and 3
-node tests/e2e/runner.mjs --tier 1,3
+# Run Tier 3 only (Cross-Feature Interactions)
+node tests/e2e/runner.mjs --tier 3
+
+# Run Tier 4 only (Real-World Scenarios)
+node tests/e2e/runner.mjs --tier 4
+
+# Run Tiers 1 and 2
+node tests/e2e/runner.mjs --tier 1,2
 ```
 
 ### Filter Tests by Name Pattern
 ```bash
-# Run all tests containing "Medical"
+# Run all tests matching "Bento"
+node tests/e2e/runner.mjs --filter "Bento"
+
+# Run all tests matching "Medical"
 node tests/e2e/runner.mjs --filter "Medical"
 
-# Run all tests containing "Modal"
-node tests/e2e/runner.mjs --filter "Modal"
+# Run all tests matching "Icon"
+node tests/e2e/runner.mjs --filter "Icon"
 ```
 
 ### List Inventory Without Running
 ```bash
 node tests/e2e/runner.mjs --list
 ```
-
-### Run Directly via Node's Native Test Runner
-```bash
-node --test tests/e2e/*.test.mjs
-```
-
----
-
-## 5. Exit Code & CI/CD Contract
-- **Exit Code 0**: All executed test cases passed successfully.
-- **Exit Code 1**: One or more test cases failed. Full error stack, assertion differences, and failing line numbers are printed to stderr/stdout.
-
----
-
-## 6. Progressive Testability & Dual-Track Verification
-During milestone implementation (M1: Backgrounds & Icons, M2: 3D Models, M3: Navigation & Modal), the E2E suite serves as the source of truth for acceptance.
-In Milestone 4 (Final Milestone), 100% of tests must pass with exit code 0 before release sign-off.

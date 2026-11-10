@@ -11,7 +11,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
-const SRC_MODELS_DIR = path.join(PROJECT_ROOT, 'src/assets/models');
 const PUBLIC_MODELS_DIR = path.join(PROJECT_ROOT, 'public/models');
 const OUT_MODELS_DIR = path.join(PROJECT_ROOT, 'out/models');
 
@@ -21,9 +20,9 @@ const EXPECTED_MODELS = {
     expectedSize: 18_141_244,
     requiredExtensions: ['EXT_meshopt_compression', 'KHR_mesh_quantization']
   },
-  quill: {
-    filename: 'model-quill.glb',
-    expectedSize: 90_192_408,
+  pena: {
+    filename: 'model-pena.glb',
+    expectedSize: 16_817_680,
     requiredExtensions: []
   }
 };
@@ -111,20 +110,16 @@ describe('Challenger M2: Adversarial Stress & Robustness Verification', () => {
 
   describe('3D Asset Binary Integrity & glTF 2.0 Specification Compliance', () => {
     for (const [key, config] of Object.entries(EXPECTED_MODELS)) {
-      test(`CH2.1 [${key}]: Source & Public GLB existence, exact size, and magic header`, () => {
-        const srcPath = path.join(SRC_MODELS_DIR, config.filename);
+      test(`CH2.1 [${key}]: Public & Exported GLB existence, exact size, and magic header`, () => {
         const pubPath = path.join(PUBLIC_MODELS_DIR, config.filename);
         const outPath = path.join(OUT_MODELS_DIR, config.filename);
 
-        assert.ok(fs.existsSync(srcPath), `Source model must exist: ${srcPath}`);
         assert.ok(fs.existsSync(pubPath), `Public mirrored model must exist: ${pubPath}`);
         assert.ok(fs.existsSync(outPath), `Exported model must exist: ${outPath}`);
 
-        const srcStat = fs.statSync(srcPath);
         const pubStat = fs.statSync(pubPath);
         const outStat = fs.statSync(outPath);
 
-        assert.strictEqual(srcStat.size, config.expectedSize, `Source ${config.filename} size mismatch: got ${srcStat.size}, expected ${config.expectedSize}`);
         assert.strictEqual(pubStat.size, config.expectedSize, `Public ${config.filename} size mismatch: got ${pubStat.size}, expected ${config.expectedSize}`);
         assert.strictEqual(outStat.size, config.expectedSize, `Exported ${config.filename} size mismatch: got ${outStat.size}, expected ${config.expectedSize}`);
 
@@ -155,17 +150,14 @@ describe('Challenger M2: Adversarial Stress & Robustness Verification', () => {
       });
     }
 
-    test('CH2.2: Bit-for-bit SHA-256 parity across src, public, and out directories', () => {
+    test('CH2.2: Bit-for-bit SHA-256 parity between public and out directories', () => {
       for (const config of Object.values(EXPECTED_MODELS)) {
-        const srcPath = path.join(SRC_MODELS_DIR, config.filename);
         const pubPath = path.join(PUBLIC_MODELS_DIR, config.filename);
         const outPath = path.join(OUT_MODELS_DIR, config.filename);
 
-        const srcHash = crypto.createHash('sha256').update(fs.readFileSync(srcPath)).digest('hex');
         const pubHash = crypto.createHash('sha256').update(fs.readFileSync(pubPath)).digest('hex');
         const outHash = crypto.createHash('sha256').update(fs.readFileSync(outPath)).digest('hex');
 
-        assert.strictEqual(srcHash, pubHash, `SHA-256 hash mismatch between src and public for ${config.filename}!`);
         assert.strictEqual(outHash, pubHash, `SHA-256 hash mismatch between out and public for ${config.filename}!`);
       }
     });

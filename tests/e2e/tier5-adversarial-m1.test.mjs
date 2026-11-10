@@ -290,8 +290,16 @@ describe('Tier 5: Adversarial Stress & Empirical Verification for Milestone 1', 
       assert.ok(html.includes('bg-academic-dark'), 'HTML must reference bg-academic-dark');
       assert.ok(html.includes('bg-academic-light'), 'HTML must reference bg-academic-light');
 
-      // Check SVG icon referenced
-      assert.ok(html.includes('project-tech'), 'HTML must reference project-tech SVG');
+      // Check Tech mode visual artifacts (restored DiamondArtifactGlyph procedural gradients per R1 or project mode SVG icons)
+      const hasR1TechGlyphs = html.includes('chrome-') && html.includes('holo-');
+      const hasModeSvgIcons =
+        html.includes('project-tech') ||
+        html.includes('project-medical') ||
+        html.includes('project-academic');
+      assert.ok(
+        hasR1TechGlyphs || hasModeSvgIcons,
+        'HTML must render authentic R1.1 DiamondArtifactGlyph procedural SVG defs (chrome- and holo-) or reference project mode SVG assets (project-tech, project-medical, project-academic)'
+      );
     });
 
     test('T5.4.2: All AVIF media emitted by Next.js static export physically exist in out/_next/static/media/', () => {

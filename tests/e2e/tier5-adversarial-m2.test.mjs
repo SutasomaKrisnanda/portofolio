@@ -64,7 +64,7 @@ describe('Tier 5: Adversarial Stress & Robustness Verification for Milestone 2',
   // Section 1: GLB Model Asset Mirroring, Hashing & Static Export Integrity
   // =========================================================================
   describe('GLB Model Asset Mirroring & Static Export Invariant', () => {
-    test('T5.2.1: Model files exist in src/assets/models/, public/models/, and out/models/ with byte-exact SHA-256 match', () => {
+    test('T5.2.1: Model files exist in public/models/ and out/models/ with byte-exact SHA-256 match', () => {
       const models = [
         {
           name: 'model-jantung.glb',
@@ -72,38 +72,32 @@ describe('Tier 5: Adversarial Stress & Robustness Verification for Milestone 2',
           expectedMaxBytes: 19_000_000
         },
         {
-          name: 'model-quill.glb',
-          expectedMinBytes: 90_000_000,
-          expectedMaxBytes: 91_000_000
+          name: 'model-pena.glb',
+          expectedMinBytes: 16_000_000,
+          expectedMaxBytes: 17_500_000
         }
       ];
 
       for (const model of models) {
-        const srcPath = path.resolve(PROJECT_ROOT, 'src/assets/models', model.name);
         const pubPath = path.resolve(PROJECT_ROOT, 'public/models', model.name);
         const outPath = path.resolve(PROJECT_ROOT, 'out/models', model.name);
 
-        assert.ok(fs.existsSync(srcPath), `Missing source model: ${srcPath}`);
         assert.ok(fs.existsSync(pubPath), `Missing public mirror: ${pubPath}`);
         assert.ok(fs.existsSync(outPath), `Missing exported output: ${outPath}`);
 
-        const srcStat = fs.statSync(srcPath);
         const pubStat = fs.statSync(pubPath);
         const outStat = fs.statSync(outPath);
 
         assert.ok(
-          srcStat.size >= model.expectedMinBytes && srcStat.size <= model.expectedMaxBytes,
-          `Source ${model.name} size out of bounds: ${srcStat.size}`
+          pubStat.size >= model.expectedMinBytes && pubStat.size <= model.expectedMaxBytes,
+          `Public ${model.name} size out of bounds: ${pubStat.size}`
         );
-        assert.strictEqual(pubStat.size, srcStat.size, `Public size mismatch for ${model.name}`);
-        assert.strictEqual(outStat.size, srcStat.size, `Out size mismatch for ${model.name}`);
+        assert.strictEqual(outStat.size, pubStat.size, `Out size mismatch for ${model.name}`);
 
-        const srcHash = sha256(srcPath);
         const pubHash = sha256(pubPath);
         const outHash = sha256(outPath);
 
-        assert.strictEqual(pubHash, srcHash, `Public hash differs from source for ${model.name}`);
-        assert.strictEqual(outHash, srcHash, `Out hash differs from source for ${model.name}`);
+        assert.strictEqual(outHash, pubHash, `Out hash differs from public for ${model.name}`);
       }
     });
 

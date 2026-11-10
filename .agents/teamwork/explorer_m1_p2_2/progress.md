@@ -1,0 +1,22 @@
+# Progress — Explorer M1-2
+
+- **Last visited**: 2026-11-08T00:23:00Z
+- **Current status**: Investigation complete. `analysis.md`, `handoff.md`, and `BRIEFING.md` completed. Sending completion message to parent.
+- **Completed steps**:
+  - Read DISPATCH.md, ORIGINAL_REQUEST.md, PROJECT.md
+  - Initialized BRIEFING.md and progress.md
+  - Investigated `src/components/achievements.tsx` and identified architectural issues
+  - Analyzed `src/data/achievements.json` category distribution across tech, medical, and academic modes
+  - Examined `globals.css` and identified missing `.no-scrollbar` utility definition
+  - Designed the dedicated filter row container decoupled from the header title
+  - Formulated mobile single-row horizontal scroll track with fade masks
+  - Designed desktop spacious wrapping layout with dynamic count badges
+  - Designed activeMode state synchronization (`selectedCategory` reset to 'All' + scroll reset)
+  - Designed empty category pruning algorithm with canonical ordering
+  - Added auto-scroll active pill into view on tap (`scrollIntoView`)
+  - Formulated complete, drop-in replacement code and verification steps
+  - Produced `analysis.md`
+  - Produced `handoff.md` (5-Component Handoff Protocol)
+  - Updated `BRIEFING.md`
+- **Next steps**:
+  - Send completion message to parent orchestrator (`296675c5-70ba-4b3d-9b05-cade43b440a6`)

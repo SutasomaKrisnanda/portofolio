@@ -64,3 +64,61 @@ Sender: fe2b4cf8-ea32-4c5f-8543-6f1a095f8df6
 Priority: MESSAGE_PRIORITY_HIGH
 
 Sentinel heartbeat nudge: progress.md has not been updated in >20 minutes (last visit: 13:43:00Z). Please report your current status, subagent health, and progress on Milestone 1 Iteration 2 gate verification.
+
+
+## 2026-11-07T23:50:05Z
+Sender: 4c587253-b466-42bd-8e98-09a2e8a408db
+Priority: MESSAGE_PRIORITY_HIGH
+
+Optimasi performa dan pembaruan UI/UX portofolio personal untuk GitHub Pages, mencakup pembuatan ulang model 3D hero-section versi ringan (Polyhedron, Helix DNA, Pena Bulu), peringkasan category pill pada galeri, penerapan sistem Smart Bento Grid yang adaptif di bagian Tentang Saya, serta penyesuaian icon proyek sesuai mode aktif.
+
+Integrity mode: development
+
+## Verification Resources
+- Build check: `npm run build`
+- Linter check: `npm run lint`
+- Browser runtime & visual check: Pengujian fungsionalitas dan responsivitas UI di browser (mobile & desktop) tanpa error konsol runtime.
+
+## Requirements
+
+### R1. Model 3D Hero-Section Ringan per Mode
+Buat ulang model 3D di hero-section dengan versi yang sangat sederhana dan ringan agar dapat dimuat dengan cepat dan berjalan lancar di GitHub Pages tanpa memberatkan performa rendering. Model yang ditampilkan harus sesuai dengan tema mode:
+- Tech mode: Polyhedron
+- Medical mode: Helix DNA
+- Academic mode: Pena Bulu
+Pendekatan implementasi teknis diserahkan kepada tim untuk memilih solusi teringan dan paling optimal.
+
+### R2. Peringkasan Category Pill Galeri
+Peringkas tampilan category pill pada galeri projek dan prestasi, terutama pada tampilan mobile agar tidak memakan terlalu banyak ruang vertikal dan tetap rapi, serta terapkan mekanisme yang serasi dan nyaman digunakan pada tampilan desktop. Desain dan interaksi spesifik diserahkan kepada tim untuk merancang solusi yang paling ringkas dan intuitif.
+
+### R3. Sistem Smart Bento Grid Adaptif pada Bagian Tentang Saya
+Kembangkan sistem Bento Grid Pintar yang dapat menyesuaikan tata letaknya secara adaptif pada bagian Tentang Saya. Sistem harus mencegah grid terlihat timpang sebelah saat konten riwayat (pengalaman organisasi, kepanitiaan, dan pendidikan formal) bertambah panjang. Mekanisme adaptif diserahkan kepada tim untuk menentukan pendekatan terbaik.
+
+### R4. Penyesuaian Logo Icon Proyek Berdasarkan Mode Aktif
+Ganti logo icon project pada galeri project menggunakan icon yang sudah ada sesuai dengan mode labelnya. Apabila suatu project memiliki lebih dari satu mode label, tampilkan icon yang sesuai dengan mode yang sedang aktif saat ini. Jika project tidak memiliki label mode aktif, tim dapat menerapkan penanganan fallback yang konsisten.
+
+## Acceptance Criteria
+
+### Model 3D Hero-Section
+- [ ] Hero-section menampilkan model 3D yang sangat ringan tanpa lag saat dimuat di GitHub Pages.
+- [ ] Mode Tech menampilkan model 3D Polyhedron.
+- [ ] Mode Medical menampilkan model 3D Helix DNA.
+- [ ] Mode Academic menampilkan model 3D Pena Bulu.
+- [ ] Transisi antar mode mengganti model 3D secara mulus dan konsisten.
+
+### Peringkasan Category Pill
+- [ ] Category pill pada galeri projek dan galeri prestasi di mobile tampil ringkas dan tidak memenuhi layar secara berlebihan.
+- [ ] Navigasi filter kategori di mobile maupun desktop tetap berfungsi normal untuk memfilter item galeri.
+
+### Smart Bento Grid
+- [ ] Bagian Tentang Saya menampilkan Bento Grid yang proporsional dan seimbang meskipun terdapat riwayat organisasi, kepanitiaan, atau pendidikan dengan jumlah item yang banyak/panjang.
+- [ ] Tata letak Bento Grid beradaptasi dengan baik di berbagai ukuran viewport (responsif di mobile, tablet, dan desktop).
+
+### Logo Icon Proyek
+- [ ] Setiap kartu project pada galeri menampilkan icon yang sesuai dengan mode labelnya.
+- [ ] Pada project dengan multiple mode label, icon yang ditampilkan berganti secara dinamis mengikuti mode yang sedang aktif.
+
+### Verifikasi & Integritas Kode
+- [ ] `npm run build` berhasil tanpa error kompilasi atau type error TypeScript.
+- [ ] `npm run lint` lolos tanpa error linting.
+- [ ] Tidak ada runtime console error saat navigasi filter, pergantian mode, dan interaksi komponen.

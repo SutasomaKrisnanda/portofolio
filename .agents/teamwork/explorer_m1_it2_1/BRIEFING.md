@@ -1,7 +1,7 @@
-# BRIEFING — 2026-11-05T13:22:45Z
+# BRIEFING — 2026-11-08T01:41:00Z
 
 ## Mission
-Design a 100% robust, cross-platform prebuild cleanup and build script for package.json to prevent Windows WSL cache corruption without external dependencies.
+Investigate patch-fs.js lines 39-50 and 640-680 to resolve the trace collection ENOENT crash on pages/_app.js.nft.json during npm run build, and deliver exact remediation diffs in analysis.md and handoff.md.
 
 ## 🔒 My Identity
 - Archetype: explorer
@@ -9,34 +9,44 @@ Design a 100% robust, cross-platform prebuild cleanup and build script for packa
 - Working directory: w:\home\krisnanda\Code\Project\Personal - github\portofolio\.agents\teamwork\explorer_m1_it2_1\
 - Original parent: 514f318a-382e-4a4c-bf5e-58e0d0eff1f1
 - Milestone: Milestone 1 Iteration 2
+- Milestone: Milestone 1 Iteration 2 (It2-1: Trace Collection ENOENT Fix)
 
 ## 🔒 Key Constraints
 - Read-only investigation — do NOT implement project source code directly
 - Zero external dependencies for cleanup (node standard library only)
 - Cross-platform compatibility across Windows PowerShell, CMD, and WSL/Linux
 - Provide exact file changes and instructions for the Worker in recommendations.md and handoff.md
+- Investigate patch-fs.js lines 39-50 and 640-680 to resolve trace collection ENOENT crash on pages/_app.js.nft.json
+- Provide exact code diff in analysis.md and deliver handoff.md
 
 ## Current Parent
-- Conversation ID: 514f318a-382e-4a4c-bf5e-58e0d0eff1f1
-- Updated: not yet
+- Conversation ID: 296675c5-70ba-4b3d-9b05-cade43b440a6
+- Updated: 2026-11-08T01:41:00Z
 
 ## Investigation State
 - **Explored paths**:
-  - `package.json`, `patch-fs.js`, `src/app/layout.tsx`, `src/app/`, `tests/e2e/runner.mjs`
-  - `GATE_STATUS.md`, `reviewer_m1_2/handoff.md`, `challenger_m1_2/handoff.md`, `ORIGINAL_REQUEST.md`, `PROJECT.md`
+  - `patch-fs.js` (lines 14–105, 305–400, 590–680, 690–716)
+  - `node_modules/next/dist/build/collect-build-traces.js` (lines 325–380)
+  - `node_modules/next/dist/build/entries.js` (lines 410–435, 765–788)
+  - `node_modules/next/dist/build/index.js` (lines 535–565, 880–950, 1510–1520, 2420–2430)
+  - `src/components/achievements.tsx` (line 140)
+  - `src/components/projects.tsx` (line 157)
+  - `tests/e2e/tier5-adversarial-m1.test.mjs`
 - **Key findings**:
-  - Incremental builds fail on Windows WSL 9P mount due to Webpack PackFileCache renaming collisions, truncated JSON manifests, and `.next/trace` EPERM locking.
-  - A clean build with `.next` and `out` removed completes in ~40s with exit code 0 and pristine static output.
-  - Windows PowerShell 5.1 rejects unquoted `&&` if run directly in the console; however, npm scripts are executed by `cmd.exe` on Windows, where `&&` is valid batch syntax.
-  - Creating a dedicated `scripts/clean.js` using Node.js built-ins (`fs.rmSync` with `maxRetries: 10`) avoids shell quotation bugs, provides directory-agnostic path resolution via `findProjectRoot()`, and works across PowerShell, CMD, and WSL bash.
-  - To fully resolve reviewer findings, `src/app/not-found.tsx` and `NEXT_TELEMETRY_DISABLED=1` in `patch-fs.js` should also be implemented.
-- **Unexplored areas**: None. All requirements for clean automation architecture are fully investigated and verified.
+  - `collect-build-traces.js` queries `.next/server/pages/_app.js.nft.json` because `entries.js` injects `pages/_app` into Webpack compilation entrypoints even in pure App Router projects.
+  - In `patch-fs.js`, `fs.promises.readFile` re-threw ENOENT on `.nft.json` files, causing Next.js build tracer to crash with exit code 1.
+  - `DEFAULT_PAGES_MANIFEST` in `patch-fs.js` contained dummy Pages router routes (`/_app: pages/_app.js`), falsely claiming Pages routes exist.
+  - A two-pronged fix is required: (1) Set `DEFAULT_PAGES_MANIFEST = '{}'`, and (2) Intercept `isNftJsonPath(p)` across `fs.promises.readFile`, `fs.readFileSync`, `fs.readFile`, `fs.promises.open`, `fs.openSync`, `fs.open`, and `process.on('uncaughtException')`, returning `{ version: 1, files: [] }` and creating missing directories/files on disk.
+  - For Reviewer Finding 2, `src/components/achievements.tsx:140` must update `shrink-0` to `shrink-0 sm:shrink` to match `projects.tsx:157`.
+- **Unexplored areas**: None. Full evidence chain and exact diffs established.
 
 ## Key Decisions Made
-- Chose Option B (`scripts/clean.js`) with npm lifecycle hook `"prebuild"` and chained invocation in `"build"` for 100% shell resilience and zero external dependencies.
-- Added complementary recommendations for `src/app/not-found.tsx` and `process.env.NEXT_TELEMETRY_DISABLED = '1'` to ensure full pass of reviewer and challenger criteria.
+- Implemented defense-in-depth architecture covering both manifest consistency (`DEFAULT_PAGES_MANIFEST = '{}'`) and filesystem trace resilience (`isNftJsonPath` handler returning `{ version: 1, files: [] }`).
+- Provided unified diff and machine-applicable `remediation.patch` for the Worker.
 
 ## Artifact Index
-- `recommendations.md` — Complete architectural analysis, code diffs, and step-by-step instructions for Worker.
-- `handoff.md` — 5-component handoff report for Orchestrator and Worker.
-- `proposed_clean.js` — Reference implementation of `scripts/clean.js`.
+- `analysis.md` — Detailed forensic analysis, code traces, and architecture specification.
+- `remediation.patch` — Unified diff patch for `patch-fs.js` and `src/components/achievements.tsx`.
+- `handoff.md` — 5-component handoff report.
+- `progress.md` — Liveness heartbeat.
+- `DISPATCH.md` — Dispatch message history.
