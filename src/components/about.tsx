@@ -69,19 +69,17 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
   return (
     <section
       id="about"
-      className={`relative w-full ${
-        scrollMode === 'snap'
-          ? 'h-[100dvh] min-h-[100dvh] max-h-[100dvh] snap-start snap-always overflow-hidden pt-20 sm:pt-24 pb-4 px-4 sm:px-8 lg:px-12 flex flex-col'
-          : 'py-20 sm:py-24 lg:py-28 px-4 sm:px-8 lg:px-12'
-      } text-slate-900 dark:text-white scroll-mt-0`}
+      className={`relative w-full ${scrollMode === 'snap'
+        ? 'h-[100dvh] min-h-[100dvh] max-h-[100dvh] snap-start snap-always overflow-hidden pt-20 sm:pt-24 pb-4 px-4 sm:px-8 lg:px-12 flex flex-col'
+        : 'py-20 sm:py-24 lg:py-28 px-4 sm:px-8 lg:px-12'
+        } text-slate-900 dark:text-white scroll-mt-0`}
     >
       <div
         data-section-scroll
-        className={`relative z-10 max-w-7xl w-full mx-auto flex flex-col ${
-          scrollMode === 'snap'
-            ? 'flex-1 h-full min-h-0 overflow-y-auto overscroll-contain pr-1.5 custom-scrollbar space-y-6'
-            : 'space-y-8'
-        }`}
+        className={`relative z-10 max-w-7xl w-full mx-auto flex flex-col ${scrollMode === 'snap'
+          ? 'flex-1 h-full min-h-0 overflow-y-auto overscroll-contain pr-1.5 custom-scrollbar space-y-6'
+          : 'space-y-8'
+          }`}
       >
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-900/5 dark:border-white/10 pb-5">
@@ -89,7 +87,7 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
             <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
               <span>03</span>
               <span className="w-6 h-[1px] bg-slate-900/20 dark:bg-white/30" />
-              <span>Identitas, Rekam Jejak & Sistem Bento Pintar</span>
+              <span>Identitas & Rekam Jejak</span>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-normal tracking-wide uppercase text-slate-950 dark:text-white">
               Tentang Saya & Rekam Jejak
@@ -230,7 +228,7 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-950 dark:text-white">
             <Layers className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-            <span>Sistem Bento Pintar — Rekam Jejak Adaptif</span>
+            <span>Rekam Jejak</span>
           </div>
 
           {/* Adaptive Category Filter Pills */}
@@ -238,11 +236,10 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
             <button
               type="button"
               onClick={() => setSelectedTimelineCategory('all')}
-              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
-                selectedTimelineCategory === 'all'
-                  ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
-              }`}
+              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${selectedTimelineCategory === 'all'
+                ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
+                }`}
             >
               <span>Semua</span>
               <span className="text-[10px] font-mono opacity-70">
@@ -252,11 +249,10 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
             <button
               type="button"
               onClick={() => setSelectedTimelineCategory('experience')}
-              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
-                selectedTimelineCategory === 'experience'
-                  ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
-              }`}
+              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${selectedTimelineCategory === 'experience'
+                ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
+                }`}
             >
               <span>Organisasi</span>
               <span className="text-[10px] font-mono opacity-70">{filteredExperience.length}</span>
@@ -264,11 +260,10 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
             <button
               type="button"
               onClick={() => setSelectedTimelineCategory('committees')}
-              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
-                selectedTimelineCategory === 'committees'
-                  ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
-              }`}
+              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${selectedTimelineCategory === 'committees'
+                ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
+                }`}
             >
               <span>Kepanitiaan</span>
               <span className="text-[10px] font-mono opacity-70">{filteredCommittees.length}</span>
@@ -276,11 +271,10 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
             <button
               type="button"
               onClick={() => setSelectedTimelineCategory('education')}
-              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
-                selectedTimelineCategory === 'education'
-                  ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
-              }`}
+              className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${selectedTimelineCategory === 'education'
+                ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-normal'
+                }`}
             >
               <span>Pendidikan</span>
               <span className="text-[10px] font-mono opacity-70">{PORTFOLIO_EDUCATION.length}</span>
@@ -321,9 +315,8 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
           {/* Organizational Experience Block */}
           {(selectedTimelineCategory === 'all' || selectedTimelineCategory === 'experience') && (
             <div
-              className={`${
-                selectedTimelineCategory === 'experience' ? 'lg:col-span-12' : 'lg:col-span-6'
-              } rounded-2xl bg-white/85 dark:bg-slate-900/60 backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10 p-6 sm:p-7 space-y-4 shadow-sm flex flex-col justify-between`}
+              className={`${selectedTimelineCategory === 'experience' ? 'lg:col-span-12' : 'lg:col-span-6'
+                } rounded-2xl bg-white/85 dark:bg-slate-900/60 backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10 p-6 sm:p-7 space-y-4 shadow-sm flex flex-col justify-between`}
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-3">
@@ -378,9 +371,8 @@ export default function About({ modeConfig, activeMode, scrollMode = 'normal' }:
           {/* Committees & Event Roles Block */}
           {(selectedTimelineCategory === 'all' || selectedTimelineCategory === 'committees') && filteredCommittees.length > 0 && (
             <div
-              className={`${
-                selectedTimelineCategory === 'committees' ? 'lg:col-span-12' : 'lg:col-span-6'
-              } rounded-2xl bg-white/85 dark:bg-slate-900/60 backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10 p-6 sm:p-7 space-y-4 shadow-sm flex flex-col justify-between`}
+              className={`${selectedTimelineCategory === 'committees' ? 'lg:col-span-12' : 'lg:col-span-6'
+                } rounded-2xl bg-white/85 dark:bg-slate-900/60 backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10 p-6 sm:p-7 space-y-4 shadow-sm flex flex-col justify-between`}
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-3">
