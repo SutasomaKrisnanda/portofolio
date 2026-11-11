@@ -550,7 +550,7 @@ export const Hero3DScene: React.FC<Hero3DSceneProps> = ({
 
           const loadCandidate = (index: number) => {
             if (index >= candidates.length) {
-              console.warn(`All candidate URLs failed for ${modelFileName}, falling back to procedural model`);
+              console.warn(`All candidate URLs failed for ${rawAssetPath}, falling back to procedural model`);
               if (activeRequestIdRef.current !== requestId) return;
               const fallbackData =
                 targetMode === 'medical' ? createMedicalDNA() : createAcademicQuill();

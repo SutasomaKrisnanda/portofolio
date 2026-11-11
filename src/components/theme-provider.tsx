@@ -31,7 +31,6 @@ export function ThemeProvider({
   defaultTheme = 'system',
   storageKey = 'ui-theme',
   enableSystem = true,
-  attribute = "class",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
