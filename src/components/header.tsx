@@ -71,19 +71,19 @@ export default function Header({
     {
       id: 'tech' as ModeId,
       code: '01',
-      label: 'Tech & Engineering',
+      label: 'Tech',
       dotHex: '#0284c7'
     },
     {
       id: 'medical' as ModeId,
       code: '02',
-      label: 'Medical & Health',
+      label: 'Medical',
       dotHex: '#9333ea'
     },
     {
       id: 'academic' as ModeId,
       code: '03',
-      label: 'Academic & Writing',
+      label: 'Academic',
       dotHex: '#e11d48'
     }
   ];
@@ -120,11 +120,10 @@ export default function Header({
                   key={item.id}
                   type="button"
                   onClick={() => onNavigateSection(item.id)}
-                  className={`relative py-1 transition-all cursor-pointer ${
-                    isActive
+                  className={`relative py-1 transition-all cursor-pointer ${isActive
                       ? 'text-slate-950 dark:text-white font-semibold'
                       : 'text-slate-500 dark:text-white/60 hover:text-slate-900 dark:hover:text-white font-normal'
-                  }`}
+                    }`}
                 >
                   <span>{item.label}</span>
                   {isActive && (
@@ -155,11 +154,10 @@ export default function Header({
                     aria-selected={isSelected}
                     type="button"
                     onClick={() => onSwitchMode(tab.id)}
-                    className={`px-3 py-1.5 rounded-full text-[11px] tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
-                      isSelected
+                    className={`px-3 py-1.5 rounded-full text-[11px] tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${isSelected
                         ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 font-semibold shadow-md scale-105'
                         : 'text-slate-600 dark:text-white/70 hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 font-normal'
-                    }`}
+                      }`}
                   >
                     <span
                       className="w-2 h-2 rounded-full"
@@ -201,42 +199,44 @@ export default function Header({
 
         {/* Hidden Navbar / Preference & Customization Drawer */}
         {menuOpen && (
-          <div className="pointer-events-auto rounded-3xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl ring-1 ring-slate-900/10 dark:ring-white/15 p-5 sm:p-6 shadow-2xl space-y-5 animate-in slide-in-from-top-4 duration-200 text-slate-900 dark:text-white max-w-4xl mx-auto w-full">
+          <div className="pointer-events-auto rounded-3xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl ring-1 ring-slate-900/10 dark:ring-white/15 p-4 sm:p-6 shadow-2xl space-y-3.5 sm:space-y-5 animate-in slide-in-from-top-4 duration-200 text-slate-900 dark:text-white max-w-4xl mx-auto w-full max-h-[85vh] sm:max-h-none overflow-y-auto">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-slate-900/5 dark:border-white/10 pb-3.5">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/10">
-                  <SlidersHorizontal className="w-4 h-4 text-slate-900 dark:text-white" />
+            <div className="flex items-center justify-between border-b border-slate-900/5 dark:border-white/10 pb-2.5 sm:pb-3.5">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-white/10">
+                  <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900 dark:text-white" />
                 </div>
                 <div>
                   <h3 className="text-xs sm:text-sm font-semibold text-slate-950 dark:text-white">
-                    Pusat Preferensi & Navigasi Tersembunyi
+                    <span className="sm:hidden">Preferensi & Mode</span>
+                    <span className="hidden sm:inline">Pusat Preferensi & Navigasi Tersembunyi</span>
                   </h3>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:block">
                     Sesuaikan pengalaman interaksi dan alur jelajah portofolio
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <ThemeToggle />
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
                   aria-label="Tutup panel preferensi"
-                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-950 dark:text-white cursor-pointer transition-colors"
+                  className="p-1.5 sm:p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-950 dark:text-white cursor-pointer transition-colors"
                 >
-                  <CloseCrossGlyph className="w-4 h-4" />
+                  <CloseCrossGlyph className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
             </div>
 
             {/* Section 1: Scroll Mode Preference (Normal vs Snap) with FAQ Tooltip */}
-            <div className="rounded-2xl p-4 bg-slate-50/80 dark:bg-white/[0.04] ring-1 ring-slate-900/5 dark:ring-white/10 space-y-3">
+            <div className="rounded-2xl p-3 sm:p-4 bg-slate-50/80 dark:bg-white/[0.04] ring-1 ring-slate-900/5 dark:ring-white/10 space-y-2 sm:space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300" />
                   <span className="text-xs font-semibold text-slate-950 dark:text-white">
-                    Mode Pengguliran Halaman (Scroll Experience)
+                    <span className="sm:hidden">Mode Gulir</span>
+                    <span className="hidden sm:inline">Mode Pengguliran Halaman (Scroll Experience)</span>
                   </span>
 
                   {/* FAQ Info Button with Hover & Touch Support */}
@@ -290,10 +290,10 @@ export default function Header({
                           </button>
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                          <strong>Normal:</strong> Pengguliran mengalir bebas alami tanpa kuncian snap.
+                          <strong>Bebas:</strong> Pengguliran mengalir bebas alami tanpa kuncian snap.
                         </p>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                          <strong>Snap:</strong> Bergulir 1 section penuh per guliran layar, dengan scroll mandiri di dalam konten tiap section.
+                          <strong>Snap:</strong> Bergulir 1 section penuh per guliran layar, dengan scroll mandiri di dalam tiap section.
                         </p>
                       </div>
                     )}
@@ -301,26 +301,54 @@ export default function Header({
                 </div>
 
                 <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-semibold">
-                  Aktif: {scrollMode === 'snap' ? 'Snap' : 'Normal'}
+                  Aktif: {scrollMode === 'snap' ? 'Snap' : 'Bebas'}
                 </span>
               </div>
 
-              {/* Segmented Switch Buttons */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              {/* Mobile View: Compact Segmented Pill Bar (Minimalist & streamlined) */}
+              <div className="sm:hidden grid grid-cols-2 p-1 bg-slate-200/70 dark:bg-white/10 rounded-xl gap-1">
                 <button
                   type="button"
                   onClick={() => onToggleScrollMode?.('normal')}
-                  className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     scrollMode === 'normal'
+                      ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white'
+                  }`}
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>Bebas</span>
+                  {scrollMode === 'normal' && <Check className="w-3 h-3" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleScrollMode?.('snap')}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    scrollMode === 'snap'
+                      ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Snap</span>
+                  {scrollMode === 'snap' && <Check className="w-3 h-3" />}
+                </button>
+              </div>
+
+              {/* Desktop View: Full descriptive cards */}
+              <div className="hidden sm:grid sm:grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => onToggleScrollMode?.('normal')}
+                  className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${scrollMode === 'normal'
                       ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-md scale-[1.01]'
                       : 'bg-white dark:bg-white/[0.05] border-slate-900/10 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold">Normal (Bebas)</span>
-                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                      scrollMode === 'normal' ? 'bg-white/20 text-white dark:bg-slate-950/20 dark:text-slate-950' : 'bg-slate-200/70 dark:bg-white/10 text-slate-600 dark:text-slate-400'
-                    }`}>
+                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded ${scrollMode === 'normal' ? 'bg-white/20 text-white dark:bg-slate-950/20 dark:text-slate-950' : 'bg-slate-200/70 dark:bg-white/10 text-slate-600 dark:text-slate-400'
+                      }`}>
                       Default
                     </span>
                   </div>
@@ -332,11 +360,10 @@ export default function Header({
                 <button
                   type="button"
                   onClick={() => onToggleScrollMode?.('snap')}
-                  className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
-                    scrollMode === 'snap'
+                  className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${scrollMode === 'snap'
                       ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-md scale-[1.01]'
                       : 'bg-white dark:bg-white/[0.05] border-slate-900/10 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold">Snap (Per Section)</span>
@@ -350,12 +377,12 @@ export default function Header({
             </div>
 
             {/* Section 2: Mode Portofolio Switcher */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-950 dark:text-white">
-                <Sparkles className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-950 dark:text-white">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300" />
                 <span>Pilihan Mode Portofolio</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 {modePills.map((m) => (
                   <button
                     key={m.id}
@@ -363,34 +390,36 @@ export default function Header({
                     onClick={() => {
                       onSwitchMode(m.id);
                     }}
-                    className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
-                      activeMode === m.id
+                    className={`p-2 sm:p-3 rounded-xl text-left transition-all cursor-pointer border ${activeMode === m.id
                         ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white font-semibold shadow-md scale-[1.01]'
                         : 'bg-slate-100/70 dark:bg-white/[0.06] border-slate-900/5 dark:border-white/10 hover:bg-slate-200/70 dark:hover:bg-white/15 text-slate-800 dark:text-white'
-                    }`}
+                      }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <span
-                        className="w-2.5 h-2.5 rounded-full"
+                        className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full"
                         style={{ backgroundColor: m.dotHex }}
                       />
-                      <span className="text-[10px] tracking-widest uppercase opacity-75 font-mono">
-                        MODE {m.code}
+                      <span className="text-[9px] sm:text-[10px] tracking-widest uppercase opacity-75 font-mono">
+                        {m.code}
                       </span>
                     </div>
-                    <div className="text-xs font-semibold mt-1">{m.label}</div>
+                    <div className="text-[11px] sm:text-xs font-semibold mt-0.5 sm:mt-1 truncate">{m.label}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Section 3: Section Jump Grid */}
-            <div className="space-y-2 pt-2 border-t border-slate-900/5 dark:border-white/10">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-950 dark:text-white">
-                <Compass className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                <span>Lompat Langsung ke Section Layar Penuh</span>
+            <div className="space-y-1.5 sm:space-y-2 pt-2 border-t border-slate-900/5 dark:border-white/10">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-950 dark:text-white">
+                <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 dark:text-slate-300" />
+                <span>
+                  <span className="sm:hidden">Lompat ke Section</span>
+                  <span className="hidden sm:inline">Lompat Langsung ke Section Layar Penuh</span>
+                </span>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
                 {navLinks.map((sec, idx) => {
                   const isCurrent = activeSection === sec.id;
                   return (
@@ -401,14 +430,13 @@ export default function Header({
                         onNavigateSection(sec.id);
                         setMenuOpen(false);
                       }}
-                      className={`px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer border ${
-                        isCurrent
+                      className={`px-2 py-1.5 sm:px-3 sm:py-2.5 rounded-xl text-left transition-all cursor-pointer border ${isCurrent
                           ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 border-slate-950 dark:border-white shadow-sm font-semibold'
                           : 'bg-slate-100/70 dark:bg-white/[0.06] border-slate-900/5 dark:border-white/10 hover:bg-slate-200/70 dark:hover:bg-white/15 text-slate-800 dark:text-white'
-                      }`}
+                        }`}
                     >
-                      <span className="block text-[9px] font-mono opacity-75">0{idx + 1}</span>
-                      <span className="block text-xs font-semibold truncate">{sec.label}</span>
+                      <span className="block text-[8px] sm:text-[9px] font-mono opacity-75">0{idx + 1}</span>
+                      <span className="block text-[10px] sm:text-xs font-semibold truncate">{sec.label}</span>
                     </button>
                   );
                 })}
